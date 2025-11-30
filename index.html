@@ -7,7 +7,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Coins mining</title>
     
+    <!-- Zone 1 Script -->
     <script src='//libtl.com/sdk.js' data-zone='9972147' data-sdk='show_9972147'></script>
+    
+    <!-- Zone 2 Script (New) -->
+    <script src='//libtl.com/sdk.js' data-zone='9966888' data-sdk='show_9966888'></script>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -112,7 +116,40 @@
                     <button id="home-withdraw-btn" class="bg-white text-black font-semibold px-6 py-2 rounded-lg">Withdraw</button>
                 </div>
                 <section>
-                    <div class="flex justify-between items-center">
+                    <div class="flex justify-between items-center mb-3">
+                        <div>
+                            <h2 class="text-lg font-semibold">Special Tasks</h2>
+                            <p class="text-sm text-gray-400">High reward tasks</p>
+                        </div>
+                    </div>
+                    <div class="space-y-3">
+                        
+                        <!-- Zone 1: 40 Coins / 2 Hours -->
+                        <div class="bg-blue-600 p-3 rounded-lg flex items-center justify-between text-white">
+                            <div class="flex items-center space-x-3">
+                                <span class="text-3xl">💎</span>
+                                <div>
+                                    <h3 class="font-bold">Gold Task (+40)</h3>
+                                    <p class="text-xs font-medium" id="zone1-status">Limit: 10/2 Hours</p>
+                                </div>
+                            </div>
+                            <button id="zone1-btn" class="bg-white text-blue-600 font-bold px-4 py-2 rounded-lg text-sm btn">Watch</button>
+                        </div>
+
+                        <!-- Zone 2: 44 Coins / 3 Hours -->
+                        <div class="bg-purple-600 p-3 rounded-lg flex items-center justify-between text-white">
+                            <div class="flex items-center space-x-3">
+                                <span class="text-3xl">👑</span>
+                                <div>
+                                    <h3 class="font-bold">Diamond Task (+44)</h3>
+                                    <p class="text-xs font-medium" id="zone2-status">Limit: 10/3 Hours</p>
+                                </div>
+                            </div>
+                            <button id="zone2-btn" class="bg-white text-purple-600 font-bold px-4 py-2 rounded-lg text-sm btn">Watch</button>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-between items-center mt-6">
                         <div>
                             <h2 class="text-lg font-semibold">Daily Tasks</h2>
                             <p class="text-sm text-gray-400 mb-4">Complete tasks to get rewards.</p>
@@ -124,8 +161,6 @@
                             <div class="flex items-center space-x-3"><span class="text-3xl">🤩</span><div><h3 class="font-bold">Watch Short Ad</h3><p class="text-xs font-medium">Rewarded Interstitial</p></div></div>
                             <button class="bg-white text-orange-500 font-bold px-6 py-2 rounded-lg text-sm btn" onclick="claimReward('interstitial')">Claim</button>
                         </div>
-                        
-                        <!-- "Click for Reward" task REMOVED from here -->
                         
                          <div class="card-bg p-3 rounded-lg flex items-center justify-between">
                            <div class="flex items-center space-x-3"><span class="text-3xl">⛏️</span><div><h3 class="font-semibold">Play Mining</h3><p class="text-xs text-gray-400">Offline mining for 1 hour!</p></div></div>
@@ -260,9 +295,21 @@
         let userData = null;
         let appConfig = {};
         let miningInterval = null;
+        let zoneTimerInterval = null;
+
         const MINING_ADS_REQUIRED = 20;
         const MINING_DURATION_MS = 3600 * 1000;
         const MINING_REWARD = 1800; 
+        
+        // --- CONSTANTS FOR NEW ADS ---
+        const ZONE1_LIMIT = 10;
+        const ZONE1_COOLDOWN_MS = 2 * 60 * 60 * 1000; // 2 Hours
+        const ZONE1_REWARD = 40;
+        
+        const ZONE2_LIMIT = 10;
+        const ZONE2_COOLDOWN_MS = 3 * 60 * 60 * 1000; // 3 Hours
+        const ZONE2_REWARD = 44;
+
 
         const loader = document.getElementById('loader');
         const coinBalanceEl = document.getElementById('coin-balance');
@@ -277,6 +324,12 @@
         const adsLeftCountEl = document.getElementById('ads-left-count');
         const paymentDetailsContainer = document.getElementById('payment-details-container');
         const miningBtn = document.getElementById('mining-btn');
+        
+        // Elements for new zones
+        const zone1Btn = document.getElementById('zone1-btn');
+        const zone2Btn = document.getElementById('zone2-btn');
+        const zone1Status = document.getElementById('zone1-status');
+        const zone2Status = document.getElementById('zone2-status');
 
         window.onload = () => {
             lucide.createIcons();
@@ -304,10 +357,15 @@
                 showMainPage('app-container');
                 navigateTo('home-page');
                 loader.style.display = 'none';
+                
+                // Start tracking timers for buttons
+                if(zoneTimerInterval) clearInterval(zoneTimerInterval);
+                zoneTimerInterval = setInterval(updateZoneButtons, 1000);
             } else {
                 currentUser = null;
                 userData = null;
                 showMainPage('auth-section');
+                if(zoneTimerInterval) clearInterval(zoneTimerInterval);
             }
         }
 
@@ -318,6 +376,23 @@
                 const userSnap = await getDoc(userRef);
                 if (userSnap.exists()) {
                     userData = userSnap.data();
+                    
+                    // --- INITIALIZE NEW FIELDS IF MISSING ---
+                    let needsUpdate = false;
+                    if (typeof userData.adZone1Count === 'undefined') { userData.adZone1Count = 0; needsUpdate = true; }
+                    if (typeof userData.adZone1Cooldown === 'undefined') { userData.adZone1Cooldown = null; needsUpdate = true; }
+                    if (typeof userData.adZone2Count === 'undefined') { userData.adZone2Count = 0; needsUpdate = true; }
+                    if (typeof userData.adZone2Cooldown === 'undefined') { userData.adZone2Cooldown = null; needsUpdate = true; }
+
+                    if(needsUpdate) {
+                        await updateDoc(userRef, {
+                            adZone1Count: userData.adZone1Count,
+                            adZone1Cooldown: userData.adZone1Cooldown,
+                            adZone2Count: userData.adZone2Count,
+                            adZone2Cooldown: userData.adZone2Cooldown
+                        });
+                    }
+                    
                 } else {
                     const ownReferralCode = Math.random().toString(36).substring(2, 8).toUpperCase();
                     const defaultUserData = {
@@ -328,7 +403,12 @@
                         dailyAdCount: 0, lastAdWatchDate: new Date().toISOString().split('T')[0], isBlocked: false,
                         miningAdsWatched: 0,
                         miningSessionStartTime: null,
-                        isMiningActive: false
+                        isMiningActive: false,
+                        // NEW FIELDS
+                        adZone1Count: 0,
+                        adZone1Cooldown: null,
+                        adZone2Count: 0,
+                        adZone2Cooldown: null
                     };
                     await setDoc(userRef, defaultUserData);
                     userData = defaultUserData;
@@ -369,6 +449,7 @@
             updateDynamicPaymentFields();
             updateAdsLeftCount();
             updateMiningButtonUI();
+            updateZoneButtons(); // New function
         }
         
         function updateAdsLeftCount() {
@@ -379,6 +460,156 @@
             const adsLeft = Math.max(0, (appConfig.dailyAdLimit || 10) - userData.dailyAdCount);
             adsLeftCountEl.textContent = adsLeft;
         }
+        
+        // --- NEW ZONE LOGIC AND UI UPDATE ---
+        
+        function formatTime(ms) {
+            if(ms < 0) return "00:00:00";
+            const seconds = Math.floor((ms / 1000) % 60);
+            const minutes = Math.floor((ms / (1000 * 60)) % 60);
+            const hours = Math.floor((ms / (1000 * 60 * 60)));
+            return `${hours}h ${minutes}m ${seconds}s`;
+        }
+
+        function updateZoneButtons() {
+            if(!userData) return;
+            const now = Date.now();
+
+            // ZONE 1 LOGIC
+            let zone1ResetTime = userData.adZone1Cooldown ? userData.adZone1Cooldown.toDate().getTime() : 0;
+            if (zone1ResetTime > 0 && now > zone1ResetTime) {
+                // Cooldown passed
+                userData.adZone1Count = 0;
+                userData.adZone1Cooldown = null;
+                // We will update DB next time user clicks, or silently in background if needed
+                // For UI speed, we update local state
+            }
+            
+            if (userData.adZone1Count >= ZONE1_LIMIT && zone1ResetTime > now) {
+                zone1Btn.disabled = true;
+                zone1Btn.classList.add('opacity-50', 'cursor-not-allowed');
+                zone1Btn.textContent = formatTime(zone1ResetTime - now);
+                zone1Status.textContent = "Cooldown Active";
+            } else {
+                zone1Btn.disabled = false;
+                zone1Btn.classList.remove('opacity-50', 'cursor-not-allowed');
+                zone1Btn.textContent = "Watch";
+                zone1Status.textContent = `Completed: ${userData.adZone1Count}/${ZONE1_LIMIT}`;
+            }
+
+            // ZONE 2 LOGIC
+            let zone2ResetTime = userData.adZone2Cooldown ? userData.adZone2Cooldown.toDate().getTime() : 0;
+            if (zone2ResetTime > 0 && now > zone2ResetTime) {
+                userData.adZone2Count = 0;
+                userData.adZone2Cooldown = null;
+            }
+
+            if (userData.adZone2Count >= ZONE2_LIMIT && zone2ResetTime > now) {
+                zone2Btn.disabled = true;
+                zone2Btn.classList.add('opacity-50', 'cursor-not-allowed');
+                zone2Btn.textContent = formatTime(zone2ResetTime - now);
+                zone2Status.textContent = "Cooldown Active";
+            } else {
+                zone2Btn.disabled = false;
+                zone2Btn.classList.remove('opacity-50', 'cursor-not-allowed');
+                zone2Btn.textContent = "Watch";
+                zone2Status.textContent = `Completed: ${userData.adZone2Count}/${ZONE2_LIMIT}`;
+            }
+        }
+        
+        async function handleZone1Ad() {
+             // Reset check
+             const now = Date.now();
+             let zone1ResetTime = userData.adZone1Cooldown ? userData.adZone1Cooldown.toDate().getTime() : 0;
+             if (zone1ResetTime > 0 && now > zone1ResetTime) {
+                const userRef = doc(db, "users", currentUser.uid);
+                await updateDoc(userRef, { adZone1Count: 0, adZone1Cooldown: null });
+                userData.adZone1Count = 0;
+                userData.adZone1Cooldown = null;
+             }
+             
+             if (userData.adZone1Count >= ZONE1_LIMIT) {
+                 return showAlert("Limit reached. Please wait for cooldown.");
+             }
+
+             if (typeof window.show_9972147 !== 'function') return showAlert("Ad load fail.");
+             
+             zone1Btn.disabled = true;
+             
+             window.show_9972147('pop').then(async () => {
+                 const userRef = doc(db, "users", currentUser.uid);
+                 let newCount = (userData.adZone1Count || 0) + 1;
+                 let updates = {
+                     balance: (userData.balance || 0) + ZONE1_REWARD,
+                     adZone1Count: newCount
+                 };
+                 
+                 // If limit hit, set cooldown
+                 if(newCount >= ZONE1_LIMIT) {
+                     const cooldownTime = new Date(Date.now() + ZONE1_COOLDOWN_MS);
+                     updates.adZone1Cooldown = cooldownTime;
+                     userData.adZone1Cooldown = { toDate: () => cooldownTime }; // Mock for local usage
+                 }
+                 
+                 await updateDoc(userRef, updates);
+                 userData.balance += ZONE1_REWARD;
+                 userData.adZone1Count = newCount;
+                 
+                 updateUI();
+                 showAlert(`Success! +${ZONE1_REWARD} Coins.`);
+             }).catch(e => {
+                 console.error(e);
+                 showAlert("Ad watch failed or closed early.");
+                 zone1Btn.disabled = false;
+             });
+        }
+
+        async function handleZone2Ad() {
+             // Reset check
+             const now = Date.now();
+             let zone2ResetTime = userData.adZone2Cooldown ? userData.adZone2Cooldown.toDate().getTime() : 0;
+             if (zone2ResetTime > 0 && now > zone2ResetTime) {
+                const userRef = doc(db, "users", currentUser.uid);
+                await updateDoc(userRef, { adZone2Count: 0, adZone2Cooldown: null });
+                userData.adZone2Count = 0;
+                userData.adZone2Cooldown = null;
+             }
+             
+             if (userData.adZone2Count >= ZONE2_LIMIT) {
+                 return showAlert("Limit reached. Please wait for cooldown.");
+             }
+
+             if (typeof window.show_9966888 !== 'function') return showAlert("Ad load fail.");
+             
+             zone2Btn.disabled = true;
+             
+             window.show_9966888('pop').then(async () => {
+                 const userRef = doc(db, "users", currentUser.uid);
+                 let newCount = (userData.adZone2Count || 0) + 1;
+                 let updates = {
+                     balance: (userData.balance || 0) + ZONE2_REWARD,
+                     adZone2Count: newCount
+                 };
+                 
+                 if(newCount >= ZONE2_LIMIT) {
+                     const cooldownTime = new Date(Date.now() + ZONE2_COOLDOWN_MS);
+                     updates.adZone2Cooldown = cooldownTime;
+                     userData.adZone2Cooldown = { toDate: () => cooldownTime };
+                 }
+                 
+                 await updateDoc(userRef, updates);
+                 userData.balance += ZONE2_REWARD;
+                 userData.adZone2Count = newCount;
+                 
+                 updateUI();
+                 showAlert(`Success! +${ZONE2_REWARD} Coins.`);
+             }).catch(e => {
+                 console.error(e);
+                 showAlert("Ad watch failed or closed early.");
+                 zone2Btn.disabled = false;
+             });
+        }
+
 
         function updateDynamicPaymentFields() {
             const selectedMethod = withdrawMethodSelect.value.toLowerCase();
@@ -436,6 +667,10 @@
             document.getElementById('apply-referral-btn').addEventListener('click', handleApplyReferralCode);
             withdrawMethodSelect.addEventListener('change', updateDynamicPaymentFields);
             miningBtn.addEventListener('click', handleMiningButtonClick);
+            
+            // New Zone Listeners
+            zone1Btn.addEventListener('click', handleZone1Ad);
+            zone2Btn.addEventListener('click', handleZone2Ad);
         }
         
         async function handleSignup() {
