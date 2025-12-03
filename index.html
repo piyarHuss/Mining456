@@ -29,7 +29,6 @@
         .btn-outline-accent:hover { background-color: #ff8c00; color: #121212; }
         .input-field { background-color: #2c2c2c; border: 1px solid #444; }
         
-        /* Default state: auth section visible to prevent blank screen if JS fails */
         .main-page { display: none; }
         .main-page.active { display: flex; animation: fadeIn 0.5s ease-in-out; }
         
@@ -42,7 +41,6 @@
         }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         
-        /* Mining Page Styles */
         #mining-page { text-align: center; }
         #mining-page h2 { 
             color: #FFD700; padding: 15px; font-size: 28px;
@@ -66,16 +64,14 @@
             text-shadow: 0 0 10px rgba(255,215,0,0.7);
         }
         
-        /* Conversion Styles */
         .convert-section { cursor: pointer; transition: background 0.2s; }
         .convert-section:active { opacity: 0.7; }
         .shine-anim { animation: shine 2s infinite; }
         @keyframes shine { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
 
-        /* FIXED EGG PAGE STYLES - NOW FITS IN LAYOUT */
+        /* FIXED EGG PAGE STYLES */
         #egg-page {
-            /* No longer fixed full screen. It fits inside main. */
-            height: calc(100vh - 140px); /* Height minus Header and Footer */
+            height: calc(100vh - 140px);
             width: 100%;
             background: #000;
             overflow: hidden;
@@ -86,7 +82,6 @@
 </head>
 <body class="max-w-md mx-auto h-screen flex flex-col overflow-hidden">
 
-    <!-- App Loader -->
     <div id="loader" class="hidden fixed inset-0 dark-bg bg-opacity-75 flex items-center justify-center z-50">
         <div class="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-accent"></div>
     </div>
@@ -187,9 +182,8 @@
                 </section>
             </div>
 
-            <!-- EGG PAGE (Now Integrated Properly) -->
+            <!-- EGG PAGE (Integrated via IFrame) -->
             <div id="egg-page" class="sub-page">
-                <!-- IFrame Loads Here, Navigation stays visible below -->
                 <iframe id="egg-frame" style="width: 100%; height: 100%; border: none;"></iframe>
             </div>
 
@@ -306,7 +300,7 @@
         #app-background { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background-size: cover; background-position: center; filter: brightness(0.4); }
         .game-container { width: 100%; max-width: 480px; height: 100%; display: flex; flex-direction: column; position: relative; padding: 10px 0; }
         .top-header { padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; color: #aaa; font-size: 13px; z-index: 10; background: rgba(0,0,0,0.3); backdrop-filter: blur(2px); }
-        .online-badge { color: #00ff88; font-weight: bold; display: flex; align-items: center; gap: 5px; }
+        .online-badge { color: #00ff88; font-weight: bold; display: flex; align-items: center; gap: 5px; cursor: pointer; }
         .online-dot { width: 8px; height: 8px; background: #00ff88; border-radius: 50%; box-shadow: 0 0 5px #00ff88; animation: blink 1s infinite; }
         @keyframes blink { 50% { opacity: 0.5; } }
         
@@ -322,7 +316,6 @@
         .hud-btn:active { transform: scale(0.95); }
         .hud-btn-bg { width: 100%; height: 100%; object-fit: cover; border-radius: 14px; border: 1px solid rgba(255,255,255,0.1); filter: drop-shadow(0 4px 5px rgba(0,0,0,0.5)); background: #222; }
         .hud-label { position: absolute; bottom: -8px; left: 50%; transform: translateX(-50%); background: white; color: black; font-size: 10px; font-weight: 800; padding: 2px 10px; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.5); text-transform: uppercase; z-index: 2; white-space: nowrap; }
-        .hud-badge { position: absolute; top: -5px; right: -5px; background: rgba(0,0,0,0.8); border: 1px solid #fff; color: white; width: 18px; height: 18px; border-radius: 50%; font-size: 10px; font-weight: bold; display: flex; justify-content: center; align-items: center; z-index: 3; }
 
         .tap-zone { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative; }
         #main-char { width: auto; max-width: 85%; max-height: 40vh; object-fit: contain; transition: 0.1s; z-index: 5; }
@@ -376,6 +369,9 @@
         .glowing { filter: drop-shadow(0 0 20px #fff) drop-shadow(0 0 40px gold) brightness(2); transform: scale(1.1); transition: all 0.5s ease; }
         @keyframes heavyShake { 0% { transform: translate(1px, 1px) rotate(0deg); } 20% { transform: translate(-3px, 0px) rotate(1deg); } 40% { transform: translate(1px, -1px) rotate(1deg); } 60% { transform: translate(-3px, 1px) rotate(0deg); } 80% { transform: translate(-1px, -1px) rotate(1deg); } 100% { transform: translate(1px, -2px) rotate(-1deg); } }
         @keyframes popIn { from{transform:scale(0);} to{transform:scale(1);} }
+
+        /* Online Players Modal List */
+        .player-row { display: flex; justify-content: space-between; padding: 8px; border-bottom: 1px solid #333; font-size: 14px; color: #eee; }
     </style>
 </head>
 <body>
@@ -386,13 +382,12 @@
                 <span id="user-name-display" style="color:white; font-weight:bold;">Player</span>
                 <span style="font-size:10px;">ID: <span id="uid">...</span></span>
             </div>
-            <div class="online-badge">
+            <div class="online-badge" onclick="openOnlineModal()">
                 <div class="online-dot"></div>
                 <span id="online-count">1</span> Online
             </div>
         </div>
 
-        <!-- NEW WALLET HUD -->
         <div class="hud-section">
             <div class="wallet-widget" id="wallet-target">
                 <div class="w-item">
@@ -459,9 +454,19 @@
         </div>
     </div>
 
+    <!-- NEW ONLINE PLAYERS MODAL -->
+    <div id="modal-online" class="modal">
+        <div class="modal-box">
+            <div class="close-btn" onclick="closeModals()">✕</div>
+            <h2 class="modal-title" style="color:#00ff88;">Online Players</h2>
+            <div style="margin-bottom:10px; font-size:14px; color:#aaa;">Total: <span id="modal-online-total">0</span></div>
+            <div id="online-list" style="max-height:300px; overflow-y:auto; text-align:left;"></div>
+        </div>
+    </div>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-        import { getDatabase, ref, onValue, set, update, get, runTransaction } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+        import { getDatabase, ref, onValue, set, update, get, runTransaction, onDisconnect } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
         const firebaseConfig = {
           apiKey: "AIzaSyBIdR3f4XpJgfqEec6YQfKuAprKpyYFPQk",
@@ -476,11 +481,13 @@
         let activeEgg = null;
         let defaultCharUrl = "";
         let userId = "guest";
-        let score = 0; // Local tracking of coins for logic
+        let userName = "Player";
+        let score = 0; 
         let gvConfig = {}, gvOrders = {};
         let dailyState = { streak: 0, lastClaim: 0 };
         let allRewardsCache = null;
         let dailyConfig = [];
+        let onlineUsersCache = {};
 
         // SYNC WITH PARENT (Wallet/User)
         setInterval(() => {
@@ -488,7 +495,8 @@
                 const data = window.parent.getExternalGameData();
                 if (data) {
                     userId = data.uid;
-                    score = data.coins; // Sync internal score
+                    userName = data.name; // Keep name synced
+                    score = data.coins;
                     document.getElementById('uid').innerText = data.uid.substring(0, 6);
                     document.getElementById('user-name-display').innerText = data.name;
                     document.getElementById('egg-coin-bal').innerText = data.coins;
@@ -497,14 +505,54 @@
             }
         }, 1000);
 
+        // --- ONLINE PRESENCE LOGIC ---
+        const connectedRef = ref(db, ".info/connected");
+        setTimeout(() => {
+            if(userId !== 'guest') {
+                const myConRef = ref(db, \`connections/\${userId}\`);
+                onValue(connectedRef, (snap) => {
+                    if (snap.val() === true) {
+                        set(myConRef, { name: userName, enteredAt: Date.now() });
+                        onDisconnect(myConRef).remove();
+                    }
+                });
+            }
+        }, 2000);
+
+        // Listen for all online users
+        onValue(ref(db, "connections"), (snap) => {
+            onlineUsersCache = snap.val() || {};
+            const count = Object.keys(onlineUsersCache).length;
+            document.getElementById('online-count').innerText = count;
+            
+            // If modal is open, refresh it
+            if(document.getElementById('modal-online').style.display === 'flex') {
+                window.openOnlineModal();
+            }
+        });
+
+        window.openOnlineModal = () => {
+             const modal = document.getElementById('modal-online');
+             const list = document.getElementById('online-list');
+             const countSpan = document.getElementById('modal-online-total');
+             
+             modal.style.display = 'flex';
+             list.innerHTML = "";
+             
+             const users = Object.values(onlineUsersCache);
+             countSpan.innerText = users.length;
+             
+             users.forEach(u => {
+                 list.innerHTML += \`<div class="player-row"><span>\${u.name || 'Unknown'}</span> <span style="color:#00ff88; font-size:10px;">● Online</span></div>\`;
+             });
+        };
+
         // 1. SETTINGS & IMAGES (Sync with Admin Panel)
         onValue(ref(db, 'admin/settings'), s => {
             const d = s.val() || {};
             if(d.backgroundImage) document.getElementById('app-background').style.backgroundImage = \`url('\${d.backgroundImage}')\`;
             defaultCharUrl = d.characterImage || "https://cdn-icons-png.flaticon.com/512/2927/2927347.png";
             if(!activeEgg) document.getElementById('main-char').src = defaultCharUrl;
-            
-            // Sync Button Images
             if(d.dailyBtnImage) document.getElementById('btn-daily-img').src = d.dailyBtnImage;
             if(d.storeBtnImage) document.getElementById('btn-store-img').src = d.storeBtnImage;
         });
