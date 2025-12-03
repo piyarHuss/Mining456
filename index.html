@@ -1,23 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta name="monetag" content="ad9e9cd11a419f3c0a5103c5bb5e151e">
-  
+    <meta name="monetag" content="ad9e9cd11a419f3c0a5103c5bb5e151e">
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Coins mining</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Coins to Cash Mining</title>
     
     <!-- Zone 1 Script -->
     <script src='//libtl.com/sdk.js' data-zone='9972147' data-sdk='show_9972147'></script>
     
-    <!-- Zone 2 Script (New) -->
+    <!-- Zone 2 Script -->
     <script src='//libtl.com/sdk.js' data-zone='9966888' data-sdk='show_9966888'></script>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #121212; color: #ffffff; }
+        body { font-family: 'Inter', sans-serif; background-color: #121212; color: #ffffff; overscroll-behavior: none; }
         .dark-bg { background-color: #121212; }
         .card-bg { background-color: #1e1e1e; }
         .border-accent { border-color: #ff8c00; }
@@ -29,8 +28,11 @@
         .btn-outline-accent { border: 1px solid #ff8c00; color: #ff8c00; }
         .btn-outline-accent:hover { background-color: #ff8c00; color: #121212; }
         .input-field { background-color: #2c2c2c; border: 1px solid #444; }
+        
+        /* Default state: auth section visible to prevent blank screen if JS fails */
         .main-page { display: none; }
         .main-page.active { display: flex; animation: fadeIn 0.5s ease-in-out; }
+        
         .sub-page { display: none; }
         .sub-page.active { display: block; animation: fadeIn 0.3s ease-in-out; }
         .bottom-nav a.active { color: #ff8c00; }
@@ -40,6 +42,7 @@
         }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         
+        /* Mining Page Styles */
         #mining-page { text-align: center; }
         #mining-page h2 { 
             color: #FFD700; padding: 15px; font-size: 28px;
@@ -62,9 +65,26 @@
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
             text-shadow: 0 0 10px rgba(255,215,0,0.7);
         }
+        
+        /* Conversion Styles */
+        .convert-section { cursor: pointer; transition: background 0.2s; }
+        .convert-section:active { opacity: 0.7; }
+        .shine-anim { animation: shine 2s infinite; }
+        @keyframes shine { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+
+        /* FIXED EGG PAGE STYLES - NOW FITS IN LAYOUT */
+        #egg-page {
+            /* No longer fixed full screen. It fits inside main. */
+            height: calc(100vh - 140px); /* Height minus Header and Footer */
+            width: 100%;
+            background: #000;
+            overflow: hidden;
+            border-radius: 8px;
+            margin-top: 10px;
+        }
     </style>
 </head>
-<body class="max-w-md mx-auto">
+<body class="max-w-md mx-auto h-screen flex flex-col overflow-hidden">
 
     <!-- App Loader -->
     <div id="loader" class="hidden fixed inset-0 dark-bg bg-opacity-75 flex items-center justify-center z-50">
@@ -72,7 +92,7 @@
     </div>
 
     <!-- Authentication Section -->
-    <div id="auth-section" class="min-h-screen p-6 flex-col justify-center main-page">
+    <div id="auth-section" class="min-h-screen p-6 flex-col justify-center main-page active overflow-y-auto">
         <h1 class="text-4xl font-bold text-center mb-2 text-accent">CashReward</h1>
         <p class="text-center text-gray-400 mb-8">Jaari rakhne ke liye Login ya Signup karein</p>
         <div id="auth-container">
@@ -93,8 +113,9 @@
     </div>
 
     <!-- Main App Container -->
-    <div id="app-container" class="min-h-screen flex-col main-page">
-        <header class="flex items-center justify-between p-4 sticky top-0 bg-opacity-80 backdrop-blur-md z-10 dark-bg">
+    <div id="app-container" class="h-screen flex flex-col main-page">
+        <!-- Header -->
+        <header class="flex items-center justify-between p-4 bg-opacity-95 z-10 dark-bg border-b border-gray-800">
             <h1 class="text-xl font-bold">456Mining</h1>
             <div class="flex items-center space-x-4">
                 <div id="notification-bell" class="relative cursor-pointer">
@@ -105,16 +126,26 @@
             </div>
         </header>
 
-        <main class="flex-grow">
+        <!-- Main Content Area (Scrollable) -->
+        <main class="flex-grow overflow-y-auto relative">
+            
             <!-- Home Page -->
             <div id="home-page" class="p-4 space-y-6 sub-page">
-                <div class="card-bg p-4 rounded-lg flex items-center justify-between">
-                    <div>
-                        <p class="text-gray-400 text-sm">Your Balance</p>
-                        <p class="text-3xl font-bold"><span id="coin-balance">0</span> Coins</p>
+                <div class="card-bg rounded-lg flex overflow-hidden border border-gray-700">
+                    <div id="convert-trigger" class="w-1/2 p-4 border-r border-gray-700 convert-section hover:bg-gray-800 relative">
+                        <p class="text-gray-400 text-xs uppercase font-bold">Coins</p>
+                        <p class="text-2xl font-bold text-accent"><span id="coin-balance">0</span></p>
+                        <div class="flex items-center mt-1 text-xs text-green-400 shine-anim">
+                            <i data-lucide="refresh-cw" class="w-3 h-3 mr-1"></i> Tap to Convert
+                        </div>
                     </div>
-                    <button id="home-withdraw-btn" class="bg-white text-black font-semibold px-6 py-2 rounded-lg">Withdraw</button>
+                    <div class="w-1/2 p-4 bg-gray-800">
+                        <p class="text-gray-400 text-xs uppercase font-bold">Cash (INR)</p>
+                        <p class="text-2xl font-bold text-white">₹ <span id="home-rupee-balance">0.00</span></p>
+                        <p class="text-xs text-gray-500 mt-1">Withdrawal Balance</p>
+                    </div>
                 </div>
+
                 <section>
                     <div class="flex justify-between items-center mb-3">
                         <div>
@@ -123,37 +154,24 @@
                         </div>
                     </div>
                     <div class="space-y-3">
-                        
-                        <!-- Zone 1: 40 Coins / 2 Hours -->
                         <div class="bg-blue-600 p-3 rounded-lg flex items-center justify-between text-white">
                             <div class="flex items-center space-x-3">
                                 <span class="text-3xl">💎</span>
-                                <div>
-                                    <h3 class="font-bold">Gold Task (+40)</h3>
-                                    <p class="text-xs font-medium" id="zone1-status">Limit: 10/2 Hours</p>
-                                </div>
+                                <div><h3 class="font-bold">Gold Task (+40)</h3><p class="text-xs font-medium" id="zone1-status">Limit: 10/2 Hours</p></div>
                             </div>
                             <button id="zone1-btn" class="bg-white text-blue-600 font-bold px-4 py-2 rounded-lg text-sm btn">Watch</button>
                         </div>
-
-                        <!-- Zone 2: 44 Coins / 3 Hours -->
                         <div class="bg-purple-600 p-3 rounded-lg flex items-center justify-between text-white">
                             <div class="flex items-center space-x-3">
                                 <span class="text-3xl">👑</span>
-                                <div>
-                                    <h3 class="font-bold">Diamond Task (+44)</h3>
-                                    <p class="text-xs font-medium" id="zone2-status">Limit: 10/3 Hours</p>
-                                </div>
+                                <div><h3 class="font-bold">Diamond Task (+44)</h3><p class="text-xs font-medium" id="zone2-status">Limit: 10/3 Hours</p></div>
                             </div>
                             <button id="zone2-btn" class="bg-white text-purple-600 font-bold px-4 py-2 rounded-lg text-sm btn">Watch</button>
                         </div>
                     </div>
 
                     <div class="flex justify-between items-center mt-6">
-                        <div>
-                            <h2 class="text-lg font-semibold">Daily Tasks</h2>
-                            <p class="text-sm text-gray-400 mb-4">Complete tasks to get rewards.</p>
-                        </div>
+                        <div><h2 class="text-lg font-semibold">Daily Tasks</h2><p class="text-sm text-gray-400 mb-4">Complete tasks to get rewards.</p></div>
                         <p class="text-sm text-gray-400">Ads Left: <span id="ads-left-count">...</span></p>
                     </div>
                     <div class="space-y-3">
@@ -161,15 +179,18 @@
                             <div class="flex items-center space-x-3"><span class="text-3xl">🤩</span><div><h3 class="font-bold">Watch Short Ad</h3><p class="text-xs font-medium">Rewarded Interstitial</p></div></div>
                             <button class="bg-white text-orange-500 font-bold px-6 py-2 rounded-lg text-sm btn" onclick="claimReward('interstitial')">Claim</button>
                         </div>
-                        
                          <div class="card-bg p-3 rounded-lg flex items-center justify-between">
                            <div class="flex items-center space-x-3"><span class="text-3xl">⛏️</span><div><h3 class="font-semibold">Play Mining</h3><p class="text-xs text-gray-400">Offline mining for 1 hour!</p></div></div>
-                           <button id="mining-btn" class="text-white font-bold px-4 py-2 rounded-lg text-sm btn flex items-center justify-center" style="min-width: 110px;">
-                               <!-- Button content will be set by JavaScript -->
-                           </button>
+                           <button id="mining-btn" class="text-white font-bold px-4 py-2 rounded-lg text-sm btn flex items-center justify-center" style="min-width: 110px;"></button>
                         </div>
                     </div>
                 </section>
+            </div>
+
+            <!-- EGG PAGE (Now Integrated Properly) -->
+            <div id="egg-page" class="sub-page">
+                <!-- IFrame Loads Here, Navigation stays visible below -->
+                <iframe id="egg-frame" style="width: 100%; height: 100%; border: none;"></iframe>
             </div>
 
             <!-- Wallet Page -->
@@ -177,10 +198,19 @@
                  <h2 class="text-xl font-bold text-center">Mera Wallet</h2>
                 <div class="card-bg p-4 rounded-lg">
                     <h3 class="font-semibold mb-3">Earnings Withdraw Karein</h3>
-                    <p class="text-sm text-gray-400 mb-1">Current Balance: <span class="font-bold text-accent"><span id="wallet-coin-balance">0</span> Coins</span></p>
-                    <p class="text-sm text-gray-400 mb-2">Minimum Withdrawal: <span id="min-withdrawal-info">...</span> Coins</p>
+                    <div class="flex justify-between mb-2">
+                        <p class="text-sm text-gray-400">Coin Balance:</p>
+                        <p class="text-sm font-bold text-accent"><span id="wallet-coin-balance">0</span></p>
+                    </div>
+                    <div class="flex justify-between mb-4 pb-2 border-b border-gray-700">
+                        <p class="text-sm text-gray-400">Available Cash:</p>
+                        <p class="text-xl font-bold text-white">₹ <span id="wallet-rupee-balance">0.00</span></p>
+                    </div>
+                    
+                    <p class="text-sm text-gray-400 mb-2">Minimum Withdrawal: ₹<span id="min-withdrawal-info">...</span></p>
                     <p class="text-sm text-gray-400 mb-4 font-semibold" id="coin-value-info">...</p>
-                    <input id="withdraw-amount" type="number" placeholder="Coin amount daalein" class="w-full p-3 rounded-lg input-field mb-3">
+                    <label class="text-xs text-gray-500 mb-1 block">Withdrawal Amount (₹)</label>
+                    <input id="withdraw-amount" type="number" placeholder="Enter Amount in Rupees" class="w-full p-3 rounded-lg input-field mb-3">
                     <select id="withdraw-method" class="w-full p-3 rounded-lg input-field mb-3"></select>
                     <div id="payment-details-container"></div>
                     <button id="withdraw-btn" class="w-full p-3 rounded-lg btn-accent mt-3">Request Withdrawal</button>
@@ -233,34 +263,22 @@
                 <h2>Mining Coins</h2>
                 <div class="progress-container">
                     <div class="circle" style="width:180px; height:180px;">
-                        <svg width="180" height="180">
-                        <defs>
-                            <linearGradient id="hamsterGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-                            <stop offset="0%" style="stop-color:#FFD700;stop-opacity:1" />
-                            <stop offset="100%" style="stop-color:#FF8C00;stop-opacity:1" />
-                            </linearGradient>
-                        </defs>
-                        <circle class="bg" cx="90" cy="90" r="80"></circle>
-                        <circle id="mining-progress-circle" class="progress" cx="90" cy="90" r="80" stroke="url(#hamsterGrad)"></circle>
-                        </svg>
+                        <svg width="180" height="180"><defs><linearGradient id="hamsterGrad" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" style="stop-color:#FFD700;stop-opacity:1" /><stop offset="100%" style="stop-color:#FF8C00;stop-opacity:1" /></linearGradient></defs><circle class="bg" cx="90" cy="90" r="80"></circle><circle id="mining-progress-circle" class="progress" cx="90" cy="90" r="80" stroke="url(#hamsterGrad)"></circle></svg>
                         <div class="count-display" id="mining-coin-count">🪙 0</div>
                     </div>
                 </div>
-                <div class="mt-8">
-                    <p class="text-lg">Session Time Remaining:</p>
-                    <p id="mining-timer" class="text-2xl font-bold text-accent">01:00:00</p>
-                </div>
-                 <div class="mt-4 card-bg p-4 rounded-lg">
-                    <p id="mining-status-text" class="text-gray-300">Mining session is active.</p>
-                </div>
+                <div class="mt-8"><p class="text-lg">Session Time Remaining:</p><p id="mining-timer" class="text-2xl font-bold text-accent">01:00:00</p></div>
+                 <div class="mt-4 card-bg p-4 rounded-lg"><p id="mining-status-text" class="text-gray-300">Mining session is active.</p></div>
             </div>
 
         </main>
 
-        <nav class="bottom-nav sticky bottom-0 grid grid-cols-4 items-center text-center py-2 card-bg">
+        <!-- BOTTOM NAV (Always Visible) -->
+        <nav class="bottom-nav sticky bottom-0 grid grid-cols-5 items-center text-center py-2 card-bg border-t border-gray-800 z-50">
             <a href="#" class="nav-link" data-page="home-page"><i data-lucide="home" class="mx-auto w-6 h-6"></i><span class="text-xs">Home</span></a>
+            <a href="#" class="nav-link" data-page="egg-page"><i data-lucide="egg" class="mx-auto w-6 h-6"></i><span class="text-xs">Egg</span></a>
             <a href="#" class="nav-link" data-page="wallet-page"><i data-lucide="wallet" class="mx-auto w-6 h-6"></i><span class="text-xs">Wallet</span></a>
-            <a href="#" class="nav-link" data-page="refer-page"><i data-lucide="users" class="mx-auto w-6 h-6"></i><span class="text-xs">Refer & Earn</span></a>
+            <a href="#" class="nav-link" data-page="refer-page"><i data-lucide="users" class="mx-auto w-6 h-6"></i><span class="text-xs">Refer</span></a>
             <a href="#" class="nav-link" data-page="profile-page"><i data-lucide="user" class="mx-auto w-6 h-6"></i><span class="text-xs">Profile</span></a>
         </nav>
     </div>
@@ -271,6 +289,438 @@
             <button id="alert-ok-btn" class="btn-accent px-6 py-2 rounded-lg">OK</button>
         </div>
     </div>
+
+    <!-- EGG GAME CODE (Fully Integrated with Admin Panel) -->
+    <script>
+        const eggGameCode = `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Tap & Win</title>
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Rajdhani', sans-serif; user-select: none; -webkit-tap-highlight-color: transparent; }
+        body { background-color: #000; color: white; height: 100vh; width: 100vw; overflow: hidden; display: flex; justify-content: center; align-items: center; }
+        #app-background { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background-size: cover; background-position: center; filter: brightness(0.4); }
+        .game-container { width: 100%; max-width: 480px; height: 100%; display: flex; flex-direction: column; position: relative; padding: 10px 0; }
+        .top-header { padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; color: #aaa; font-size: 13px; z-index: 10; background: rgba(0,0,0,0.3); backdrop-filter: blur(2px); }
+        .online-badge { color: #00ff88; font-weight: bold; display: flex; align-items: center; gap: 5px; }
+        .online-dot { width: 8px; height: 8px; background: #00ff88; border-radius: 50%; box-shadow: 0 0 5px #00ff88; animation: blink 1s infinite; }
+        @keyframes blink { 50% { opacity: 0.5; } }
+        
+        .hud-section { display: flex; justify-content: space-between; align-items: flex-end; padding: 0 15px; z-index: 10; margin-top: 10px; }
+        .wallet-widget { flex: 1; background: rgba(20, 20, 20, 0.8); border: 1px solid #444; border-radius: 12px; height: 65px; margin-right: 15px; display: flex; align-items: center; justify-content: space-around; padding: 0 10px; position: relative; }
+        .w-item { display: flex; flex-direction: column; align-items: center; }
+        .w-label { font-size: 10px; color: #aaa; }
+        .w-val { font-size: 16px; font-weight: bold; color: white; }
+        .w-icon { font-size: 18px; margin-bottom: 2px; }
+
+        .hud-buttons-right { display: flex; gap: 12px; }
+        .hud-btn { width: 65px; height: 65px; background: transparent; position: relative; cursor: pointer; transition: 0.1s; }
+        .hud-btn:active { transform: scale(0.95); }
+        .hud-btn-bg { width: 100%; height: 100%; object-fit: cover; border-radius: 14px; border: 1px solid rgba(255,255,255,0.1); filter: drop-shadow(0 4px 5px rgba(0,0,0,0.5)); background: #222; }
+        .hud-label { position: absolute; bottom: -8px; left: 50%; transform: translateX(-50%); background: white; color: black; font-size: 10px; font-weight: 800; padding: 2px 10px; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.5); text-transform: uppercase; z-index: 2; white-space: nowrap; }
+        .hud-badge { position: absolute; top: -5px; right: -5px; background: rgba(0,0,0,0.8); border: 1px solid #fff; color: white; width: 18px; height: 18px; border-radius: 50%; font-size: 10px; font-weight: bold; display: flex; justify-content: center; align-items: center; z-index: 3; }
+
+        .tap-zone { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative; }
+        #main-char { width: auto; max-width: 85%; max-height: 40vh; object-fit: contain; transition: 0.1s; z-index: 5; }
+        #main-char:active { transform: scale(0.92); }
+
+        .main-hp-container { width: 60%; margin-top: 20px; display: none; flex-direction: column; align-items: center; }
+        .main-hp-bar { width: 100%; height: 12px; background: #333; border-radius: 6px; overflow: hidden; border: 1px solid #555; }
+        .main-hp-fill { width: 100%; height: 100%; background: linear-gradient(90deg, #ff00cc, #333399); transition: width 0.1s; }
+        .main-hp-text { font-size: 12px; color: #fff; margin-top: 5px; font-weight: bold; text-shadow: 0 0 5px black; }
+
+        .giveaway-wrapper { margin-top: 15px; z-index: 10; animation: pulse 2s infinite; }
+        .giveaway-btn { background: linear-gradient(90deg, #ff00cc, #333399); border: 2px solid #ff00cc; padding: 10px 30px; border-radius: 50px; color: white; font-size: 16px; font-weight: 800; text-transform: uppercase; box-shadow: 0 0 15px rgba(255, 0, 204, 0.5); cursor: pointer; display: flex; align-items: center; gap: 8px; }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 100; display: none; justify-content: center; align-items: center; flex-direction: column; }
+        .modal-box { width: 95%; max-width: 400px; background: #141414; padding: 20px; border-radius: 20px; text-align: center; border: 1px solid #333; position: relative; max-height: 90vh; overflow-y: auto; display: flex; flex-direction: column; }
+        .close-btn { position: absolute; top: 10px; right: 15px; font-size: 24px; color: #888; cursor: pointer; z-index: 20; }
+        .modal-title { font-size: 24px; color: white; font-weight: 800; text-transform: uppercase; margin-bottom: 5px; }
+
+        .daily-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 15px; width: 100%; }
+        .day-card { background: #1f1f1f; border: 1px solid #333; border-radius: 10px; padding: 10px 5px; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; opacity: 0.6; min-height: 80px;}
+        .day-card.active { opacity: 1; border: 1px solid #ffd700; background: linear-gradient(180deg, #2a2a2a, #111); box-shadow: 0 0 10px rgba(255, 215, 0, 0.2); }
+        .day-card.claimed { opacity: 0.4; background: #111; border-color: #00ff88; }
+        .day-title { font-size: 12px; font-weight: bold; margin-bottom: 5px; color: #aaa; }
+        .day-icon { width: 30px; height: 30px; object-fit: contain; margin-bottom: 5px; }
+        .day-reward { font-size: 11px; font-weight: 800; color: white; }
+        .day-card.big-day { grid-column: span 3; flex-direction: row; justify-content: space-between; padding: 15px 20px; background: linear-gradient(90deg, #2c2c2c, #1a1a1a); }
+        .big-day img { width: 60px; height: 60px; }
+        .claim-btn { width: 100%; margin-top: 20px; padding: 12px; border-radius: 10px; border:none; background: linear-gradient(45deg, #ffd700, #ffaa00); color: black; font-weight: 800; font-size: 16px; cursor: pointer; }
+        .claim-btn:disabled { background: #444; color: #888; cursor: not-allowed; }
+
+        .store-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; overflow-y: auto; margin-top: 10px; }
+        .store-card { background: #2a2a2a; padding: 10px; border-radius: 10px; border: 1px solid #444; display: flex; flex-direction: column; align-items: center; }
+        .store-card img { width: 40px; height: 40px; object-fit: contain; }
+        .buy-btn { background: gold; color: black; border: none; padding: 4px 12px; border-radius: 20px; font-weight: bold; margin-top: 5px; cursor: pointer; font-size: 11px; }
+
+        .giveaway-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; overflow-y: auto; padding: 10px; width: 100%; margin-top: 10px; }
+        .gv-card { background: transparent; border: none; display: flex; flex-direction: column; align-items: center; position: relative; min-height: 140px; justify-content: center; }
+        .gv-img { width: 110px; height: 110px; object-fit: contain; filter: drop-shadow(0 5px 10px rgba(0,0,0,0.5)); transition: transform 0.2s; } 
+        .gv-info { width: 100%; display: flex; flex-direction: column; align-items: center; }
+        .gv-name { font-size: 14px; color: #fff; font-weight: bold; text-shadow: 0 0 5px #000; margin-top: -10px; z-index: 2; }
+        .gv-timer { font-size: 12px; color: gold; font-family: monospace; font-weight: bold; margin-top: 5px; }
+        .gv-btn { background: #ff00cc; color: white; border: none; border-radius: 20px; padding: 5px 15px; font-size: 12px; margin-top: 5px; cursor: pointer; font-weight: bold; box-shadow: 0 0 10px #ff00cc; }
+        .gv-reward { font-size: 24px; color: #ffd700; font-weight: 800; text-shadow: 0 0 20px gold; animation: popIn 0.5s; }
+        .gv-missed-win { font-size: 20px; color: #ff5555; font-weight: 800; margin-top: 5px; }
+        .gv-missed { font-size: 18px; color: #aaa; font-weight: bold; margin-top: 5px; }
+
+        .fly-coin { position: fixed; width: 30px; height: 30px; background: gold; border-radius: 50%; border: 2px solid orange; z-index: 200; display: flex; justify-content: center; align-items: center; font-weight: bold; color: black; transition: all 1s ease-in-out; pointer-events: none; }
+        .fly-txt { position: fixed; color: #00ff88; font-size: 20px; font-weight: bold; z-index: 201; text-shadow: 0 2px 4px black; transition: all 1s ease-out; pointer-events: none; }
+        .shaking { animation: heavyShake 0.5s infinite; }
+        .glowing { filter: drop-shadow(0 0 20px #fff) drop-shadow(0 0 40px gold) brightness(2); transform: scale(1.1); transition: all 0.5s ease; }
+        @keyframes heavyShake { 0% { transform: translate(1px, 1px) rotate(0deg); } 20% { transform: translate(-3px, 0px) rotate(1deg); } 40% { transform: translate(1px, -1px) rotate(1deg); } 60% { transform: translate(-3px, 1px) rotate(0deg); } 80% { transform: translate(-1px, -1px) rotate(1deg); } 100% { transform: translate(1px, -2px) rotate(-1deg); } }
+        @keyframes popIn { from{transform:scale(0);} to{transform:scale(1);} }
+    </style>
+</head>
+<body>
+    <div id="app-background"></div>
+    <div class="game-container">
+        <div class="top-header">
+            <div style="display:flex; flex-direction:column;">
+                <span id="user-name-display" style="color:white; font-weight:bold;">Player</span>
+                <span style="font-size:10px;">ID: <span id="uid">...</span></span>
+            </div>
+            <div class="online-badge">
+                <div class="online-dot"></div>
+                <span id="online-count">1</span> Online
+            </div>
+        </div>
+
+        <!-- NEW WALLET HUD -->
+        <div class="hud-section">
+            <div class="wallet-widget" id="wallet-target">
+                <div class="w-item">
+                    <div class="w-icon">🪙</div>
+                    <div class="w-val" id="egg-coin-bal">0</div>
+                    <div class="w-label">Coins</div>
+                </div>
+                <div style="width:1px; height:30px; background:#444;"></div>
+                <div class="w-item">
+                    <div class="w-icon">₹</div>
+                    <div class="w-val" id="egg-rupee-bal">0.0</div>
+                    <div class="w-label">Rupees</div>
+                </div>
+            </div>
+            <div class="hud-buttons-right">
+                <div class="hud-btn" onclick="openDaily()">
+                    <div class="hud-label">Daily</div>
+                    <img id="btn-daily-img" class="hud-btn-bg" src="https://cdn-icons-png.flaticon.com/512/8298/8298950.png">
+                </div>
+                <div class="hud-btn" onclick="openStore()">
+                    <div class="hud-label">Store</div>
+                    <img id="btn-store-img" class="hud-btn-bg" src="https://cdn-icons-png.flaticon.com/512/3594/3594412.png">
+                </div>
+            </div>
+        </div>
+
+        <div class="tap-zone">
+            <img id="main-char" src="">
+            <div id="main-hp-container" class="main-hp-container">
+                <div class="main-hp-bar"><div id="main-hp-fill" class="main-hp-fill"></div></div>
+                <div id="main-hp-text" class="main-hp-text">100 HP Left</div>
+            </div>
+            <div class="giveaway-wrapper" onclick="openGiveaway()">
+                <div class="giveaway-btn"><span>🎉</span> LIVE GIVEAWAY</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODALS -->
+    <div id="modal-store" class="modal">
+        <div class="modal-box">
+            <div class="close-btn" onclick="closeModals()">✕</div>
+            <h2 class="modal-title" style="color:gold;">Store</h2>
+            <div id="store-container" class="store-grid">Loading...</div>
+        </div>
+    </div>
+    
+    <div id="modal-daily" class="modal">
+        <div class="modal-box">
+            <div class="close-btn" onclick="closeModals()">✕</div>
+            <h2 class="modal-title" style="color:#00ff88;">Daily Rewards</h2>
+            <div class="daily-grid" id="daily-grid"></div>
+            <button id="daily-claim-btn" class="claim-btn" onclick="claimDailyReward()" disabled>Come back tomorrow</button>
+            <p id="daily-timer" style="color:#ff5555; margin-top:10px; font-size:12px;"></p>
+        </div>
+    </div>
+
+    <div id="modal-giveaway" class="modal">
+        <div class="modal-box" style="width:95%; max-width:400px; background:rgba(20,20,20,0.95);">
+            <div class="close-btn" onclick="closeModals()">✕</div>
+            <h2 class="modal-title" style="color:#ff00cc;">Lucky Draw</h2>
+            <p id="gv-status" style="font-size:11px; color:#aaa;">Claim Fast!</p>
+            <div id="gv-grid" class="giveaway-grid"></div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+        import { getDatabase, ref, onValue, set, update, get, runTransaction } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+        const firebaseConfig = {
+          apiKey: "AIzaSyBIdR3f4XpJgfqEec6YQfKuAprKpyYFPQk",
+          authDomain: "telegram-minimum-app.firebaseapp.com",
+          projectId: "telegram-minimum-app",
+          storageBucket: "telegram-minimum-app.firebasestorage.app",
+          messagingSenderId: "22735797313",
+          appId: "1:22735797313:web:69226b610cedd7dc199ac0"
+        };
+        const db = getDatabase(initializeApp(firebaseConfig, "eggGame"));
+
+        let activeEgg = null;
+        let defaultCharUrl = "";
+        let userId = "guest";
+        let score = 0; // Local tracking of coins for logic
+        let gvConfig = {}, gvOrders = {};
+        let dailyState = { streak: 0, lastClaim: 0 };
+        let allRewardsCache = null;
+        let dailyConfig = [];
+
+        // SYNC WITH PARENT (Wallet/User)
+        setInterval(() => {
+            if (window.parent && window.parent.getExternalGameData) {
+                const data = window.parent.getExternalGameData();
+                if (data) {
+                    userId = data.uid;
+                    score = data.coins; // Sync internal score
+                    document.getElementById('uid').innerText = data.uid.substring(0, 6);
+                    document.getElementById('user-name-display').innerText = data.name;
+                    document.getElementById('egg-coin-bal').innerText = data.coins;
+                    document.getElementById('egg-rupee-bal').innerText = data.rupees.toFixed(2);
+                }
+            }
+        }, 1000);
+
+        // 1. SETTINGS & IMAGES (Sync with Admin Panel)
+        onValue(ref(db, 'admin/settings'), s => {
+            const d = s.val() || {};
+            if(d.backgroundImage) document.getElementById('app-background').style.backgroundImage = \`url('\${d.backgroundImage}')\`;
+            defaultCharUrl = d.characterImage || "https://cdn-icons-png.flaticon.com/512/2927/2927347.png";
+            if(!activeEgg) document.getElementById('main-char').src = defaultCharUrl;
+            
+            // Sync Button Images
+            if(d.dailyBtnImage) document.getElementById('btn-daily-img').src = d.dailyBtnImage;
+            if(d.storeBtnImage) document.getElementById('btn-store-img').src = d.storeBtnImage;
+        });
+
+        // 2. DAILY REWARDS CONFIG (Sync with Admin)
+        onValue(ref(db, 'admin/daily_config'), (snap) => {
+            const data = snap.val();
+            dailyConfig = [];
+            for(let i=0; i<7; i++) {
+                if(data && data[i]) dailyConfig.push(data[i]);
+                else dailyConfig.push({ day: i+1, reward: 100, image: "https://cdn-icons-png.flaticon.com/512/1828/1828884.png" });
+            }
+        });
+
+        // 3. EGG STATUS
+        setTimeout(() => {
+            if(userId !== 'guest') {
+                onValue(ref(db, \`users/\${userId}/currentEgg\`), (snap) => {
+                    const eggData = snap.val();
+                    if(eggData) {
+                        activeEgg = eggData;
+                        document.getElementById('main-char').src = eggData.image; 
+                        document.getElementById('main-hp-container').style.display = "flex"; 
+                        updateMainHpUI();
+                    } else {
+                        activeEgg = null;
+                        document.getElementById('main-char').src = defaultCharUrl; 
+                        document.getElementById('main-hp-container').style.display = "none"; 
+                    }
+                });
+            }
+        }, 2000);
+
+        function updateMainHpUI() {
+            if(!activeEgg) return;
+            const pct = (activeEgg.hp / activeEgg.maxHp) * 100;
+            document.getElementById('main-hp-fill').style.width = pct + "%";
+            document.getElementById('main-hp-text').innerText = \`\${activeEgg.hp} / \${activeEgg.maxHp} HP\`;
+        }
+
+        // TAP LOGIC
+        document.getElementById('main-char').addEventListener('click', (e) => {
+            const img = document.getElementById('main-char');
+            img.style.transform = "scale(0.92)"; setTimeout(()=>img.style.transform="scale(1)", 50);
+
+            if(activeEgg) {
+                activeEgg.hp--; updateMainHpUI(); 
+                if(activeEgg.hp <= 0) {
+                    const r = activeEgg.reward;
+                    if(window.parent.handleAddReward) window.parent.handleAddReward(r); // Add to wallet
+                    flyCoinToWallet(e.clientX, e.clientY, r);
+                    set(ref(db, \`users/\${userId}/currentEgg\`), null); 
+                } else {
+                    update(ref(db, \`users/\${userId}/currentEgg\`), { hp: activeEgg.hp });
+                }
+            } else {
+                if(navigator.vibrate) navigator.vibrate(10);
+            }
+        });
+
+        // 4. STORE LOGIC (Controlled by Admin Panel)
+        window.openStore = () => { document.getElementById('modal-store').style.display='flex'; const c=document.getElementById('store-container'); c.innerHTML='Loading...'; onValue(ref(db,'admin/store_items'),s=>{ c.innerHTML=''; const d=s.val(); if(d) Object.keys(d).forEach(k=>{ c.innerHTML+=\`<div class="store-card"><img src="\${d[k].image}"><div>\${d[k].name}</div><button class="buy-btn" onclick="buyStore('\${k}')">Buy \${d[k].price}</button></div>\`; }); }, {onlyOnce:true}); }
+        
+        window.buyStore = (k) => {
+            if(activeEgg) { alert("Finish breaking current egg!"); return; }
+            get(ref(db,'admin/store_items/'+k)).then(s=>{ 
+                const item = s.val(); 
+                if(window.parent.handleBuyItem) {
+                    window.parent.handleBuyItem(item.price).then(success => {
+                        if(success) {
+                            set(ref(db, \`users/\${userId}/currentEgg\`), { name: item.name, image: item.image, reward: item.reward, maxHp: item.taps, hp: item.taps });
+                            document.getElementById('modal-store').style.display='none'; 
+                        }
+                    });
+                }
+            }); 
+        };
+
+        // 5. DAILY REWARDS LOGIC (Controlled by Admin Panel)
+        window.openDaily = () => { 
+            document.getElementById('modal-daily').style.display='flex'; 
+            get(ref(db, \`users/\${userId}/daily\`)).then((s) => { 
+                dailyState = s.val() || { streak: 0, lastClaim: 0 }; 
+                renderDailyGrid(); 
+            }); 
+        };
+
+        function renderDailyGrid() {
+            const grid = document.getElementById('daily-grid'); 
+            grid.innerHTML = "";
+            const now = Date.now(); 
+            const oneDay = 86400000;
+            if (now - dailyState.lastClaim > (2 * oneDay)) dailyState.streak = 0;
+            const canClaim = (now - dailyState.lastClaim) > oneDay;
+
+            for(let i=0; i<7; i++) {
+                const item = dailyConfig[i];
+                const div = document.createElement('div'); 
+                div.className = \`day-card \${i === 6 ? 'big-day' : ''}\`;
+                let icon = item.image || "https://cdn-icons-png.flaticon.com/512/1828/1828884.png";
+                let html = "";
+
+                if(i < dailyState.streak) {
+                    div.classList.add('claimed');
+                    html = \`<div><span style="color:#00ff88;font-size:20px;">✓</span></div><div class="day-title">Day \${item.day}</div>\`;
+                } else {
+                    if(i === dailyState.streak) div.classList.add('active');
+                    html = \`<div class="day-title">Day \${item.day}</div><img src="\${icon}" class="day-icon"><div class="day-reward">+\${item.reward}</div>\`;
+                }
+                div.innerHTML = html; grid.appendChild(div);
+            }
+
+            const btn = document.getElementById('daily-claim-btn'); 
+            const tmr = document.getElementById('daily-timer');
+            if(canClaim || (dailyState.streak===0 && dailyState.lastClaim===0)) { 
+                btn.disabled=false; btn.innerText="CLAIM REWARD"; btn.style.background="gold"; tmr.innerText=""; 
+            } else { 
+                btn.disabled=true; btn.innerText="Come back tomorrow"; btn.style.background="#444"; 
+                const wait = (dailyState.lastClaim + oneDay) - now; 
+                const h=Math.floor(wait/3600000); const m=Math.floor((wait%3600000)/60000); 
+                tmr.innerText=\`\${h}h \${m}m left\`; 
+            }
+        }
+
+        window.claimDailyReward = () => {
+            const currentDay = dailyState.streak;
+            const reward = dailyConfig[currentDay] ? dailyConfig[currentDay].reward : 100;
+            if(window.parent.handleAddReward) window.parent.handleAddReward(reward);
+            update(ref(db, \`users/\${userId}/daily\`), { streak: (dailyState.streak+1) % 7, lastClaim: Date.now() }).then(()=>{ 
+                alert(\`Claimed \${reward} Coins!\`); 
+                openDaily(); 
+            });
+        };
+
+        // 6. GIVEAWAY LOGIC (Controlled by Admin Panel)
+        window.openGiveaway = () => { document.getElementById('modal-giveaway').style.display = 'flex'; renderGiveaway(); setInterval(renderGiveaway,1000); };
+        onValue(ref(db, 'admin/giveaway'), s => { gvConfig = s.val() || {}; if(gvConfig.revealTime>Date.now()) allRewardsCache=null; renderGiveaway(); });
+        onValue(ref(db, 'giveaway_orders'), s => { gvOrders = s.val() || {}; renderGiveaway(); });
+
+        function renderGiveaway() {
+            if(document.getElementById('modal-giveaway').style.display === 'none') return;
+            const grid = document.getElementById('gv-grid'); grid.innerHTML = "";
+            const status = document.getElementById('gv-status');
+            const now = Date.now(); const revealTime = gvConfig.revealTime || 0;
+            if(!gvConfig.isOpen) { status.innerText = "Closed"; return; }
+            if(now >= revealTime && !allRewardsCache) { get(ref(db, 'admin/giveaway_rewards')).then(s => { allRewardsCache = s.val() || {}; renderGiveaway(); }); }
+            status.innerText = (now >= revealTime) ? "Revealed!" : \`Eggs: \${gvConfig.totalEggs}\`;
+
+            for(let i=1; i<= (gvConfig.totalEggs || 0); i++) {
+                const id = \`egg_\${i}\`; const o = gvOrders[id];
+                const isOwned = o && o.uid === userId; const isTaken = o != null;
+                const div = document.createElement('div'); div.className = \`gv-card\`;
+                let html = \`<div class="gv-info">\`;
+                if(isTaken) {
+                    if(o.isOpened) { html += \`<div class="gv-reward">+\${o.reward}</div><div class="gv-name" style="color:gold">\${o.name}</div>\`; }
+                    else {
+                        if(isOwned) {
+                            html += \`<img id="gv-img-\${id}" src="\${gvConfig.eggImage}" class="gv-img shaking"><div class="gv-name">\${o.name}</div>\`;
+                            if(now >= revealTime) autoRevealEgg(id, i);
+                            else { const t = revealTime - now; const m = Math.floor(t/60000); const s = Math.floor((t%60000)/1000); html += \`<div class="gv-timer">\${m}:\${s}</div>\`; }
+                        } else { html += \`<img src="\${gvConfig.eggImage}" class="gv-img" style="filter:grayscale(1);opacity:0.6"><div class="gv-name" style="color:#aaa">\${o.name}</div>\`; }
+                    }
+                } else {
+                    if(now >= revealTime) {
+                        let r = 0; if(allRewardsCache) r = allRewardsCache[i] || 0;
+                        if(r > 0) html += \`<div class="gv-missed-win" style="text-shadow:0 0 5px red">+\${r}</div><div style="font-size:10px;color:#777">Missed</div>\`; else html += \`<div class="gv-missed">Empty</div>\`;
+                    } else { html += \`<img src="\${gvConfig.eggImage}" class="gv-img"><button class="gv-btn" onclick="window.claimEgg('\${id}')">CLAIM \${gvConfig.price>0?gvConfig.price:'FREE'}</button>\`; }
+                }
+                html += \`</div>\`; div.innerHTML = html; grid.appendChild(div);
+            }
+        }
+        window.claimEgg = (id) => {
+            if(Date.now() >= gvConfig.revealTime) { alert("Time Up!"); return; }
+            if(score < gvConfig.price) { alert("No Money!"); return; }
+            if(window.parent.handleBuyItem) {
+                window.parent.handleBuyItem(gvConfig.price).then(success => {
+                    if(success) {
+                        runTransaction(ref(db, \`giveaway_orders/\${id}\`), (c) => c === null ? {uid:userId, name:window.parent.getExternalGameData().name, isOpened:false, reward:0} : undefined).then((r) => { if(!r.committed) alert("Taken!"); });
+                    }
+                });
+            }
+        };
+        function autoRevealEgg(id, idx) {
+            if(window[\`op_\${id}\`]) return; window[\`op_\${id}\`] = true;
+            const img = document.getElementById(\`gv-img-\${id}\`);
+            if(img) { img.classList.remove('shaking'); img.classList.add('glowing'); }
+            setTimeout(() => {
+                get(ref(db, \`admin/giveaway_rewards/\${idx}\`)).then(s => {
+                    const w = s.val() || 0;
+                    update(ref(db, \`giveaway_orders/\${id}\`), { isOpened: true, reward: w }).then(() => { 
+                        if(w>0 && window.parent.handleAddReward) window.parent.handleAddReward(w);
+                    });
+                });
+            }, 1500);
+        }
+
+        // COIN ANIMATION
+        function flyCoinToWallet(x, y, amount) {
+            const coin = document.createElement('div'); coin.className = 'fly-coin'; coin.innerText = '🪙';
+            coin.style.left = x + 'px'; coin.style.top = y + 'px'; document.body.appendChild(coin);
+            const txt = document.createElement('div'); txt.className = 'fly-txt'; txt.innerText = "+" + amount;
+            txt.style.left = x + 'px'; txt.style.top = (y - 30) + 'px'; document.body.appendChild(txt);
+            const target = document.getElementById('wallet-target').getBoundingClientRect();
+            setTimeout(() => {
+                coin.style.left = (target.left + target.width/2) + 'px'; coin.style.top = (target.top + target.height/2) + 'px'; coin.style.opacity = 0;
+                txt.style.top = (y - 100) + 'px'; txt.style.opacity = 0;
+            }, 50);
+            setTimeout(() => { coin.remove(); txt.remove(); }, 1000);
+        }
+
+        window.closeModals = () => document.querySelectorAll('.modal').forEach(m => m.style.display='none');
+    <\/script>
+</body>
+</html>
+        `;
+    </script>
 
     <script type="module">
         const firebaseConfig = {
@@ -296,360 +746,74 @@
         let appConfig = {};
         let miningInterval = null;
         let zoneTimerInterval = null;
+        let eggGameLoaded = false;
 
         const MINING_ADS_REQUIRED = 20;
         const MINING_DURATION_MS = 3600 * 1000;
         const MINING_REWARD = 1800; 
         
-        // --- CONSTANTS FOR NEW ADS ---
         const ZONE1_LIMIT = 10;
-        const ZONE1_COOLDOWN_MS = 2 * 60 * 60 * 1000; // 2 Hours
+        const ZONE1_COOLDOWN_MS = 2 * 60 * 60 * 1000; 
         const ZONE1_REWARD = 40;
         
         const ZONE2_LIMIT = 10;
-        const ZONE2_COOLDOWN_MS = 3 * 60 * 60 * 1000; // 3 Hours
+        const ZONE2_COOLDOWN_MS = 3 * 60 * 60 * 1000; 
         const ZONE2_REWARD = 44;
 
-
-        const loader = document.getElementById('loader');
-        const coinBalanceEl = document.getElementById('coin-balance');
-        const walletCoinBalanceEl = document.getElementById('wallet-coin-balance');
-        const profileNameEl = document.getElementById('profile-name');
-        const profileEmailEl = document.getElementById('profile-email');
-        const referralCodeEl = document.getElementById('referral-code');
-        const minWithdrawalInfoEl = document.getElementById('min-withdrawal-info');
-        const coinValueInfoEl = document.getElementById('coin-value-info');
-        const withdrawMethodSelect = document.getElementById('withdraw-method');
-        const notificationDot = document.getElementById('notification-dot');
-        const adsLeftCountEl = document.getElementById('ads-left-count');
-        const paymentDetailsContainer = document.getElementById('payment-details-container');
-        const miningBtn = document.getElementById('mining-btn');
-        
-        // Elements for new zones
-        const zone1Btn = document.getElementById('zone1-btn');
-        const zone2Btn = document.getElementById('zone2-btn');
-        const zone1Status = document.getElementById('zone1-status');
-        const zone2Status = document.getElementById('zone2-status');
-
-        window.onload = () => {
-            lucide.createIcons();
-            setupEventListeners();
-            showMainPage('auth-section');
-            loader.style.display = 'none';
-            onAuthStateChanged(auth, handleAuthStateChange);
+        // --- PARENT WINDOW FUNCTIONS FOR IRAME ---
+        window.getExternalGameData = function() {
+            if(!userData) return null;
+            return {
+                uid: currentUser.uid,
+                name: userData.name,
+                coins: userData.balance || 0,
+                rupees: userData.walletBalance || 0
+            };
         };
 
-        async function handleAuthStateChange(user) {
-            if (user) {
-                loader.style.display = 'flex';
-                currentUser = user;
-                await fetchUserData();
-                if (userData.isBlocked) {
-                    showAlert("Aapka account block kar diya gaya hai.");
-                    await signOut(auth);
-                    loader.style.display = 'none';
-                    return;
+        window.handleBuyItem = async function(cost) {
+            if(userData.balance >= cost) {
+                try {
+                    const newBal = userData.balance - cost;
+                    await updateDoc(doc(db, "users", currentUser.uid), { balance: newBal });
+                    userData.balance = newBal;
+                    updateUI();
+                    return true;
+                } catch(e) {
+                    console.error(e);
+                    alert("Error buying item");
+                    return false;
                 }
-                await fetchAppConfig();
-                await checkAndFinalizeMiningSession();
-                await checkNewNotifications();
+            } else {
+                alert("Not enough coins!");
+                return false;
+            }
+        };
+
+        window.handleAddReward = async function(amount) {
+            try {
+                // Add to coin balance
+                const newBal = (userData.balance || 0) + amount;
+                await updateDoc(doc(db, "users", currentUser.uid), { balance: newBal });
+                userData.balance = newBal;
                 updateUI();
-                showMainPage('app-container');
-                navigateTo('home-page');
-                loader.style.display = 'none';
-                
-                // Start tracking timers for buttons
-                if(zoneTimerInterval) clearInterval(zoneTimerInterval);
-                zoneTimerInterval = setInterval(updateZoneButtons, 1000);
-            } else {
-                currentUser = null;
-                userData = null;
-                showMainPage('auth-section');
-                if(zoneTimerInterval) clearInterval(zoneTimerInterval);
-            }
-        }
+            } catch(e) { console.error(e); }
+        };
+        // -----------------------------------------
 
-        async function fetchUserData() {
-            if (!currentUser) return;
-            const userRef = doc(db, "users", currentUser.uid);
-            try {
-                const userSnap = await getDoc(userRef);
-                if (userSnap.exists()) {
-                    userData = userSnap.data();
-                    
-                    // --- INITIALIZE NEW FIELDS IF MISSING ---
-                    let needsUpdate = false;
-                    if (typeof userData.adZone1Count === 'undefined') { userData.adZone1Count = 0; needsUpdate = true; }
-                    if (typeof userData.adZone1Cooldown === 'undefined') { userData.adZone1Cooldown = null; needsUpdate = true; }
-                    if (typeof userData.adZone2Count === 'undefined') { userData.adZone2Count = 0; needsUpdate = true; }
-                    if (typeof userData.adZone2Cooldown === 'undefined') { userData.adZone2Cooldown = null; needsUpdate = true; }
-
-                    if(needsUpdate) {
-                        await updateDoc(userRef, {
-                            adZone1Count: userData.adZone1Count,
-                            adZone1Cooldown: userData.adZone1Cooldown,
-                            adZone2Count: userData.adZone2Count,
-                            adZone2Cooldown: userData.adZone2Cooldown
-                        });
-                    }
-                    
-                } else {
-                    const ownReferralCode = Math.random().toString(36).substring(2, 8).toUpperCase();
-                    const defaultUserData = {
-                        uid: currentUser.uid, name: currentUser.email.split('@')[0], email: currentUser.email,
-                        balance: 50, referralCode: ownReferralCode, referredBy: null,
-                        lastNotificationCheck: new Date(),
-                        createdAt: serverTimestamp(),
-                        dailyAdCount: 0, lastAdWatchDate: new Date().toISOString().split('T')[0], isBlocked: false,
-                        miningAdsWatched: 0,
-                        miningSessionStartTime: null,
-                        isMiningActive: false,
-                        // NEW FIELDS
-                        adZone1Count: 0,
-                        adZone1Cooldown: null,
-                        adZone2Count: 0,
-                        adZone2Cooldown: null
-                    };
-                    await setDoc(userRef, defaultUserData);
-                    userData = defaultUserData;
-                }
-            } catch (error) {
-                console.error("Error fetching user data:", error);
-                showAlert("User data load karne mein error aayi.");
+        window.onload = () => {
+            function safeListen(id, event, func) {
+                const el = document.getElementById(id);
+                if (el) { el.addEventListener(event, func); }
             }
-        }
+            if (typeof lucide !== 'undefined') lucide.createIcons();
 
-        async function fetchAppConfig() {
-            const configRef = doc(db, "config", "main");
-            try {
-                const configSnap = await getDoc(configRef);
-                appConfig = configSnap.exists() ? configSnap.data() : { minWithdrawal: 5000, paymentMethods: ["UPI", "Paytm"], dailyAdLimit: 10, coinValueCoins: 1000, coinValueInr: 10 };
-            } catch (error) {
-                console.error("Error fetching app config:", error);
-            }
-        }
-        
-        function updateUI() {
-            if (!userData) return;
-            const balance = userData.balance || 0;
-            coinBalanceEl.textContent = balance;
-            walletCoinBalanceEl.textContent = balance;
-            profileNameEl.textContent = userData.name || 'No Name';
-            profileEmailEl.textContent = userData.email || 'No Email';
-            referralCodeEl.textContent = userData.referralCode || '...';
-            minWithdrawalInfoEl.textContent = `${appConfig.minWithdrawal || 5000} Coins`;
-            coinValueInfoEl.textContent = `${appConfig.coinValueCoins || 1000} Coins = ₹${appConfig.coinValueInr || 10}`;
-            withdrawMethodSelect.innerHTML = '';
-            (appConfig.paymentMethods || []).forEach(method => {
-                const option = document.createElement('option');
-                option.value = method;
-                option.textContent = method;
-                withdrawMethodSelect.appendChild(option);
-            });
-            updateDynamicPaymentFields();
-            updateAdsLeftCount();
-            updateMiningButtonUI();
-            updateZoneButtons(); // New function
-        }
-        
-        function updateAdsLeftCount() {
-            const today = new Date().toISOString().split('T')[0];
-            if (userData.lastAdWatchDate !== today) {
-                userData.dailyAdCount = 0;
-            }
-            const adsLeft = Math.max(0, (appConfig.dailyAdLimit || 10) - userData.dailyAdCount);
-            adsLeftCountEl.textContent = adsLeft;
-        }
-        
-        // --- NEW ZONE LOGIC AND UI UPDATE ---
-        
-        function formatTime(ms) {
-            if(ms < 0) return "00:00:00";
-            const seconds = Math.floor((ms / 1000) % 60);
-            const minutes = Math.floor((ms / (1000 * 60)) % 60);
-            const hours = Math.floor((ms / (1000 * 60 * 60)));
-            return `${hours}h ${minutes}m ${seconds}s`;
-        }
-
-        function updateZoneButtons() {
-            if(!userData) return;
-            const now = Date.now();
-
-            // ZONE 1 LOGIC
-            let zone1ResetTime = userData.adZone1Cooldown ? userData.adZone1Cooldown.toDate().getTime() : 0;
-            if (zone1ResetTime > 0 && now > zone1ResetTime) {
-                // Cooldown passed
-                userData.adZone1Count = 0;
-                userData.adZone1Cooldown = null;
-                // We will update DB next time user clicks, or silently in background if needed
-                // For UI speed, we update local state
-            }
+            safeListen('show-signup', 'click', (e) => { e.preventDefault(); document.getElementById('login-view').classList.add('hidden'); document.getElementById('signup-view').classList.remove('hidden'); });
+            safeListen('show-login', 'click', (e) => { e.preventDefault(); document.getElementById('signup-view').classList.add('hidden'); document.getElementById('login-view').classList.remove('hidden'); });
+            safeListen('signup-btn', 'click', handleSignup);
+            safeListen('login-btn', 'click', handleLogin);
+            safeListen('logout-btn', 'click', handleLogout);
             
-            if (userData.adZone1Count >= ZONE1_LIMIT && zone1ResetTime > now) {
-                zone1Btn.disabled = true;
-                zone1Btn.classList.add('opacity-50', 'cursor-not-allowed');
-                zone1Btn.textContent = formatTime(zone1ResetTime - now);
-                zone1Status.textContent = "Cooldown Active";
-            } else {
-                zone1Btn.disabled = false;
-                zone1Btn.classList.remove('opacity-50', 'cursor-not-allowed');
-                zone1Btn.textContent = "Watch";
-                zone1Status.textContent = `Completed: ${userData.adZone1Count}/${ZONE1_LIMIT}`;
-            }
-
-            // ZONE 2 LOGIC
-            let zone2ResetTime = userData.adZone2Cooldown ? userData.adZone2Cooldown.toDate().getTime() : 0;
-            if (zone2ResetTime > 0 && now > zone2ResetTime) {
-                userData.adZone2Count = 0;
-                userData.adZone2Cooldown = null;
-            }
-
-            if (userData.adZone2Count >= ZONE2_LIMIT && zone2ResetTime > now) {
-                zone2Btn.disabled = true;
-                zone2Btn.classList.add('opacity-50', 'cursor-not-allowed');
-                zone2Btn.textContent = formatTime(zone2ResetTime - now);
-                zone2Status.textContent = "Cooldown Active";
-            } else {
-                zone2Btn.disabled = false;
-                zone2Btn.classList.remove('opacity-50', 'cursor-not-allowed');
-                zone2Btn.textContent = "Watch";
-                zone2Status.textContent = `Completed: ${userData.adZone2Count}/${ZONE2_LIMIT}`;
-            }
-        }
-        
-        async function handleZone1Ad() {
-             // Reset check
-             const now = Date.now();
-             let zone1ResetTime = userData.adZone1Cooldown ? userData.adZone1Cooldown.toDate().getTime() : 0;
-             if (zone1ResetTime > 0 && now > zone1ResetTime) {
-                const userRef = doc(db, "users", currentUser.uid);
-                await updateDoc(userRef, { adZone1Count: 0, adZone1Cooldown: null });
-                userData.adZone1Count = 0;
-                userData.adZone1Cooldown = null;
-             }
-             
-             if (userData.adZone1Count >= ZONE1_LIMIT) {
-                 return showAlert("Limit reached. Please wait for cooldown.");
-             }
-
-             if (typeof window.show_9972147 !== 'function') return showAlert("Ad load fail.");
-             
-             zone1Btn.disabled = true;
-             
-             window.show_9972147('pop').then(async () => {
-                 const userRef = doc(db, "users", currentUser.uid);
-                 let newCount = (userData.adZone1Count || 0) + 1;
-                 let updates = {
-                     balance: (userData.balance || 0) + ZONE1_REWARD,
-                     adZone1Count: newCount
-                 };
-                 
-                 // If limit hit, set cooldown
-                 if(newCount >= ZONE1_LIMIT) {
-                     const cooldownTime = new Date(Date.now() + ZONE1_COOLDOWN_MS);
-                     updates.adZone1Cooldown = cooldownTime;
-                     userData.adZone1Cooldown = { toDate: () => cooldownTime }; // Mock for local usage
-                 }
-                 
-                 await updateDoc(userRef, updates);
-                 userData.balance += ZONE1_REWARD;
-                 userData.adZone1Count = newCount;
-                 
-                 updateUI();
-                 showAlert(`Success! +${ZONE1_REWARD} Coins.`);
-             }).catch(e => {
-                 console.error(e);
-                 showAlert("Ad watch failed or closed early.");
-                 zone1Btn.disabled = false;
-             });
-        }
-
-        async function handleZone2Ad() {
-             // Reset check
-             const now = Date.now();
-             let zone2ResetTime = userData.adZone2Cooldown ? userData.adZone2Cooldown.toDate().getTime() : 0;
-             if (zone2ResetTime > 0 && now > zone2ResetTime) {
-                const userRef = doc(db, "users", currentUser.uid);
-                await updateDoc(userRef, { adZone2Count: 0, adZone2Cooldown: null });
-                userData.adZone2Count = 0;
-                userData.adZone2Cooldown = null;
-             }
-             
-             if (userData.adZone2Count >= ZONE2_LIMIT) {
-                 return showAlert("Limit reached. Please wait for cooldown.");
-             }
-
-             if (typeof window.show_9966888 !== 'function') return showAlert("Ad load fail.");
-             
-             zone2Btn.disabled = true;
-             
-             window.show_9966888('pop').then(async () => {
-                 const userRef = doc(db, "users", currentUser.uid);
-                 let newCount = (userData.adZone2Count || 0) + 1;
-                 let updates = {
-                     balance: (userData.balance || 0) + ZONE2_REWARD,
-                     adZone2Count: newCount
-                 };
-                 
-                 if(newCount >= ZONE2_LIMIT) {
-                     const cooldownTime = new Date(Date.now() + ZONE2_COOLDOWN_MS);
-                     updates.adZone2Cooldown = cooldownTime;
-                     userData.adZone2Cooldown = { toDate: () => cooldownTime };
-                 }
-                 
-                 await updateDoc(userRef, updates);
-                 userData.balance += ZONE2_REWARD;
-                 userData.adZone2Count = newCount;
-                 
-                 updateUI();
-                 showAlert(`Success! +${ZONE2_REWARD} Coins.`);
-             }).catch(e => {
-                 console.error(e);
-                 showAlert("Ad watch failed or closed early.");
-                 zone2Btn.disabled = false;
-             });
-        }
-
-
-        function updateDynamicPaymentFields() {
-            const selectedMethod = withdrawMethodSelect.value.toLowerCase();
-            let placeholder = "Detail Daalein";
-            if (selectedMethod.includes('upi')) placeholder = "Apni UPI ID Daalein";
-            if (selectedMethod.includes('paytm')) placeholder = "Apna Paytm Number Daalein";
-            paymentDetailsContainer.innerHTML = `<input id="payment-detail-input" type="text" placeholder="${placeholder}" class="w-full p-3 rounded-lg input-field">`;
-        }
-
-
-        function showMainPage(pageId) {
-            document.querySelectorAll('.main-page').forEach(p => p.classList.remove('active'));
-            document.getElementById(pageId).classList.add('active');
-        }
-
-        function navigateTo(pageId) {
-            if (miningInterval) {
-                clearInterval(miningInterval);
-                miningInterval = null;
-            }
-
-            document.querySelectorAll('.sub-page').forEach(p => p.classList.remove('active'));
-            document.getElementById(pageId).classList.add('active');
-            document.querySelectorAll('.nav-link').forEach(link => {
-                link.classList.remove('active', 'text-accent');
-                if (link.dataset.page === pageId) link.classList.add('active', 'text-accent');
-            });
-
-            if (pageId === 'mining-page') {
-                updateMiningPageUI();
-            }
-        }
-        window.navigateTo = navigateTo;
-
-        function setupEventListeners() {
-            document.getElementById('show-signup').addEventListener('click', (e) => { e.preventDefault(); document.getElementById('login-view').classList.add('hidden'); document.getElementById('signup-view').classList.remove('hidden'); });
-            document.getElementById('show-login').addEventListener('click', (e) => { e.preventDefault(); document.getElementById('signup-view').classList.add('hidden'); document.getElementById('login-view').classList.remove('hidden'); });
-            document.getElementById('signup-btn').addEventListener('click', handleSignup);
-            document.getElementById('login-btn').addEventListener('click', handleLogin);
-            document.getElementById('logout-btn').addEventListener('click', handleLogout);
             document.querySelectorAll('.nav-link').forEach(link => {
                 link.addEventListener('click', (e) => {
                     e.preventDefault();
@@ -659,402 +823,407 @@
                 });
             });
 
-            document.getElementById('notification-bell').addEventListener('click', () => { navigateTo('notifications-page'); loadNotifications(); });
-            document.getElementById('copy-code-btn').addEventListener('click', copyReferralCode);
-            document.getElementById('share-btn').addEventListener('click', shareReferralCode);
-            document.getElementById('withdraw-btn').addEventListener('click', handleWithdrawal);
-            document.getElementById('home-withdraw-btn').addEventListener('click', () => { loadWithdrawalHistory(); navigateTo('wallet-page'); });
-            document.getElementById('apply-referral-btn').addEventListener('click', handleApplyReferralCode);
-            withdrawMethodSelect.addEventListener('change', updateDynamicPaymentFields);
-            miningBtn.addEventListener('click', handleMiningButtonClick);
-            
-            // New Zone Listeners
-            zone1Btn.addEventListener('click', handleZone1Ad);
-            zone2Btn.addEventListener('click', handleZone2Ad);
+            safeListen('notification-bell', 'click', () => { navigateTo('notifications-page'); loadNotifications(); });
+            safeListen('copy-code-btn', 'click', copyReferralCode);
+            safeListen('share-btn', 'click', shareReferralCode);
+            safeListen('withdraw-btn', 'click', handleWithdrawal);
+            safeListen('apply-referral-btn', 'click', handleApplyReferralCode);
+            safeListen('withdraw-method', 'change', updateDynamicPaymentFields);
+            safeListen('mining-btn', 'click', handleMiningButtonClick);
+            safeListen('zone1-btn', 'click', handleZone1Ad);
+            safeListen('zone2-btn', 'click', handleZone2Ad);
+            safeListen('convert-trigger', 'click', handleCoinConversion);
+
+            const ldr = document.getElementById('loader');
+            if(ldr) ldr.style.display = 'none';
+
+            onAuthStateChanged(auth, handleAuthStateChange);
+        };
+
+        async function handleAuthStateChange(user) {
+            const ldr = document.getElementById('loader');
+            if (user) {
+                if(ldr) ldr.style.display = 'flex';
+                currentUser = user;
+                await fetchUserData();
+                if (userData.isBlocked) {
+                    showAlert("Aapka account block kar diya gaya hai.");
+                    await signOut(auth);
+                    if(ldr) ldr.style.display = 'none';
+                    return;
+                }
+                await fetchAppConfig();
+                await checkAndFinalizeMiningSession();
+                await checkNewNotifications();
+                updateUI();
+                showMainPage('app-container');
+                navigateTo('home-page');
+                if(ldr) ldr.style.display = 'none';
+                
+                if(zoneTimerInterval) clearInterval(zoneTimerInterval);
+                zoneTimerInterval = setInterval(updateZoneButtons, 1000);
+            } else {
+                currentUser = null;
+                userData = null;
+                showMainPage('auth-section');
+                if(zoneTimerInterval) clearInterval(zoneTimerInterval);
+            }
         }
         
-        async function handleSignup() {
-            const name = document.getElementById('signup-name').value;
-            const email = document.getElementById('signup-email').value;
-            const password = document.getElementById('signup-password').value;
-            if (!name || !email || !password) return showAlert("Kripya sabhi fields bharein.");
-            loader.style.display = 'flex';
+        function setText(id, text) { const el = document.getElementById(id); if(el) el.textContent = text; }
+
+        async function fetchUserData() {
+            if (!currentUser) return;
+            const userRef = doc(db, "users", currentUser.uid);
             try {
-                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-            } catch (error) {
-                showAlert(error.message);
-            } finally {
-                loader.style.display = 'none';
+                const userSnap = await getDoc(userRef);
+                if (userSnap.exists()) {
+                    userData = userSnap.data();
+                    let needsUpdate = false;
+                    if (typeof userData.adZone1Count === 'undefined') { userData.adZone1Count = 0; needsUpdate = true; }
+                    if (typeof userData.adZone1Cooldown === 'undefined') { userData.adZone1Cooldown = null; needsUpdate = true; }
+                    if (typeof userData.adZone2Count === 'undefined') { userData.adZone2Count = 0; needsUpdate = true; }
+                    if (typeof userData.adZone2Cooldown === 'undefined') { userData.adZone2Cooldown = null; needsUpdate = true; }
+                    if (typeof userData.walletBalance === 'undefined') { userData.walletBalance = 0; needsUpdate = true; }
+                    if(needsUpdate) {
+                        await updateDoc(userRef, {
+                            adZone1Count: userData.adZone1Count, adZone1Cooldown: userData.adZone1Cooldown,
+                            adZone2Count: userData.adZone2Count, adZone2Cooldown: userData.adZone2Cooldown,
+                            walletBalance: userData.walletBalance
+                        });
+                    }
+                } else {
+                    const ownReferralCode = Math.random().toString(36).substring(2, 8).toUpperCase();
+                    const defaultUserData = {
+                        uid: currentUser.uid, name: currentUser.email.split('@')[0], email: currentUser.email,
+                        balance: 50, referralCode: ownReferralCode, referredBy: null,
+                        lastNotificationCheck: new Date(), createdAt: serverTimestamp(),
+                        dailyAdCount: 0, lastAdWatchDate: new Date().toISOString().split('T')[0], isBlocked: false,
+                        miningAdsWatched: 0, miningSessionStartTime: null, isMiningActive: false,
+                        adZone1Count: 0, adZone1Cooldown: null, adZone2Count: 0, adZone2Cooldown: null, walletBalance: 0 
+                    };
+                    await setDoc(userRef, defaultUserData);
+                    userData = defaultUserData;
+                }
+            } catch (error) { console.error("Error fetching user data:", error); showAlert("User data load karne mein error aayi."); }
+        }
+
+        async function fetchAppConfig() {
+            const configRef = doc(db, "config", "main");
+            try {
+                const configSnap = await getDoc(configRef);
+                appConfig = configSnap.exists() ? configSnap.data() : { minWithdrawal: 50, paymentMethods: ["UPI", "Paytm"], dailyAdLimit: 10, coinValueCoins: 1000, coinValueInr: 10 };
+            } catch (error) { console.error("Error fetching app config:", error); }
+        }
+        
+        function updateUI() {
+            if (!userData) return;
+            const balance = userData.balance || 0;
+            const wallet = userData.walletBalance || 0;
+            setText('coin-balance', balance); setText('wallet-coin-balance', balance);
+            setText('home-rupee-balance', wallet.toFixed(2)); setText('wallet-rupee-balance', wallet.toFixed(2));
+            setText('profile-name', userData.name || 'No Name'); setText('profile-email', userData.email || 'No Email');
+            setText('referral-code', userData.referralCode || '...');
+            setText('min-withdrawal-info', `${appConfig.minWithdrawal || 50}`); 
+            setText('coin-value-info', `${appConfig.coinValueCoins || 1000} Coins = ₹${appConfig.coinValueInr || 10}`);
+            const withdrawMethodSelect = document.getElementById('withdraw-method');
+            if(withdrawMethodSelect) {
+                withdrawMethodSelect.innerHTML = '';
+                (appConfig.paymentMethods || []).forEach(method => {
+                    const option = document.createElement('option'); option.value = method; option.textContent = method;
+                    withdrawMethodSelect.appendChild(option);
+                });
+            }
+            updateDynamicPaymentFields(); updateAdsLeftCount(); updateMiningButtonUI(); updateZoneButtons(); 
+        }
+        
+        function updateAdsLeftCount() {
+            const today = new Date().toISOString().split('T')[0];
+            if (userData.lastAdWatchDate !== today) userData.dailyAdCount = 0;
+            const adsLeft = Math.max(0, (appConfig.dailyAdLimit || 10) - userData.dailyAdCount);
+            setText('ads-left-count', adsLeft);
+        }
+        
+        async function handleCoinConversion() {
+            if(!userData || !appConfig) return;
+            const coins = userData.balance || 0;
+            const rateCoins = appConfig.coinValueCoins || 1000;
+            const rateInr = appConfig.coinValueInr || 10;
+            if (coins < rateCoins) return showAlert(`Convert karne ke liye kam se kam ${rateCoins} coins chahiye.`);
+            const batches = Math.floor(coins / rateCoins);
+            const coinsToDeduct = batches * rateCoins;
+            const cashToAdd = batches * rateInr;
+            if (confirm(`Kya aap ${coinsToDeduct} coins ko ₹${cashToAdd.toFixed(2)} mein convert karna chahte hain?`)) {
+                const ldr = document.getElementById('loader'); if(ldr) ldr.style.display = 'flex';
+                try {
+                    const userRef = doc(db, "users", currentUser.uid);
+                    const newCoinBalance = coins - coinsToDeduct;
+                    const newWalletBalance = (userData.walletBalance || 0) + cashToAdd;
+                    await updateDoc(userRef, { balance: newCoinBalance, walletBalance: newWalletBalance });
+                    userData.balance = newCoinBalance; userData.walletBalance = newWalletBalance;
+                    updateUI(); showAlert(`Conversion Safal! ₹${cashToAdd.toFixed(2)} wallet mein add ho gaye.`);
+                } catch(e) { console.error(e); showAlert("Conversion mein error aayi."); } finally { if(ldr) ldr.style.display = 'none'; }
             }
         }
-        async function handleLogin() {
-            const email = document.getElementById('login-email').value;
-            const password = document.getElementById('login-password').value;
-            if (!email || !password) return showAlert("Kripya email aur password daalein.");
-            loader.style.display = 'flex';
-            try {
-                await signInWithEmailAndPassword(auth, email, password);
-            } catch (error) {
-                showAlert(error.message);
-            } finally {
-                loader.style.display = 'none';
+        
+        function formatTime(ms) {
+            if(ms < 0) return "00:00:00";
+            const seconds = Math.floor((ms / 1000) % 60); const minutes = Math.floor((ms / (1000 * 60)) % 60); const hours = Math.floor((ms / (1000 * 60 * 60)));
+            return `${hours}h ${minutes}m ${seconds}s`;
+        }
+
+        function updateZoneButtons() {
+            if(!userData) return;
+            const now = Date.now();
+            let zone1ResetTime = userData.adZone1Cooldown ? userData.adZone1Cooldown.toDate().getTime() : 0;
+            if (zone1ResetTime > 0 && now > zone1ResetTime) { userData.adZone1Count = 0; userData.adZone1Cooldown = null; }
+            const z1Btn = document.getElementById('zone1-btn');
+            const z1Stat = document.getElementById('zone1-status');
+            if (z1Btn) {
+                if (userData.adZone1Count >= ZONE1_LIMIT && zone1ResetTime > now) {
+                    z1Btn.disabled = true; z1Btn.classList.add('opacity-50', 'cursor-not-allowed'); z1Btn.textContent = formatTime(zone1ResetTime - now);
+                    if(z1Stat) z1Stat.textContent = "Cooldown Active";
+                } else {
+                    z1Btn.disabled = false; z1Btn.classList.remove('opacity-50', 'cursor-not-allowed'); z1Btn.textContent = "Watch";
+                    if(z1Stat) z1Stat.textContent = `Completed: ${userData.adZone1Count}/${ZONE1_LIMIT}`;
+                }
             }
+            let zone2ResetTime = userData.adZone2Cooldown ? userData.adZone2Cooldown.toDate().getTime() : 0;
+            if (zone2ResetTime > 0 && now > zone2ResetTime) { userData.adZone2Count = 0; userData.adZone2Cooldown = null; }
+            const z2Btn = document.getElementById('zone2-btn');
+            const z2Stat = document.getElementById('zone2-status');
+            if (z2Btn) {
+                if (userData.adZone2Count >= ZONE2_LIMIT && zone2ResetTime > now) {
+                    z2Btn.disabled = true; z2Btn.classList.add('opacity-50', 'cursor-not-allowed'); z2Btn.textContent = formatTime(zone2ResetTime - now);
+                    if(z2Stat) z2Stat.textContent = "Cooldown Active";
+                } else {
+                    z2Btn.disabled = false; z2Btn.classList.remove('opacity-50', 'cursor-not-allowed'); z2Btn.textContent = "Watch";
+                    if(z2Stat) z2Stat.textContent = `Completed: ${userData.adZone2Count}/${ZONE2_LIMIT}`;
+                }
+            }
+        }
+        
+        async function handleZone1Ad() {
+             const now = Date.now();
+             let zone1ResetTime = userData.adZone1Cooldown ? userData.adZone1Cooldown.toDate().getTime() : 0;
+             if (zone1ResetTime > 0 && now > zone1ResetTime) { const userRef = doc(db, "users", currentUser.uid); await updateDoc(userRef, { adZone1Count: 0, adZone1Cooldown: null }); userData.adZone1Count = 0; userData.adZone1Cooldown = null; }
+             if (userData.adZone1Count >= ZONE1_LIMIT) return showAlert("Limit reached. Please wait for cooldown.");
+             if (typeof window.show_9972147 !== 'function') return showAlert("Ad load fail.");
+             const btn = document.getElementById('zone1-btn'); if(btn) btn.disabled = true;
+             window.show_9972147('pop').then(async () => {
+                 const userRef = doc(db, "users", currentUser.uid);
+                 let newCount = (userData.adZone1Count || 0) + 1;
+                 let updates = { balance: (userData.balance || 0) + ZONE1_REWARD, adZone1Count: newCount };
+                 if(newCount >= ZONE1_LIMIT) { const cooldownTime = new Date(Date.now() + ZONE1_COOLDOWN_MS); updates.adZone1Cooldown = cooldownTime; userData.adZone1Cooldown = { toDate: () => cooldownTime }; }
+                 await updateDoc(userRef, updates); userData.balance += ZONE1_REWARD; userData.adZone1Count = newCount;
+                 updateUI(); showAlert(`Success! +${ZONE1_REWARD} Coins.`);
+             }).catch(e => { console.error(e); showAlert("Ad watch failed or closed early."); if(btn) btn.disabled = false; });
+        }
+
+        async function handleZone2Ad() {
+             const now = Date.now();
+             let zone2ResetTime = userData.adZone2Cooldown ? userData.adZone2Cooldown.toDate().getTime() : 0;
+             if (zone2ResetTime > 0 && now > zone2ResetTime) { const userRef = doc(db, "users", currentUser.uid); await updateDoc(userRef, { adZone2Count: 0, adZone2Cooldown: null }); userData.adZone2Count = 0; userData.adZone2Cooldown = null; }
+             if (userData.adZone2Count >= ZONE2_LIMIT) return showAlert("Limit reached. Please wait for cooldown.");
+             if (typeof window.show_9966888 !== 'function') return showAlert("Ad load fail.");
+             const btn = document.getElementById('zone2-btn'); if(btn) btn.disabled = true;
+             window.show_9966888('pop').then(async () => {
+                 const userRef = doc(db, "users", currentUser.uid);
+                 let newCount = (userData.adZone2Count || 0) + 1;
+                 let updates = { balance: (userData.balance || 0) + ZONE2_REWARD, adZone2Count: newCount };
+                 if(newCount >= ZONE2_LIMIT) { const cooldownTime = new Date(Date.now() + ZONE2_COOLDOWN_MS); updates.adZone2Cooldown = cooldownTime; userData.adZone2Cooldown = { toDate: () => cooldownTime }; }
+                 await updateDoc(userRef, updates); userData.balance += ZONE2_REWARD; userData.adZone2Count = newCount;
+                 updateUI(); showAlert(`Success! +${ZONE2_REWARD} Coins.`);
+             }).catch(e => { console.error(e); showAlert("Ad watch failed or closed early."); if(btn) btn.disabled = false; });
+        }
+
+        function updateDynamicPaymentFields() {
+            const select = document.getElementById('withdraw-method'); const container = document.getElementById('payment-details-container'); if(!select || !container) return;
+            const selectedMethod = select.value.toLowerCase();
+            let placeholder = "Detail Daalein"; if (selectedMethod.includes('upi')) placeholder = "Apni UPI ID Daalein"; if (selectedMethod.includes('paytm')) placeholder = "Apna Paytm Number Daalein";
+            container.innerHTML = `<input id="payment-detail-input" type="text" placeholder="${placeholder}" class="w-full p-3 rounded-lg input-field">`;
+        }
+
+        function showMainPage(pageId) {
+            document.querySelectorAll('.main-page').forEach(p => p.classList.remove('active'));
+            const el = document.getElementById(pageId); if(el) el.classList.add('active');
+        }
+
+        function navigateTo(pageId) {
+            if (miningInterval) { clearInterval(miningInterval); miningInterval = null; }
+            document.querySelectorAll('.sub-page').forEach(p => p.classList.remove('active'));
+            
+            if (pageId === 'egg-page') {
+                const eggFrame = document.getElementById('egg-frame');
+                const eggPage = document.getElementById('egg-page');
+                // Ensure page is active first for dimensions
+                if (eggPage) { eggPage.style.display = 'block'; eggPage.classList.add('active'); }
+                
+                if (!eggGameLoaded && eggFrame && typeof eggGameCode !== 'undefined') {
+                    const doc = eggFrame.contentWindow.document;
+                    doc.open(); doc.write(eggGameCode); doc.close();
+                    eggGameLoaded = true;
+                }
+            } else {
+                const eggPage = document.getElementById('egg-page'); if (eggPage) eggPage.style.display = 'none';
+                const el = document.getElementById(pageId); if(el) el.classList.add('active');
+            }
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('active', 'text-accent');
+                if (link.dataset.page === pageId) link.classList.add('active', 'text-accent');
+            });
+            if (pageId === 'wallet-page') loadWithdrawalHistory();
+            if (pageId === 'mining-page') updateMiningPageUI();
+        }
+        window.navigateTo = navigateTo;
+        
+        async function handleSignup() {
+            const name = document.getElementById('signup-name').value; const email = document.getElementById('signup-email').value; const password = document.getElementById('signup-password').value;
+            if (!name || !email || !password) return showAlert("Kripya sabhi fields bharein.");
+            const ldr = document.getElementById('loader'); if(ldr) ldr.style.display = 'flex';
+            try { await createUserWithEmailAndPassword(auth, email, password); } catch (error) { showAlert(error.message); } finally { if(ldr) ldr.style.display = 'none'; }
+        }
+        async function handleLogin() {
+            const email = document.getElementById('login-email').value; const password = document.getElementById('login-password').value;
+            if (!email || !password) return showAlert("Kripya email aur password daalein.");
+            const ldr = document.getElementById('loader'); if(ldr) ldr.style.display = 'flex';
+            try { await signInWithEmailAndPassword(auth, email, password); } catch (error) { showAlert(error.message); } finally { if(ldr) ldr.style.display = 'none'; }
         }
         async function handleLogout() { await signOut(auth); }
         async function checkNewNotifications() {
-            const lastCheck = userData.lastNotificationCheck;
-            if (!lastCheck || typeof lastCheck.seconds === 'undefined') {
-                return;
-            }
-            const q = query(collection(db, "notifications"), where("createdAt", ">", lastCheck), limit(1));
+            if (!userData.lastNotificationCheck) return;
+            const q = query(collection(db, "notifications"), where("createdAt", ">", userData.lastNotificationCheck), limit(1));
             const querySnapshot = await getDocs(q);
-            notificationDot.style.display = querySnapshot.empty ? 'none' : 'block';
+            const dot = document.getElementById('notification-dot'); if(dot) dot.style.display = querySnapshot.empty ? 'none' : 'block';
         }
         async function loadNotifications() {
-            const listEl = document.getElementById('notifications-list');
-            listEl.innerHTML = '<p class="text-gray-400">Loading...</p>';
-            notificationDot.style.display = 'none';
+            const listEl = document.getElementById('notifications-list'); if(listEl) listEl.innerHTML = '<p class="text-gray-400">Loading...</p>';
+            const dot = document.getElementById('notification-dot'); if(dot) dot.style.display = 'none';
             const q = query(collection(db, "notifications"), orderBy("createdAt", "desc"));
             try {
                 const querySnapshot = await getDocs(q);
-                if (querySnapshot.empty) {
-                    listEl.innerHTML = '<p class="text-gray-400 text-center">Koi notifications nahi hain.</p>';
-                    return;
+                if(listEl) {
+                    if (querySnapshot.empty) { listEl.innerHTML = '<p class="text-gray-400 text-center">Koi notifications nahi hain.</p>'; return; }
+                    listEl.innerHTML = '';
+                    querySnapshot.forEach(doc => {
+                        const msg = doc.data(); const date = msg.createdAt ? msg.createdAt.toDate().toLocaleDateString() : 'N/A';
+                        listEl.innerHTML += `<div class="card-bg p-4 rounded-lg"><div class="flex justify-between items-center mb-1"><h3 class="font-bold">${msg.title}</h3><p class="text-xs text-gray-400">${date}</p></div><p class="text-sm text-gray-300">${msg.message}</p></div>`;
+                    });
                 }
-                listEl.innerHTML = '';
-                querySnapshot.forEach(doc => {
-                    const msg = doc.data();
-                    const date = msg.createdAt ? msg.createdAt.toDate().toLocaleDateString() : 'N/A';
-                    listEl.innerHTML += `<div class="card-bg p-4 rounded-lg"><div class="flex justify-between items-center mb-1"><h3 class="font-bold">${msg.title}</h3><p class="text-xs text-gray-400">${date}</p></div><p class="text-sm text-gray-300">${msg.message}</p></div>`;
-                });
                 await updateDoc(doc(db, "users", currentUser.uid), { lastNotificationCheck: serverTimestamp() });
-            } catch (error) {
-                console.error("Error loading notifications:", error);
-                listEl.innerHTML = '<p class="text-red-400">Notifications load karne mein error aayi.</p>';
-            }
+            } catch (error) { console.error(error); if(listEl) listEl.innerHTML = '<p class="text-red-400">Error loading notifications.</p>'; }
         }
         async function loadWithdrawalHistory() {
-            const historyList = document.getElementById('withdrawal-history-list');
-            historyList.innerHTML = '<p class="text-gray-400">History load ho rahi hai...</p>';
+            const historyList = document.getElementById('withdrawal-history-list'); if(historyList) historyList.innerHTML = '<p class="text-gray-400">History load ho rahi hai...</p>';
             const q = query(collection(db, "withdrawals"), where("userId", "==", currentUser.uid));
             try {
                 const querySnapshot = await getDocs(q);
-                if (querySnapshot.empty) {
-                    historyList.innerHTML = '<p class="text-gray-400">Aapne abhi tak koi withdrawal nahi kiya hai.</p>';
-                    return;
+                if(historyList) {
+                    if (querySnapshot.empty) { historyList.innerHTML = '<p class="text-gray-400">Aapne abhi tak koi withdrawal nahi kiya hai.</p>'; return; }
+                    const withdrawals = []; querySnapshot.forEach(doc => withdrawals.push(doc.data()));
+                    withdrawals.sort((a, b) => (b.requestedAt?.seconds || 0) - (a.requestedAt?.seconds || 0));
+                    historyList.innerHTML = '';
+                    withdrawals.forEach(request => {
+                        const status = request.status; let statusColor = 'text-yellow-400'; if (status === 'approved') statusColor = 'text-green-400'; else if (status === 'rejected') statusColor = 'text-red-400';
+                        const date = request.requestedAt ? request.requestedAt.toDate().toLocaleDateString() : 'N/A';
+                        historyList.innerHTML += `<div class="card-bg p-3 rounded-lg flex items-center justify-between"><div><p class="font-semibold">₹${request.amount} - ${request.method}</p><p class="text-xs text-gray-400">${date}</p></div><p class="font-bold ${statusColor} capitalize">${status}</p></div>`;
+                    });
                 }
-                const withdrawals = [];
-                querySnapshot.forEach(doc => withdrawals.push(doc.data()));
-                withdrawals.sort((a, b) => (b.requestedAt?.seconds || 0) - (a.requestedAt?.seconds || 0));
-                historyList.innerHTML = '';
-                withdrawals.forEach(request => {
-                    const status = request.status;
-                    let statusColor = 'text-yellow-400';
-                    if (status === 'approved') statusColor = 'text-green-400';
-                    else if (status === 'rejected') statusColor = 'text-red-400';
-                    const date = request.requestedAt ? request.requestedAt.toDate().toLocaleDateString() : 'N/A';
-                    historyList.innerHTML += `<div class="card-bg p-3 rounded-lg flex items-center justify-between"><div><p class="font-semibold">${request.amount} Coins - ${request.method}</p><p class="text-xs text-gray-400">${date}</p></div><p class="font-bold ${statusColor} capitalize">${status}</p></div>`;
-                });
-            } catch (error) {
-                console.error("Error fetching withdrawal history: ", error);
-                historyList.innerHTML = '<p class="text-red-400">History load karne mein error aayi.</p>';
-            }
+            } catch (error) { console.error(error); if(historyList) historyList.innerHTML = '<p class="text-red-400">Error loading history.</p>'; }
         }
         async function handleApplyReferralCode() {
-            if (userData.referredBy) return showAlert("Aap pehle hi ek referral code istemal kar chuke hain.");
-            const codeInput = document.getElementById('enter-referral-code');
-            const code = codeInput.value.trim().toUpperCase();
-            if (!code) return showAlert("Kripya ek code daalein.");
-            if (code === userData.referralCode) return showAlert("Aap apna khud ka code istemal nahi kar sakte.");
-            loader.style.display = 'flex';
-            await applyReferralBonus(code, true);
-            codeInput.value = '';
-            loader.style.display = 'none';
+            if (userData.referredBy) return showAlert("Referral already used.");
+            const codeInput = document.getElementById('enter-referral-code'); const code = codeInput.value.trim().toUpperCase();
+            if (!code) return showAlert("Kripya ek code daalein."); if (code === userData.referralCode) return showAlert("Cannot use own code.");
+            const ldr = document.getElementById('loader'); if(ldr) ldr.style.display = 'flex';
+            await applyReferralBonus(code, true); codeInput.value = ''; if(ldr) ldr.style.display = 'none';
         }
         async function applyReferralBonus(referrerCode, isManualApply = false) {
-            const usersRef = collection(db, "users");
-            const q = query(usersRef, where("referralCode", "==", referrerCode));
+            const usersRef = collection(db, "users"); const q = query(usersRef, where("referralCode", "==", referrerCode));
             try {
                 const querySnapshot = await getDocs(q);
                 if (!querySnapshot.empty) {
-                    const referrerDoc = querySnapshot.docs[0];
-                    const batch = writeBatch(db);
-                    const referrerRef = doc(db, "users", referrerDoc.id);
-                    batch.update(referrerRef, { balance: (referrerDoc.data().balance || 0) + 100 });
-                    const newUserRef = doc(db, "users", currentUser.uid);
-                    batch.update(newUserRef, { balance: (userData.balance || 0) + 100, referredBy: referrerCode });
-                    await batch.commit();
-
-                    userData.balance += 100; userData.referredBy = referrerCode;
-                    updateUI();
-                    if(isManualApply) showAlert("Code safaltapoorvak apply ho gaya! Aapko 100 coins mile hain.");
-                } else {
-                    if(isManualApply) showAlert("Galat referral code.");
-                }
-            } catch(error) {
-                console.error("Error applying referral bonus: ", error);
-                if(isManualApply) showAlert("Code apply karte samay error aayi.");
-            }
-        }
-        async function updateBalance(amount) {
-            if (!currentUser) return;
-            const newBalance = (userData.balance || 0) + amount;
-            const userRef = doc(db, "users", currentUser.uid);
-            await updateDoc(userRef, { balance: newBalance });
-            userData.balance = newBalance;
-            updateUI();
-        }
-        async function handleWithdrawal() {
-            const amount = parseInt(document.getElementById('withdraw-amount').value);
-            const method = document.getElementById('withdraw-method').value;
-            const paymentDetailInput = document.getElementById('payment-detail-input');
-            const paymentDetail = paymentDetailInput ? paymentDetailInput.value.trim() : '';
-            const minWithdrawal = appConfig.minWithdrawal || 5000;
-            if (!amount || amount <= 0) return showAlert("Kripya valid amount daalein.");
-            if (amount < minWithdrawal) return showAlert(`Minimum withdrawal ${minWithdrawal} coins hai.`);
-            if (amount > userData.balance) return showAlert("Insufficient balance.");
-            if (!paymentDetail) return showAlert("Kripya payment detail daalein (UPI ID ya Paytm Number).");
-            try {
-                await updateBalance(-amount);
-                await addDoc(collection(db, "withdrawals"), {
-                    userId: currentUser.uid, userName: userData.name, userEmail: userData.email,
-                    amount: amount, method: method, paymentDetail: paymentDetail, status: "pending", requestedAt: serverTimestamp()
-                });
-                showAlert("Withdrawal request safaltapoorvak submit ho gayi hai!");
-                document.getElementById('withdraw-amount').value = '';
-                paymentDetailInput.value = '';
-            } catch (error) {
-                showAlert("Request submit karne mein error: " + error.message);
-                await updateBalance(amount);
-            }
-        }
-        function copyReferralCode() {
-            const textToCopy = referralCodeEl.textContent;
-            navigator.clipboard.writeText(textToCopy).then(() => {
-                showAlert("Referral code copy ho gaya!");
-            }).catch(() => {
-                showAlert("Code copy karne mein विफल.");
-            });
-        }
-        function shareReferralCode() {
-            const text = `CashReward join karein aur paise kamayein! Bonus paane ke liye mera referral code use karein: ${userData.referralCode}`;
-            if (navigator.share) {
-                navigator.share({ title: 'CashReward Join Karein!', text: text, url: window.location.href })
-                    .catch((error) => console.error("Share failed:", error));
-            } else {
-                copyReferralCode();
-                showAlert("Share feature available nahi hai. Iske bajaye referral code copy kar diya gaya hai!");
-            }
+                    const referrerDoc = querySnapshot.docs[0]; const batch = writeBatch(db);
+                    batch.update(doc(db, "users", referrerDoc.id), { balance: (referrerDoc.data().balance || 0) + 100 });
+                    batch.update(doc(db, "users", currentUser.uid), { balance: (userData.balance || 0) + 100, referredBy: referrerCode });
+                    await batch.commit(); userData.balance += 100; userData.referredBy = referrerCode;
+                    updateUI(); if(isManualApply) showAlert("Code applied! +100 Coins.");
+                } else { if(isManualApply) showAlert("Invalid code."); }
+            } catch(error) { console.error(error); if(isManualApply) showAlert("Error applying code."); }
         }
         
-        // --- UPDATED MINING LOGIC ---
-
+        async function handleWithdrawal() {
+            const amount = parseFloat(document.getElementById('withdraw-amount').value); const method = document.getElementById('withdraw-method').value;
+            const paymentDetailInput = document.getElementById('payment-detail-input'); const paymentDetail = paymentDetailInput ? paymentDetailInput.value.trim() : '';
+            const minWithdrawal = appConfig.minWithdrawal || 50; 
+            if (!amount || amount <= 0) return showAlert("Invalid amount."); if (amount < minWithdrawal) return showAlert(`Min withdrawal: ₹${minWithdrawal}`); if (amount > userData.walletBalance) return showAlert("Insufficient balance."); if (!paymentDetail) return showAlert("Details required.");
+            const ldr = document.getElementById('loader'); if(ldr) ldr.style.display = 'flex';
+            try {
+                const newWalletBalance = (userData.walletBalance || 0) - amount; await updateDoc(doc(db, "users", currentUser.uid), { walletBalance: newWalletBalance });
+                userData.walletBalance = newWalletBalance;
+                await addDoc(collection(db, "withdrawals"), { userId: currentUser.uid, userName: userData.name, userEmail: userData.email, amount: amount, method: method, paymentDetail: paymentDetail, status: "pending", requestedAt: serverTimestamp() });
+                showAlert("Request submitted!"); document.getElementById('withdraw-amount').value = ''; if(paymentDetailInput) paymentDetailInput.value = ''; updateUI();
+            } catch (error) { showAlert("Error: " + error.message); } finally { if(ldr) ldr.style.display = 'none'; }
+        }
+        function copyReferralCode() { navigator.clipboard.writeText(userData.referralCode).then(() => showAlert("Copied!")).catch(() => showAlert("Failed copy.")); }
+        function shareReferralCode() {
+            const text = `Join CashReward! Code: ${userData.referralCode}`;
+            if (navigator.share) navigator.share({ title: 'CashReward', text: text, url: window.location.href }).catch(console.error);
+            else { copyReferralCode(); showAlert("Code copied!"); }
+        }
+        
         function updateMiningButtonUI() {
-            if (userData.isMiningActive) {
-                miningBtn.innerHTML = `<span>Play</span>`;
-                miningBtn.disabled = false;
-                miningBtn.classList.remove('bg-gray-500');
-                miningBtn.classList.add('bg-blue-500');
-            } else if (userData.miningAdsWatched >= MINING_ADS_REQUIRED) {
-                miningBtn.innerHTML = `<span>Play</span>`;
-                miningBtn.disabled = false;
-                miningBtn.classList.remove('bg-gray-500');
-                miningBtn.classList.add('bg-blue-500');
-            } else {
-                miningBtn.innerHTML = `<i data-lucide="lock" class="w-4 h-4 mr-2"></i> <span>Ads: ${userData.miningAdsWatched || 0}/${MINING_ADS_REQUIRED}</span>`;
-                miningBtn.disabled = false;
-                miningBtn.classList.remove('bg-blue-500');
-                miningBtn.classList.add('bg-gray-500');
-            }
-            lucide.createIcons();
+            const btn = document.getElementById('mining-btn'); if(!btn) return;
+            if (userData.isMiningActive) { btn.innerHTML = `<span>Play</span>`; btn.disabled = false; btn.classList.remove('bg-gray-500'); btn.classList.add('bg-blue-500'); } else if (userData.miningAdsWatched >= MINING_ADS_REQUIRED) { btn.innerHTML = `<span>Play</span>`; btn.disabled = false; btn.classList.remove('bg-gray-500'); btn.classList.add('bg-blue-500'); } else { btn.innerHTML = `<i data-lucide="lock" class="w-4 h-4 mr-2"></i> <span>Ads: ${userData.miningAdsWatched || 0}/${MINING_ADS_REQUIRED}</span>`; btn.disabled = false; btn.classList.remove('bg-blue-500'); btn.classList.add('bg-gray-500'); }
+            if(typeof lucide !== 'undefined') lucide.createIcons();
         }
         
         async function handleMiningButtonClick() {
-            await fetchUserData();
-
-            if (userData.isMiningActive) {
-                navigateTo('mining-page');
-            } else if (userData.miningAdsWatched >= MINING_ADS_REQUIRED) {
-                await startNewMiningSession();
-                navigateTo('mining-page');
-            } else {
-                showAlert(`Mining shuru karne ke liye aapko ${MINING_ADS_REQUIRED - (userData.miningAdsWatched || 0)} aur ads dekhne honge. Ek ad dekhne ke liye "Claim" button par click karein.`);
-            }
+            await fetchUserData(); if (userData.isMiningActive) navigateTo('mining-page'); else if (userData.miningAdsWatched >= MINING_ADS_REQUIRED) { await startNewMiningSession(); navigateTo('mining-page'); } else showAlert(`Watch ${MINING_ADS_REQUIRED - (userData.miningAdsWatched || 0)} more ads to mine.`);
         }
 
         async function startNewMiningSession() {
-            loader.style.display = 'flex';
-            const userRef = doc(db, "users", currentUser.uid);
-            try {
-                await updateDoc(userRef, {
-                    isMiningActive: true,
-                    miningSessionStartTime: serverTimestamp()
-                });
-                await fetchUserData();
-                showAlert("Mining session shuru ho gaya hai!");
-                updateMiningButtonUI();
-            } catch(e) {
-                console.error("Error starting mining session:", e);
-                showAlert("Mining session shuru karne mein error aayi.");
-            }
-            loader.style.display = 'none';
+            const ldr = document.getElementById('loader'); if(ldr) ldr.style.display = 'flex';
+            try { await updateDoc(doc(db, "users", currentUser.uid), { isMiningActive: true, miningSessionStartTime: serverTimestamp() }); await fetchUserData(); showAlert("Mining started!"); updateMiningButtonUI(); } catch(e) { console.error(e); showAlert("Error starting mining."); } if(ldr) ldr.style.display = 'none';
         }
 
         function updateMiningPageUI() {
             if (miningInterval) clearInterval(miningInterval);
-            
-            const coinCircle = document.getElementById("mining-progress-circle");
-            const coinDisplay = document.getElementById("mining-coin-count");
-            const timerDisplay = document.getElementById("mining-timer");
-            const statusText = document.getElementById("mining-status-text");
-            const radius = 80;
-            const circumference = 2 * Math.PI * radius;
-            coinCircle.style.strokeDasharray = circumference;
-
-            if (!userData.isMiningActive || !userData.miningSessionStartTime) {
-                coinDisplay.textContent = "🪙 0";
-                coinCircle.style.strokeDashoffset = circumference;
-                timerDisplay.textContent = "00:00:00";
-                statusText.textContent = "Koi active mining session nahi hai. Home page par jaakar shuru karein.";
-                return;
-            }
-
+            const coinCircle = document.getElementById("mining-progress-circle"); const coinDisplay = document.getElementById("mining-coin-count"); const timerDisplay = document.getElementById("mining-timer"); const statusText = document.getElementById("mining-status-text");
+            const radius = 80; const circumference = 2 * Math.PI * radius; if(coinCircle) coinCircle.style.strokeDasharray = circumference;
+            if (!userData.isMiningActive || !userData.miningSessionStartTime) { if(coinDisplay) coinDisplay.textContent = "🪙 0"; if(coinCircle) coinCircle.style.strokeDashoffset = circumference; if(timerDisplay) timerDisplay.textContent = "00:00:00"; if(statusText) statusText.textContent = "Inactive."; return; }
             const startTime = userData.miningSessionStartTime.toDate().getTime();
-            
             miningInterval = setInterval(() => {
-                const now = Date.now();
-                const elapsedTime = now - startTime;
-
-                if (elapsedTime >= MINING_DURATION_MS) {
-                    clearInterval(miningInterval);
-                    timerDisplay.textContent = "00:00:00";
-                    coinDisplay.textContent = `🪙 ${MINING_REWARD}`;
-                    coinCircle.style.strokeDashoffset = 0;
-                    statusText.textContent = "Session poora ho gaya! Reward aapke balance mein add kar diya jayega.";
-                    return;
-                }
-
+                const now = Date.now(); const elapsedTime = now - startTime;
+                if (elapsedTime >= MINING_DURATION_MS) { clearInterval(miningInterval); if(timerDisplay) timerDisplay.textContent = "00:00:00"; if(coinDisplay) coinDisplay.textContent = `🪙 ${MINING_REWARD}`; if(coinCircle) coinCircle.style.strokeDashoffset = 0; if(statusText) statusText.textContent = "Finished! Reward pending."; return; }
                 const remainingTime = MINING_DURATION_MS - elapsedTime;
-                const hours = Math.floor(remainingTime / (1000 * 60 * 60)).toString().padStart(2, '0');
-                const minutes = Math.floor((remainingTime % (1000 * 60 * 60)) / (1000 * 60)).toString().padStart(2, '0');
-                const seconds = Math.floor((remainingTime % (1000 * 60)) / 1000).toString().padStart(2, '0');
-                timerDisplay.textContent = `${hours}:${minutes}:${seconds}`;
-                
-                const coinsMined = Math.floor((elapsedTime / 1000) / 2);
-                coinDisplay.textContent = `🪙 ${coinsMined}`;
-
-                const progress = elapsedTime / MINING_DURATION_MS;
-                coinCircle.style.strokeDashoffset = circumference * (1 - progress);
-                statusText.textContent = "Mining session active hai...";
+                const hours = Math.floor(remainingTime / (1000 * 60 * 60)).toString().padStart(2, '0'); const minutes = Math.floor((remainingTime % (1000 * 60 * 60)) / (1000 * 60)).toString().padStart(2, '0'); const seconds = Math.floor((remainingTime % (1000 * 60)) / 1000).toString().padStart(2, '0');
+                if(timerDisplay) timerDisplay.textContent = `${hours}:${minutes}:${seconds}`; const coinsMined = Math.floor((elapsedTime / 1000) / 2); if(coinDisplay) coinDisplay.textContent = `🪙 ${coinsMined}`; const progress = elapsedTime / MINING_DURATION_MS; if(coinCircle) coinCircle.style.strokeDashoffset = circumference * (1 - progress); if(statusText) statusText.textContent = "Mining active...";
             }, 1000);
         }
 
         async function checkAndFinalizeMiningSession() {
             if (userData.isMiningActive && userData.miningSessionStartTime) {
                 const startTime = userData.miningSessionStartTime.toDate().getTime();
-                const now = Date.now();
-                
-                if (now - startTime >= MINING_DURATION_MS) {
-                    console.log("Offline mining session finished. Awarding reward.");
-                    const userRef = doc(db, "users", currentUser.uid);
-                    try {
-                        const newBalance = (userData.balance || 0) + MINING_REWARD;
-                        await updateDoc(userRef, {
-                            balance: newBalance,
-                            isMiningActive: false,
-                            miningSessionStartTime: null,
-                            miningAdsWatched: 0
-                        });
-                        userData.balance = newBalance;
-                        userData.isMiningActive = false;
-                        userData.miningSessionStartTime = null;
-                        userData.miningAdsWatched = 0;
-
-                        showAlert(`Aapka pichla mining session poora ho gaya! Aapke account mein ${MINING_REWARD} coins add kar diye gaye hain.`);
-                        updateUI();
-                    } catch (e) {
-                        console.error("Error finalizing mining session:", e);
-                    }
+                if (Date.now() - startTime >= MINING_DURATION_MS) {
+                    try { const newBalance = (userData.balance || 0) + MINING_REWARD; await updateDoc(doc(db, "users", currentUser.uid), { balance: newBalance, isMiningActive: false, miningSessionStartTime: null, miningAdsWatched: 0 }); userData.balance = newBalance; userData.isMiningActive = false; userData.miningSessionStartTime = null; userData.miningAdsWatched = 0; showAlert(`Mining Finished! +${MINING_REWARD} Coins.`); updateUI(); } catch (e) { console.error(e); }
                 }
             }
         }
         
         window.claimReward = async function(taskType) {
-            const today = new Date().toISOString().split('T')[0];
-            const userRef = doc(db, "users", currentUser.uid);
-            let isForMining = false;
-
-            if (!userData.isMiningActive && (userData.miningAdsWatched || 0) < MINING_ADS_REQUIRED) {
-                isForMining = true;
-            }
-
-            if (userData.lastAdWatchDate !== today) {
-                await updateDoc(userRef, { dailyAdCount: 0, lastAdWatchDate: today });
-                userData.dailyAdCount = 0; userData.lastAdWatchDate = today;
-            }
-            if (userData.dailyAdCount >= (appConfig.dailyAdLimit || 10) && !isForMining) {
-                return showAlert("Aapki aaj ki ad dekhne ki seema poori ho gayi hai.");
-            }
-            
-            if (typeof window.show_9972147 !== 'function') {
-                return showAlert("Ad service abhi uplabdh nahi hai. Kripya baad mein prayas karein.");
-            }
-            
-            let adPromise;
-            switch(taskType) {
-                case 'interstitial': adPromise = window.show_9972147(); break;
-                // 'popup' case is no longer needed since the button is gone, but we can leave it for future use.
-                case 'popup': adPromise = window.show_9972147('pop'); break;
-                default: adPromise = window.show_9972147(); break;
-            }
-
-            adPromise.then(async () => {
-                let rewardAmount = 50;
-                let alertMsg = "";
-                let updates = {};
-
-                const newDailyCount = (userData.dailyAdCount || 0) + 1;
-                updates.dailyAdCount = newDailyCount;
-                userData.dailyAdCount = newDailyCount;
-
-                if (isForMining) {
-                    const newMiningAdCount = (userData.miningAdsWatched || 0) + 1;
-                    updates.miningAdsWatched = newMiningAdCount;
-                    userData.miningAdsWatched = newMiningAdCount;
-                    rewardAmount = 0;
-                    if (newMiningAdCount >= MINING_ADS_REQUIRED) {
-                        alertMsg = "Badhai ho! Aapne mining ke liye sabhi ads dekh liye hain. Ab 'Play Mining' par click karein.";
-                    } else {
-                        alertMsg = `Mining ke liye ad dekha gaya! (${newMiningAdCount}/${MINING_ADS_REQUIRED})`;
-                    }
-                    updateMiningButtonUI();
-                } else {
-                     alertMsg = `Badhai ho! Aapne ${rewardAmount} coins jeete hain.`;
-                }
-                
-                if (rewardAmount > 0) {
-                    const newBalance = (userData.balance || 0) + rewardAmount;
-                    updates.balance = newBalance;
-                    userData.balance = newBalance;
-                }
-
-                await updateDoc(userRef, updates);
-
-                showAlert(alertMsg);
-                updateUI();
-            }).catch(e => {
-                console.error("Ad error:", e);
-                showAlert('Ad nahi dikhaya ja saka. Kripya baad mein prayas karein.');
-            });
+            const today = new Date().toISOString().split('T')[0]; const isForMining = (!userData.isMiningActive && (userData.miningAdsWatched || 0) < MINING_ADS_REQUIRED);
+            if (userData.lastAdWatchDate !== today) { await updateDoc(doc(db, "users", currentUser.uid), { dailyAdCount: 0, lastAdWatchDate: today }); userData.dailyAdCount = 0; userData.lastAdWatchDate = today; }
+            if (userData.dailyAdCount >= (appConfig.dailyAdLimit || 10) && !isForMining) return showAlert("Daily ad limit reached.");
+            if (typeof window.show_9972147 !== 'function') return showAlert("Ad not ready.");
+            window.show_9972147().then(async () => {
+                let reward = 50, msg = ""; const newDaily = (userData.dailyAdCount || 0) + 1; let updates = { dailyAdCount: newDaily };
+                if (isForMining) { const newMining = (userData.miningAdsWatched || 0) + 1; updates.miningAdsWatched = newMining; reward = 0; msg = (newMining >= MINING_ADS_REQUIRED) ? "Mining Ads done! Start Mining." : `Ad watched (${newMining}/${MINING_ADS_REQUIRED})`; updateMiningButtonUI(); } else { msg = `+${reward} Coins!`; }
+                if (reward > 0) { updates.balance = (userData.balance || 0) + reward; } await updateDoc(doc(db, "users", currentUser.uid), updates); if(reward>0) userData.balance += reward; userData.dailyAdCount = newDaily; if(isForMining) userData.miningAdsWatched = (userData.miningAdsWatched || 0) + 1; showAlert(msg); updateUI();
+            }).catch(e => { console.error(e); showAlert("Ad failed."); });
         }
 
-        function showAlert(message) {
-            document.getElementById('alert-message').textContent = message;
-            document.getElementById('custom-alert').classList.remove('hidden');
-            document.getElementById('alert-ok-btn').onclick = () => {
-                document.getElementById('custom-alert').classList.add('hidden');
-            };
-        }
+        function showAlert(message) { document.getElementById('alert-message').textContent = message; document.getElementById('custom-alert').classList.remove('hidden'); document.getElementById('alert-ok-btn').onclick = () => { document.getElementById('custom-alert').classList.add('hidden'); }; }
         window.showAlert = showAlert;
 
     </script>
