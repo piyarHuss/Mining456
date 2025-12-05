@@ -284,7 +284,7 @@
         </div>
     </div>
 
-    <!-- EGG GAME CODE (Fully Integrated with Admin Panel) -->
+    <!-- EGG GAME CODE (Fixed Giveaway Logic) -->
     <script>
         const eggGameCode = `
 <!DOCTYPE html>
@@ -735,18 +735,26 @@
                 });
             }
         };
+        
+        // FIXED AUTO REVEAL LOGIC
         function autoRevealEgg(id, idx) {
             if(window[\`op_\${id}\`]) return; window[\`op_\${id}\`] = true;
             const img = document.getElementById(\`gv-img-\${id}\`);
             if(img) { img.classList.remove('shaking'); img.classList.add('glowing'); }
+            
+            // Stagger requests slightly to prevent UI freeze
             setTimeout(() => {
                 get(ref(db, \`admin/giveaway_rewards/\${idx}\`)).then(s => {
                     const w = s.val() || 0;
+                    // Mark as opened in Egg DB
                     update(ref(db, \`giveaway_orders/\${id}\`), { isOpened: true, reward: w }).then(() => { 
-                        if(w>0 && window.parent.handleAddReward) window.parent.handleAddReward(w);
+                        // ADD REWARD SAFELY TO PARENT WALLET
+                        if(w > 0 && window.parent.handleAddReward) {
+                            window.parent.handleAddReward(w);
+                        }
                     });
                 });
-            }, 1500);
+            }, 1500 + (idx * 500)); // Added staggered delay based on index
         }
 
         // COIN ANIMATION
@@ -783,7 +791,8 @@
         
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
         import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc, updateDoc, collection, addDoc, serverTimestamp, query, where, getDocs, orderBy, limit, writeBatch } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+        // IMPORTED 'increment' HERE
+        import { getFirestore, doc, setDoc, getDoc, updateDoc, collection, addDoc, serverTimestamp, query, where, getDocs, orderBy, limit, writeBatch, increment } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
@@ -822,9 +831,10 @@
         window.handleBuyItem = async function(cost) {
             if(userData.balance >= cost) {
                 try {
-                    const newBal = userData.balance - cost;
-                    await updateDoc(doc(db, "users", currentUser.uid), { balance: newBal });
-                    userData.balance = newBal;
+                    // Use increment for safety
+                    const userRef = doc(db, "users", currentUser.uid);
+                    await updateDoc(userRef, { balance: increment(-cost) });
+                    userData.balance -= cost;
                     updateUI();
                     return true;
                 } catch(e) {
@@ -838,14 +848,16 @@
             }
         };
 
+        // FIXED REWARD ADDING LOGIC (Using increment to allow multiple simultaneous adds)
         window.handleAddReward = async function(amount) {
             try {
-                // Add to coin balance
-                const newBal = (userData.balance || 0) + amount;
-                await updateDoc(doc(db, "users", currentUser.uid), { balance: newBal });
-                userData.balance = newBal;
+                const userRef = doc(db, "users", currentUser.uid);
+                // ATOMIC INCREMENT: Prevents data loss if 4 eggs trigger at once
+                await updateDoc(userRef, { balance: increment(amount) });
+                userData.balance = (userData.balance || 0) + amount;
                 updateUI();
-            } catch(e) { console.error(e); }
+                console.log(`Added ${amount} coins safely.`);
+            } catch(e) { console.error("Reward Error:", e); }
         };
         // -----------------------------------------
 
@@ -1005,10 +1017,9 @@
                 const ldr = document.getElementById('loader'); if(ldr) ldr.style.display = 'flex';
                 try {
                     const userRef = doc(db, "users", currentUser.uid);
-                    const newCoinBalance = coins - coinsToDeduct;
-                    const newWalletBalance = (userData.walletBalance || 0) + cashToAdd;
-                    await updateDoc(userRef, { balance: newCoinBalance, walletBalance: newWalletBalance });
-                    userData.balance = newCoinBalance; userData.walletBalance = newWalletBalance;
+                    await updateDoc(userRef, { balance: increment(-coinsToDeduct), walletBalance: increment(cashToAdd) });
+                    userData.balance -= coinsToDeduct; 
+                    userData.walletBalance += cashToAdd;
                     updateUI(); showAlert(`Conversion Safal! ₹${cashToAdd.toFixed(2)} wallet mein add ho gaye.`);
                 } catch(e) { console.error(e); showAlert("Conversion mein error aayi."); } finally { if(ldr) ldr.style.display = 'none'; }
             }
@@ -1061,7 +1072,7 @@
              window.show_9972147('pop').then(async () => {
                  const userRef = doc(db, "users", currentUser.uid);
                  let newCount = (userData.adZone1Count || 0) + 1;
-                 let updates = { balance: (userData.balance || 0) + ZONE1_REWARD, adZone1Count: newCount };
+                 let updates = { balance: increment(ZONE1_REWARD), adZone1Count: newCount };
                  if(newCount >= ZONE1_LIMIT) { const cooldownTime = new Date(Date.now() + ZONE1_COOLDOWN_MS); updates.adZone1Cooldown = cooldownTime; userData.adZone1Cooldown = { toDate: () => cooldownTime }; }
                  await updateDoc(userRef, updates); userData.balance += ZONE1_REWARD; userData.adZone1Count = newCount;
                  updateUI(); showAlert(`Success! +${ZONE1_REWARD} Coins.`);
@@ -1078,7 +1089,7 @@
              window.show_9966888('pop').then(async () => {
                  const userRef = doc(db, "users", currentUser.uid);
                  let newCount = (userData.adZone2Count || 0) + 1;
-                 let updates = { balance: (userData.balance || 0) + ZONE2_REWARD, adZone2Count: newCount };
+                 let updates = { balance: increment(ZONE2_REWARD), adZone2Count: newCount };
                  if(newCount >= ZONE2_LIMIT) { const cooldownTime = new Date(Date.now() + ZONE2_COOLDOWN_MS); updates.adZone2Cooldown = cooldownTime; userData.adZone2Cooldown = { toDate: () => cooldownTime }; }
                  await updateDoc(userRef, updates); userData.balance += ZONE2_REWARD; userData.adZone2Count = newCount;
                  updateUI(); showAlert(`Success! +${ZONE2_REWARD} Coins.`);
@@ -1192,8 +1203,8 @@
                 const querySnapshot = await getDocs(q);
                 if (!querySnapshot.empty) {
                     const referrerDoc = querySnapshot.docs[0]; const batch = writeBatch(db);
-                    batch.update(doc(db, "users", referrerDoc.id), { balance: (referrerDoc.data().balance || 0) + 100 });
-                    batch.update(doc(db, "users", currentUser.uid), { balance: (userData.balance || 0) + 100, referredBy: referrerCode });
+                    batch.update(doc(db, "users", referrerDoc.id), { balance: increment(100) });
+                    batch.update(doc(db, "users", currentUser.uid), { balance: increment(100), referredBy: referrerCode });
                     await batch.commit(); userData.balance += 100; userData.referredBy = referrerCode;
                     updateUI(); if(isManualApply) showAlert("Code applied! +100 Coins.");
                 } else { if(isManualApply) showAlert("Invalid code."); }
@@ -1207,7 +1218,7 @@
             if (!amount || amount <= 0) return showAlert("Invalid amount."); if (amount < minWithdrawal) return showAlert(`Min withdrawal: ₹${minWithdrawal}`); if (amount > userData.walletBalance) return showAlert("Insufficient balance."); if (!paymentDetail) return showAlert("Details required.");
             const ldr = document.getElementById('loader'); if(ldr) ldr.style.display = 'flex';
             try {
-                const newWalletBalance = (userData.walletBalance || 0) - amount; await updateDoc(doc(db, "users", currentUser.uid), { walletBalance: newWalletBalance });
+                const newWalletBalance = (userData.walletBalance || 0) - amount; await updateDoc(doc(db, "users", currentUser.uid), { walletBalance: increment(-amount) });
                 userData.walletBalance = newWalletBalance;
                 await addDoc(collection(db, "withdrawals"), { userId: currentUser.uid, userName: userData.name, userEmail: userData.email, amount: amount, method: method, paymentDetail: paymentDetail, status: "pending", requestedAt: serverTimestamp() });
                 showAlert("Request submitted!"); document.getElementById('withdraw-amount').value = ''; if(paymentDetailInput) paymentDetailInput.value = ''; updateUI();
@@ -1254,7 +1265,7 @@
             if (userData.isMiningActive && userData.miningSessionStartTime) {
                 const startTime = userData.miningSessionStartTime.toDate().getTime();
                 if (Date.now() - startTime >= MINING_DURATION_MS) {
-                    try { const newBalance = (userData.balance || 0) + MINING_REWARD; await updateDoc(doc(db, "users", currentUser.uid), { balance: newBalance, isMiningActive: false, miningSessionStartTime: null, miningAdsWatched: 0 }); userData.balance = newBalance; userData.isMiningActive = false; userData.miningSessionStartTime = null; userData.miningAdsWatched = 0; showAlert(`Mining Finished! +${MINING_REWARD} Coins.`); updateUI(); } catch (e) { console.error(e); }
+                    try { const newBalance = (userData.balance || 0) + MINING_REWARD; await updateDoc(doc(db, "users", currentUser.uid), { balance: increment(MINING_REWARD), isMiningActive: false, miningSessionStartTime: null, miningAdsWatched: 0 }); userData.balance = newBalance; userData.isMiningActive = false; userData.miningSessionStartTime = null; userData.miningAdsWatched = 0; showAlert(`Mining Finished! +${MINING_REWARD} Coins.`); updateUI(); } catch (e) { console.error(e); }
                 }
             }
         }
@@ -1267,7 +1278,7 @@
             window.show_9972147().then(async () => {
                 let reward = 50, msg = ""; const newDaily = (userData.dailyAdCount || 0) + 1; let updates = { dailyAdCount: newDaily };
                 if (isForMining) { const newMining = (userData.miningAdsWatched || 0) + 1; updates.miningAdsWatched = newMining; reward = 0; msg = (newMining >= MINING_ADS_REQUIRED) ? "Mining Ads done! Start Mining." : `Ad watched (${newMining}/${MINING_ADS_REQUIRED})`; updateMiningButtonUI(); } else { msg = `+${reward} Coins!`; }
-                if (reward > 0) { updates.balance = (userData.balance || 0) + reward; } await updateDoc(doc(db, "users", currentUser.uid), updates); if(reward>0) userData.balance += reward; userData.dailyAdCount = newDaily; if(isForMining) userData.miningAdsWatched = (userData.miningAdsWatched || 0) + 1; showAlert(msg); updateUI();
+                if (reward > 0) { updates.balance = increment(reward); } await updateDoc(doc(db, "users", currentUser.uid), updates); if(reward>0) userData.balance += reward; userData.dailyAdCount = newDaily; if(isForMining) userData.miningAdsWatched = (userData.miningAdsWatched || 0) + 1; showAlert(msg); updateUI();
             }).catch(e => { console.error(e); showAlert("Ad failed."); });
         }
 
