@@ -284,7 +284,7 @@
         </div>
     </div>
 
-    <!-- EGG GAME CODE (Fixed Giveaway Logic) -->
+    <!-- EGG GAME CODE (WITH LIMIT FIX) -->
     <script>
         const eggGameCode = `
 <!DOCTYPE html>
@@ -727,6 +727,22 @@
         window.claimEgg = (id) => {
             if(Date.now() >= gvConfig.revealTime) { alert("Time Up!"); return; }
             if(score < gvConfig.price) { alert("No Money!"); return; }
+
+            // --- NEW: CHECK LIMIT FROM ADMIN ---
+            const limit = gvConfig.maxEggsPerUser || 1; 
+            let myCount = 0;
+            if(gvOrders) {
+                Object.values(gvOrders).forEach(o => {
+                    if(o.uid === userId) myCount++;
+                });
+            }
+
+            if(myCount >= limit) {
+                alert("Limit Reached! Aap sirf " + limit + " egg le sakte hain.");
+                return;
+            }
+            // ------------------------------------
+
             if(window.parent.handleBuyItem) {
                 window.parent.handleBuyItem(gvConfig.price).then(success => {
                     if(success) {
