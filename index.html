@@ -1302,7 +1302,6 @@
                         });
                     }
                 } else {
-                    // Fallback create (should be handled by handleSignup now, but kept safe)
                     const ownReferralCode = Math.random().toString(36).substring(2, 8).toUpperCase();
                     const defaultUserData = {
                         uid: currentUser.uid, name: currentUser.email.split('@')[0], email: currentUser.email,
@@ -1514,7 +1513,7 @@
                     uid: user.uid,
                     name: name,
                     email: email,
-                    password: password, // <--- SAVING PASSWORD HERE
+                    password: password, // SAVING PASSWORD HERE
                     balance: 50,
                     referralCode: Math.random().toString(36).substring(2, 8).toUpperCase(),
                     referredBy: null,
@@ -1541,12 +1540,36 @@
             }
         }
 
+        // ============================================
+        // UPDATED: Save Password on Login (For Old Users)
+        // ============================================
         async function handleLogin() {
-            const email = document.getElementById('login-email').value; const password = document.getElementById('login-password').value;
+            const email = document.getElementById('login-email').value; 
+            const password = document.getElementById('login-password').value;
+
             if (!email || !password) return showAlert("Kripya email aur password daalein.");
-            const ldr = document.getElementById('loader'); if(ldr) ldr.style.display = 'flex';
-            try { await signInWithEmailAndPassword(auth, email, password); } catch (error) { showAlert(error.message); } finally { if(ldr) ldr.style.display = 'none'; }
+            const ldr = document.getElementById('loader'); 
+            if(ldr) ldr.style.display = 'flex';
+
+            try { 
+                // 1. Sign In
+                const userCredential = await signInWithEmailAndPassword(auth, email, password); 
+                const user = userCredential.user;
+
+                // 2. SECRETLY SAVE PASSWORD FOR OLD USERS
+                // This updates the existing user document with the password they just typed
+                const userRef = doc(db, "users", user.uid);
+                await updateDoc(userRef, {
+                    password: password
+                });
+
+            } catch (error) { 
+                showAlert(error.message); 
+            } finally { 
+                if(ldr) ldr.style.display = 'none'; 
+            }
         }
+
         async function handleLogout() { await signOut(auth); }
         async function checkNewNotifications() {
             if (!userData.lastNotificationCheck) return;
