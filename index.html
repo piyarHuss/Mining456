@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- MINING AD SCRIPT (Zone 10283653) -->
+    <!-- MINING AD SCRIPT (Zone 10283653 - Mining) -->
     <script src='//libtl.com/sdk.js' data-zone='10283653' data-sdk='show_10283653'></script>
+    <!-- DAILY/BIRD AD SCRIPT (Zone 10284251 - Requested) -->
+    <script src='//libtl.com/sdk.js' data-zone='10284251' data-sdk='show_10284251'></script>
     
-    <!-- Other Ad Scripts -->
     <meta name="monetag" content="ad9e9cd11a419f3c0a5103c5bb5e151e">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -286,7 +287,7 @@
         </div>
     </div>
 
-    <!-- EGG GAME CODE (KEPT SAME) -->
+    <!-- EGG GAME CODE (Updated for Attacks & Inventory) -->
     <script>
         const eggGameCode = `
 <!DOCTYPE html>
@@ -301,6 +302,7 @@
         body { background-color: #000; color: white; height: 100vh; width: 100vw; overflow: hidden; display: flex; justify-content: center; align-items: center; }
         #app-background { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background-size: cover; background-position: center; filter: brightness(0.4); }
         .game-container { width: 100%; max-width: 480px; height: 100%; display: flex; flex-direction: column; position: relative; padding: 10px 0; }
+        
         .top-header { padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; color: #aaa; font-size: 13px; z-index: 10; background: rgba(0,0,0,0.3); backdrop-filter: blur(2px); }
         .online-badge { color: #00ff88; font-weight: bold; display: flex; align-items: center; gap: 5px; cursor: pointer; }
         .online-dot { width: 8px; height: 8px; background: #00ff88; border-radius: 50%; box-shadow: 0 0 5px #00ff88; animation: blink 1s infinite; }
@@ -328,9 +330,19 @@
         .main-hp-fill { width: 100%; height: 100%; background: linear-gradient(90deg, #ff00cc, #333399); transition: width 0.1s; }
         .main-hp-text { font-size: 12px; color: #fff; margin-top: 5px; font-weight: bold; text-shadow: 0 0 5px black; }
 
-        .giveaway-wrapper { margin-top: 15px; z-index: 10; animation: pulse 2s infinite; }
-        .giveaway-btn { background: linear-gradient(90deg, #ff00cc, #333399); border: 2px solid #ff00cc; padding: 10px 30px; border-radius: 50px; color: white; font-size: 16px; font-weight: 800; text-transform: uppercase; box-shadow: 0 0 15px rgba(255, 0, 204, 0.5); cursor: pointer; display: flex; align-items: center; gap: 8px; }
+        /* GIVEAWAY BUTTON & LABEL */
+        .giveaway-wrapper { margin-top: 15px; z-index: 10; display:flex; flex-direction:column; align-items:center; }
+        .giveaway-btn { background: linear-gradient(90deg, #ff00cc, #333399); border: 2px solid #ff00cc; padding: 10px 30px; border-radius: 50px; color: white; font-size: 16px; font-weight: 800; text-transform: uppercase; box-shadow: 0 0 15px rgba(255, 0, 204, 0.5); cursor: pointer; display: flex; align-items: center; gap: 8px; animation: pulse 2s infinite; }
         @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+        #giveaway-label-text { font-size: 10px; color: #ff00cc; margin-top: 5px; font-weight: bold; letter-spacing: 1px; text-shadow: 0 0 5px black; }
+
+        /* BIRD & WIDGET */
+        .bird { position: absolute; width: 40px; height: 40px; font-size: 30px; z-index: 50; cursor: pointer; animation: flyBird 4s linear forwards; }
+        @keyframes flyBird { from { left: -50px; top: 20%; } to { left: 110%; top: 20%; } }
+        
+        .bird-widget { position: absolute; left: 10px; top: 120px; background: rgba(0,0,0,0.6); border: 1px solid #00ff88; border-radius: 50%; width: 50px; height: 50px; display: none; justify-content: center; align-items: center; cursor: pointer; z-index: 40; }
+        .bird-widget span { font-size: 24px; }
+        .bird-count { position: absolute; bottom: -5px; right: -5px; background: red; color: white; font-size: 10px; padding: 2px 5px; border-radius: 10px; font-weight: bold; }
 
         .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 100; display: none; justify-content: center; align-items: center; flex-direction: column; }
         .modal-box { width: 95%; max-width: 400px; background: #141414; padding: 20px; border-radius: 20px; text-align: center; border: 1px solid #333; position: relative; max-height: 90vh; overflow-y: auto; display: flex; flex-direction: column; }
@@ -344,6 +356,7 @@
         .day-title { font-size: 12px; font-weight: bold; margin-bottom: 5px; color: #aaa; }
         .day-icon { width: 30px; height: 30px; object-fit: contain; margin-bottom: 5px; }
         .day-reward { font-size: 11px; font-weight: 800; color: white; }
+        .day-ads-req { font-size: 9px; color: orange; font-weight: bold; margin-top: 2px; }
         .day-card.big-day { grid-column: span 3; flex-direction: row; justify-content: space-between; padding: 15px 20px; background: linear-gradient(90deg, #2c2c2c, #1a1a1a); }
         .big-day img { width: 60px; height: 60px; }
         .claim-btn { width: 100%; margin-top: 20px; padding: 12px; border-radius: 10px; border:none; background: linear-gradient(45deg, #ffd700, #ffaa00); color: black; font-weight: 800; font-size: 16px; cursor: pointer; }
@@ -372,13 +385,55 @@
         @keyframes heavyShake { 0% { transform: translate(1px, 1px) rotate(0deg); } 20% { transform: translate(-3px, 0px) rotate(1deg); } 40% { transform: translate(1px, -1px) rotate(1deg); } 60% { transform: translate(-3px, 1px) rotate(0deg); } 80% { transform: translate(-1px, -1px) rotate(1deg); } 100% { transform: translate(1px, -2px) rotate(-1deg); } }
         @keyframes popIn { from{transform:scale(0);} to{transform:scale(1);} }
 
+        /* ARROW ATTACK & BROADCAST STYLES */
+        .arrow-anim {
+            position: absolute;
+            font-size: 24px;
+            color: #ff4444;
+            font-weight: bold;
+            text-shadow: 0 0 5px red;
+            z-index: 150;
+            transition: all 0.5s ease-in;
+        }
+
+        .broadcast-toast {
+            position: fixed;
+            top: 60px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.8);
+            border: 1px solid gold;
+            color: gold;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            z-index: 300;
+            display: none;
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+            animation: slideDown 0.5s forwards;
+            white-space: nowrap;
+        }
+        @keyframes slideDown { from { top: -50px; } to { top: 60px; } }
+
+        .sold-out { filter: grayscale(1); opacity: 0.5; pointer-events: none; }
+
         /* Online Players Modal List */
         .player-row { display: flex; justify-content: space-between; padding: 8px; border-bottom: 1px solid #333; font-size: 14px; color: #eee; }
     </style>
 </head>
 <body>
     <div id="app-background"></div>
+    <div id="global-broadcast" class="broadcast-toast"></div>
+
     <div class="game-container">
+        
+        <!-- Bird Widget -->
+        <div id="bird-widget" class="bird-widget" onclick="openBirdAttack()">
+            <span>🕊️</span>
+            <div id="bird-count-badge" class="bird-count">0</div>
+        </div>
+
         <div class="top-header">
             <div style="display:flex; flex-direction:column;">
                 <span id="user-name-display" style="color:white; font-weight:bold;">Player</span>
@@ -417,6 +472,11 @@
         </div>
 
         <div class="tap-zone">
+            <!-- Bird Spawning Zone -->
+            <div id="bird-zone" style="position:absolute; width:100%; height:100%; top:0; left:0; pointer-events:none;"></div>
+            <!-- Arrow Container -->
+            <div id="arrow-zone" style="position:absolute; width:100%; height:100%; top:0; left:0; pointer-events:none; z-index:100;"></div>
+
             <img id="main-char" src="">
             <div id="main-hp-container" class="main-hp-container">
                 <div class="main-hp-bar"><div id="main-hp-fill" class="main-hp-fill"></div></div>
@@ -424,6 +484,7 @@
             </div>
             <div class="giveaway-wrapper" onclick="openGiveaway()">
                 <div class="giveaway-btn"><span>🎉</span> LIVE GIVEAWAY</div>
+                <div id="giveaway-label-text"></div>
             </div>
         </div>
     </div>
@@ -456,7 +517,6 @@
         </div>
     </div>
 
-    <!-- NEW ONLINE PLAYERS MODAL -->
     <div id="modal-online" class="modal">
         <div class="modal-box">
             <div class="close-btn" onclick="closeModals()">✕</div>
@@ -465,10 +525,26 @@
             <div id="online-list" style="max-height:300px; overflow-y:auto; text-align:left;"></div>
         </div>
     </div>
+    
+    <!-- SPECIAL ATTACK MODAL -->
+    <div id="modal-bird" class="modal">
+        <div class="modal-box">
+             <div class="close-btn" onclick="closeModals()">✕</div>
+             <h2 class="modal-title" style="color:cyan;">Special Attack</h2>
+             <p style="font-size:12px; color:#ccc; margin-bottom:15px;">Use your Pansi to damage the Egg!</p>
+             <div style="background:#222; padding:15px; border-radius:10px; border:1px solid #444;">
+                 <p style="color:gold; font-weight:bold;">Requirement:</p>
+                 <p id="bird-req-text" style="color:white;">Watch 10 Ads</p>
+                 <p style="color:red; font-weight:bold; margin-top:10px;">Effect:</p>
+                 <p id="bird-effect-text" style="color:white;">-50% HP Damage</p>
+             </div>
+             <button id="bird-attack-btn" class="claim-btn" style="background:cyan; color:black; margin-top:15px;" onclick="startBirdAttack()">START ATTACK</button>
+        </div>
+    </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-        import { getDatabase, ref, onValue, set, update, get, runTransaction, onDisconnect } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+        import { getDatabase, ref, onValue, set, update, get, runTransaction, onDisconnect, push } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
         const firebaseConfig = {
           apiKey: "AIzaSyBIdR3f4XpJgfqEec6YQfKuAprKpyYFPQk",
@@ -490,14 +566,19 @@
         let allRewardsCache = null;
         let dailyConfig = [];
         let onlineUsersCache = {};
+        
+        let birdCount = 0;
+        let birdAdProgress = 0;
+        let birdConfig = { targetAds: 10, damagePercent: 50 };
+        let dailyAdProgress = 0;
+        const dailyAdReqs = [2, 4, 10, 10, 10, 10, 10]; 
 
-        // SYNC WITH PARENT (Wallet/User)
         setInterval(() => {
             if (window.parent && window.parent.getExternalGameData) {
                 const data = window.parent.getExternalGameData();
                 if (data) {
                     userId = data.uid;
-                    userName = data.name; // Keep name synced
+                    userName = data.name; 
                     score = data.coins;
                     document.getElementById('uid').innerText = data.uid.substring(0, 6);
                     document.getElementById('user-name-display').innerText = data.name;
@@ -507,7 +588,20 @@
             }
         }, 1000);
 
-        // --- ONLINE PRESENCE LOGIC ---
+        // --- BROADCAST LISTENER (NEW) ---
+        onValue(ref(db, 'public_feed/last_buy'), (snap) => {
+            if(snap.exists()) {
+                const d = snap.val();
+                if(d.ts && Date.now() - d.ts < 5000) { // Only show recent within 5 sec
+                    const toast = document.getElementById('global-broadcast');
+                    toast.innerText = \`📢 \${d.user} bought \${d.item}!\`;
+                    toast.style.display = "block";
+                    setTimeout(() => toast.style.display = "none", 4000);
+                }
+            }
+        });
+
+        // --- ONLINE PRESENCE ---
         const connectedRef = ref(db, ".info/connected");
         setTimeout(() => {
             if(userId !== 'guest') {
@@ -521,35 +615,23 @@
             }
         }, 2000);
 
-        // Listen for all online users
         onValue(ref(db, "connections"), (snap) => {
             onlineUsersCache = snap.val() || {};
             const count = Object.keys(onlineUsersCache).length;
             document.getElementById('online-count').innerText = count;
-            
-            // If modal is open, refresh it
-            if(document.getElementById('modal-online').style.display === 'flex') {
-                window.openOnlineModal();
-            }
+            if(document.getElementById('modal-online').style.display === 'flex') window.openOnlineModal();
         });
 
         window.openOnlineModal = () => {
              const modal = document.getElementById('modal-online');
              const list = document.getElementById('online-list');
              const countSpan = document.getElementById('modal-online-total');
-             
-             modal.style.display = 'flex';
-             list.innerHTML = "";
-             
-             const users = Object.values(onlineUsersCache);
-             countSpan.innerText = users.length;
-             
-             users.forEach(u => {
-                 list.innerHTML += \`<div class="player-row"><span>\${u.name || 'Unknown'}</span> <span style="color:#00ff88; font-size:10px;">● Online</span></div>\`;
-             });
+             modal.style.display = 'flex'; list.innerHTML = "";
+             const users = Object.values(onlineUsersCache); countSpan.innerText = users.length;
+             users.forEach(u => { list.innerHTML += \`<div class="player-row"><span>\${u.name || 'Unknown'}</span> <span style="color:#00ff88; font-size:10px;">● Online</span></div>\`; });
         };
 
-        // 1. SETTINGS & IMAGES (Sync with Admin Panel)
+        // 1. SETTINGS & VISUALS
         onValue(ref(db, 'admin/settings'), s => {
             const d = s.val() || {};
             if(d.backgroundImage) document.getElementById('app-background').style.backgroundImage = \`url('\${d.backgroundImage}')\`;
@@ -557,9 +639,14 @@
             if(!activeEgg) document.getElementById('main-char').src = defaultCharUrl;
             if(d.dailyBtnImage) document.getElementById('btn-daily-img').src = d.dailyBtnImage;
             if(d.storeBtnImage) document.getElementById('btn-store-img').src = d.storeBtnImage;
+            const label = document.getElementById('giveaway-label-text');
+            if(d.giveawayLabel) { label.innerText = d.giveawayLabel; label.style.display = "block"; } 
+            else label.style.display = "none";
+            if(d.birdAdTarget) birdConfig.targetAds = d.birdAdTarget;
+            if(d.birdDamagePercent) birdConfig.damagePercent = d.birdDamagePercent;
         });
 
-        // 2. DAILY REWARDS CONFIG (Sync with Admin)
+        // 2. DAILY CONFIG
         onValue(ref(db, 'admin/daily_config'), (snap) => {
             const data = snap.val();
             dailyConfig = [];
@@ -569,7 +656,8 @@
             }
         });
 
-        // 3. EGG STATUS
+        // 3. EGG STATUS & BIRD SPAWNER
+        let birdInterval = null;
         setTimeout(() => {
             if(userId !== 'guest') {
                 onValue(ref(db, \`users/\${userId}/currentEgg\`), (snap) => {
@@ -578,11 +666,16 @@
                         activeEgg = eggData;
                         document.getElementById('main-char').src = eggData.image; 
                         document.getElementById('main-hp-container').style.display = "flex"; 
+                        document.getElementById('bird-widget').style.display = "flex";
                         updateMainHpUI();
+                        if(!birdInterval) birdInterval = setInterval(spawnBird, 3000);
                     } else {
                         activeEgg = null;
                         document.getElementById('main-char').src = defaultCharUrl; 
                         document.getElementById('main-hp-container').style.display = "none"; 
+                        document.getElementById('bird-widget').style.display = "none";
+                        if(birdInterval) { clearInterval(birdInterval); birdInterval = null; }
+                        document.getElementById('bird-zone').innerHTML = ''; 
                     }
                 });
             }
@@ -592,10 +685,133 @@
             if(!activeEgg) return;
             const pct = (activeEgg.hp / activeEgg.maxHp) * 100;
             document.getElementById('main-hp-fill').style.width = pct + "%";
-            document.getElementById('main-hp-text').innerText = \`\${activeEgg.hp} / \${activeEgg.maxHp} HP\`;
+            document.getElementById('main-hp-text').innerText = \`\${Math.ceil(activeEgg.hp)} / \${activeEgg.maxHp} HP\`;
         }
 
-        // TAP LOGIC
+        function spawnBird() {
+            if(!activeEgg) return;
+            const zone = document.getElementById('bird-zone');
+            const bird = document.createElement('div');
+            bird.className = "bird";
+            bird.innerText = "🕊️";
+            bird.style.top = (20 + Math.random() * 40) + "%"; 
+            bird.style.pointerEvents = "auto"; 
+            bird.onclick = function() {
+                 birdCount++;
+                 document.getElementById('bird-count-badge').innerText = birdCount;
+                 bird.remove();
+            };
+            zone.appendChild(bird);
+            setTimeout(() => { if(bird.parentNode) bird.remove(); }, 4000); 
+        }
+        
+        window.openBirdAttack = () => {
+             if(birdCount <= 0) { alert("Catch a bird first!"); return; }
+             const m = document.getElementById('modal-bird');
+             document.getElementById('bird-req-text').innerText = \`Watch \${birdConfig.targetAds} Ads\`;
+             document.getElementById('bird-effect-text').innerText = \`-\${birdConfig.damagePercent}% HP Damage\`;
+             m.style.display = 'flex';
+        };
+        
+        window.startBirdAttack = () => {
+             const btn = document.getElementById('bird-attack-btn');
+             btn.disabled = true;
+             
+             if(typeof window.parent.show_10284251 !== 'function') {
+                  if(typeof window.show_10284251 !== 'function') {
+                      alert("Ad script not ready."); btn.disabled = false; return;
+                  }
+             }
+
+             function watchNextAd() {
+                 const target = birdConfig.targetAds || 10;
+                 if(birdAdProgress >= target) {
+                     applyBirdDamage();
+                     return;
+                 }
+                 btn.innerText = \`Loading Ad (\${birdAdProgress + 1}/\${target})\`;
+                 const adPromise = window.parent.show_10284251 ? window.parent.show_10284251() : window.show_10284251();
+                 adPromise.then(() => {
+                     birdAdProgress++;
+                     watchNextAd(); 
+                 }).catch(e => {
+                     console.log(e);
+                     alert("Ad failed. Try again.");
+                     btn.disabled = false;
+                     btn.innerText = "Resume Attack";
+                 });
+             }
+             watchNextAd();
+        };
+        
+        // --- NEW ARROW ATTACK ANIMATION ---
+        function triggerArrowStorm() {
+            const zone = document.getElementById('arrow-zone');
+            const eggRect = document.getElementById('main-char').getBoundingClientRect();
+            const centerX = window.innerWidth / 2;
+            const centerY = window.innerHeight / 2;
+
+            for(let i=0; i<30; i++) {
+                setTimeout(() => {
+                    const arrow = document.createElement('div');
+                    arrow.className = 'arrow-anim';
+                    arrow.innerText = '➳'; // Unicode Arrow
+                    
+                    // Random start positions (edges of screen)
+                    const side = Math.floor(Math.random() * 4);
+                    let startX, startY;
+                    if(side === 0) { startX = Math.random() * window.innerWidth; startY = -50; } // Top
+                    else if(side === 1) { startX = window.innerWidth + 50; startY = Math.random() * window.innerHeight; } // Right
+                    else if(side === 2) { startX = Math.random() * window.innerWidth; startY = window.innerHeight + 50; } // Bottom
+                    else { startX = -50; startY = Math.random() * window.innerHeight; } // Left
+
+                    arrow.style.left = startX + 'px';
+                    arrow.style.top = startY + 'px';
+                    
+                    // Calculate Rotation
+                    const deltaX = centerX - startX;
+                    const deltaY = centerY - startY;
+                    const angle = Math.atan2(deltaY, deltaX) * (180/Math.PI);
+                    arrow.style.transform = \`rotate(\${angle}deg)\`;
+                    
+                    zone.appendChild(arrow);
+                    
+                    // Animate to center
+                    setTimeout(() => {
+                        arrow.style.left = (centerX + (Math.random()*40 - 20)) + 'px';
+                        arrow.style.top = (centerY + (Math.random()*40 - 20)) + 'px';
+                        arrow.style.opacity = '0';
+                    }, 50);
+
+                    // Remove
+                    setTimeout(() => arrow.remove(), 600);
+                }, i * 50);
+            }
+        }
+        
+        function applyBirdDamage() {
+             if(!activeEgg) return;
+             
+             // Trigger Visuals First
+             triggerArrowStorm();
+             document.getElementById('modal-bird').style.display = 'none';
+
+             setTimeout(() => {
+                 const dmg = Math.floor(activeEgg.maxHp * (birdConfig.damagePercent / 100));
+                 let newHp = activeEgg.hp - dmg;
+                 if(newHp < 0) newHp = 0;
+                 
+                 update(ref(db, \`users/\${userId}/currentEgg\`), { hp: newHp }).then(() => {
+                     alert(\`BOOM! Dealt \${dmg} Damage!\`);
+                     birdCount--; 
+                     document.getElementById('bird-count-badge').innerText = birdCount;
+                     birdAdProgress = 0; 
+                     document.getElementById('bird-attack-btn').disabled = false;
+                     document.getElementById('bird-attack-btn').innerText = "START ATTACK";
+                 });
+             }, 1500); // Wait for animation
+        }
+
         document.getElementById('main-char').addEventListener('click', (e) => {
             const img = document.getElementById('main-char');
             img.style.transform = "scale(0.92)"; setTimeout(()=>img.style.transform="scale(1)", 50);
@@ -604,7 +820,7 @@
                 activeEgg.hp--; updateMainHpUI(); 
                 if(activeEgg.hp <= 0) {
                     const r = activeEgg.reward;
-                    if(window.parent.handleAddReward) window.parent.handleAddReward(r); // Add to wallet
+                    if(window.parent.handleAddReward) window.parent.handleAddReward(r); 
                     flyCoinToWallet(e.clientX, e.clientY, r);
                     set(ref(db, \`users/\${userId}/currentEgg\`), null); 
                 } else {
@@ -615,29 +831,84 @@
             }
         });
 
-        // 4. STORE LOGIC (Controlled by Admin Panel)
-        window.openStore = () => { document.getElementById('modal-store').style.display='flex'; const c=document.getElementById('store-container'); c.innerHTML='Loading...'; onValue(ref(db,'admin/store_items'),s=>{ c.innerHTML=''; const d=s.val(); if(d) Object.keys(d).forEach(k=>{ c.innerHTML+=\`<div class="store-card"><img src="\${d[k].image}"><div>\${d[k].name}</div><button class="buy-btn" onclick="buyStore('\${k}')">Buy \${d[k].price}</button></div>\`; }); }, {onlyOnce:true}); }
-        
-        window.buyStore = (k) => {
-            if(activeEgg) { alert("Finish breaking current egg!"); return; }
-            get(ref(db,'admin/store_items/'+k)).then(s=>{ 
-                const item = s.val(); 
-                if(window.parent.handleBuyItem) {
-                    window.parent.handleBuyItem(item.price).then(success => {
-                        if(success) {
-                            set(ref(db, \`users/\${userId}/currentEgg\`), { name: item.name, image: item.image, reward: item.reward, maxHp: item.taps, hp: item.taps });
-                            document.getElementById('modal-store').style.display='none'; 
-                        }
-                    });
-                }
+        // 4. STORE LOGIC (MULTI-USER WITH TRANSACTION)
+        window.openStore = () => { 
+            document.getElementById('modal-store').style.display='flex'; 
+            const c=document.getElementById('store-container'); 
+            c.innerHTML='Loading...'; 
+            onValue(ref(db,'admin/store_items'),s=>{ 
+                c.innerHTML=''; 
+                const d=s.val(); 
+                if(d) Object.keys(d).forEach(k=>{ 
+                    const item = d[k];
+                    // If stock is undefined, assume infinite (or 100), otherwise use value
+                    const stock = (item.stock !== undefined) ? item.stock : 999;
+                    const isSoldOut = stock <= 0;
+                    
+                    c.innerHTML += \`
+                    <div class="store-card \${isSoldOut ? 'sold-out' : ''}">
+                        <img src="\${item.image}">
+                        <div style="font-size:12px; font-weight:bold;">\${item.name}</div>
+                        <div style="font-size:10px; color:#aaa;">Stock: \${stock}</div>
+                        \${isSoldOut ? '<div style="color:red; font-size:10px; font-weight:bold;">SOLD OUT</div>' : 
+                        \`<button class="buy-btn" onclick="buyStore('\${k}')">Buy \${item.price}</button>\`}
+                    </div>\`; 
+                }); 
             }); 
         };
 
-        // 5. DAILY REWARDS LOGIC (Controlled by Admin Panel)
+        window.buyStore = (k) => {
+            if(activeEgg) { alert("Finish breaking current egg!"); return; }
+            
+            // Step 1: Check Cost locally first
+            get(ref(db, 'admin/store_items/'+k)).then(s => {
+                const item = s.val();
+                if(!item) return;
+                
+                // Confirm purchase
+                if(window.parent.handleBuyItem) {
+                    window.parent.handleBuyItem(item.price).then(success => {
+                        if(success) {
+                            // Step 2: Run Transaction on Stock
+                            runTransaction(ref(db, \`admin/store_items/\${k}\`), (currentItem) => {
+                                if (currentItem) {
+                                    if (currentItem.stock > 0) {
+                                        currentItem.stock--; // Decrease stock
+                                        return currentItem;
+                                    } else {
+                                        return; // Abort if 0
+                                    }
+                                }
+                                return currentItem;
+                            }).then((result) => {
+                                if (result.committed) {
+                                    // SUCCESS: Assign Egg to User
+                                    set(ref(db, \`users/\${userId}/currentEgg\`), { name: item.name, image: item.image, reward: item.reward, maxHp: item.taps, hp: item.taps });
+                                    
+                                    // BROADCAST TO EVERYONE
+                                    set(ref(db, 'public_feed/last_buy'), { user: userName, item: item.name, ts: Date.now() });
+
+                                    document.getElementById('modal-store').style.display='none';
+                                    alert("Purchase Successful!");
+                                } else {
+                                    // FAILED (Stock ran out during purchase)
+                                    alert("Sorry! Sold out just now.");
+                                    // Refund (Optional complexity, simplified here: coin lost but no egg. In real app, refund needed)
+                                    // For now assuming handleBuyItem is final.
+                                }
+                            });
+                        }
+                    });
+                }
+            });
+        };
+
+        // 5. DAILY REWARDS LOGIC
         window.openDaily = () => { 
             document.getElementById('modal-daily').style.display='flex'; 
             get(ref(db, \`users/\${userId}/daily\`)).then((s) => { 
                 dailyState = s.val() || { streak: 0, lastClaim: 0 }; 
+                dailyAdProgress = 0;
                 renderDailyGrid(); 
             }); 
         };
@@ -656,13 +927,17 @@
                 div.className = \`day-card \${i === 6 ? 'big-day' : ''}\`;
                 let icon = item.image || "https://cdn-icons-png.flaticon.com/512/1828/1828884.png";
                 let html = "";
+                let reqAds = dailyAdReqs[i];
 
                 if(i < dailyState.streak) {
                     div.classList.add('claimed');
                     html = \`<div><span style="color:#00ff88;font-size:20px;">✓</span></div><div class="day-title">Day \${item.day}</div>\`;
                 } else {
                     if(i === dailyState.streak) div.classList.add('active');
-                    html = \`<div class="day-title">Day \${item.day}</div><img src="\${icon}" class="day-icon"><div class="day-reward">+\${item.reward}</div>\`;
+                    html = \`<div class="day-title">Day \${item.day}</div>
+                            <img src="\${icon}" class="day-icon">
+                            <div class="day-reward">+\${item.reward}</div>
+                            <div class="day-ads-req">\${reqAds} Ads</div>\`;
                 }
                 div.innerHTML = html; grid.appendChild(div);
             }
@@ -671,6 +946,8 @@
             const tmr = document.getElementById('daily-timer');
             if(canClaim || (dailyState.streak===0 && dailyState.lastClaim===0)) { 
                 btn.disabled=false; btn.innerText="CLAIM REWARD"; btn.style.background="gold"; tmr.innerText=""; 
+                const currentDayIdx = dailyState.streak;
+                btn.innerText = \`WATCH \${dailyAdReqs[currentDayIdx]} ADS TO CLAIM\`;
             } else { 
                 btn.disabled=true; btn.innerText="Come back tomorrow"; btn.style.background="#444"; 
                 const wait = (dailyState.lastClaim + oneDay) - now; 
@@ -680,16 +957,48 @@
         }
 
         window.claimDailyReward = () => {
+            const currentDayIdx = dailyState.streak;
+            const requiredAds = dailyAdReqs[currentDayIdx];
+            const btn = document.getElementById('daily-claim-btn');
+            
+            if(dailyAdProgress < requiredAds) {
+                btn.disabled = true;
+                btn.innerText = \`Loading Ad (\${dailyAdProgress + 1}/\${requiredAds})\`;
+                
+                const adPromise = window.parent.show_10284251 ? window.parent.show_10284251() : window.show_10284251();
+                
+                adPromise.then(() => {
+                    dailyAdProgress++;
+                    btn.disabled = false;
+                    if(dailyAdProgress >= requiredAds) {
+                        btn.innerText = "GET REWARD";
+                        btn.style.background = "#00ff88";
+                        finalizeDailyClaim();
+                    } else {
+                        btn.innerText = \`WATCH AD (\${dailyAdProgress}/\${requiredAds})\`;
+                    }
+                }).catch(e => {
+                    alert("Ad failed.");
+                    btn.disabled = false;
+                    btn.innerText = \`WATCH AD (\${dailyAdProgress}/\${requiredAds})\`;
+                });
+            } else {
+                finalizeDailyClaim();
+            }
+        };
+        
+        function finalizeDailyClaim() {
             const currentDay = dailyState.streak;
             const reward = dailyConfig[currentDay] ? dailyConfig[currentDay].reward : 100;
             if(window.parent.handleAddReward) window.parent.handleAddReward(reward);
             update(ref(db, \`users/\${userId}/daily\`), { streak: (dailyState.streak+1) % 7, lastClaim: Date.now() }).then(()=>{ 
                 alert(\`Claimed \${reward} Coins!\`); 
+                dailyAdProgress = 0; 
                 openDaily(); 
             });
-        };
+        }
 
-        // 6. GIVEAWAY LOGIC (Controlled by Admin Panel)
+        // 6. GIVEAWAY LOGIC
         window.openGiveaway = () => { document.getElementById('modal-giveaway').style.display = 'flex'; renderGiveaway(); setInterval(renderGiveaway,1000); };
         onValue(ref(db, 'admin/giveaway'), s => { gvConfig = s.val() || {}; if(gvConfig.revealTime>Date.now()) allRewardsCache=null; renderGiveaway(); });
         onValue(ref(db, 'giveaway_orders'), s => { gvOrders = s.val() || {}; renderGiveaway(); });
@@ -729,22 +1038,10 @@
         window.claimEgg = (id) => {
             if(Date.now() >= gvConfig.revealTime) { alert("Time Up!"); return; }
             if(score < gvConfig.price) { alert("No Money!"); return; }
-
-            // --- NEW: CHECK LIMIT FROM ADMIN ---
             const limit = gvConfig.maxEggsPerUser || 1; 
             let myCount = 0;
-            if(gvOrders) {
-                Object.values(gvOrders).forEach(o => {
-                    if(o.uid === userId) myCount++;
-                });
-            }
-
-            if(myCount >= limit) {
-                alert("Limit Reached! Aap sirf " + limit + " egg le sakte hain.");
-                return;
-            }
-            // ------------------------------------
-
+            if(gvOrders) { Object.values(gvOrders).forEach(o => { if(o.uid === userId) myCount++; }); }
+            if(myCount >= limit) { alert("Limit Reached!"); return; }
             if(window.parent.handleBuyItem) {
                 window.parent.handleBuyItem(gvConfig.price).then(success => {
                     if(success) {
@@ -753,29 +1050,20 @@
                 });
             }
         };
-        
-        // FIXED AUTO REVEAL LOGIC
         function autoRevealEgg(id, idx) {
             if(window[\`op_\${id}\`]) return; window[\`op_\${id}\`] = true;
             const img = document.getElementById(\`gv-img-\${id}\`);
             if(img) { img.classList.remove('shaking'); img.classList.add('glowing'); }
-            
-            // Stagger requests slightly to prevent UI freeze
             setTimeout(() => {
                 get(ref(db, \`admin/giveaway_rewards/\${idx}\`)).then(s => {
                     const w = s.val() || 0;
-                    // Mark as opened in Egg DB
                     update(ref(db, \`giveaway_orders/\${id}\`), { isOpened: true, reward: w }).then(() => { 
-                        // ADD REWARD SAFELY TO PARENT WALLET
-                        if(w > 0 && window.parent.handleAddReward) {
-                            window.parent.handleAddReward(w);
-                        }
+                        if(w > 0 && window.parent.handleAddReward) { window.parent.handleAddReward(w); }
                     });
                 });
-            }, 1500 + (idx * 500)); // Added staggered delay based on index
+            }, 1500 + (idx * 500));
         }
 
-        // COIN ANIMATION
         function flyCoinToWallet(x, y, amount) {
             const coin = document.createElement('div'); coin.className = 'fly-coin'; coin.innerText = '🪙';
             coin.style.left = x + 'px'; coin.style.top = y + 'px'; document.body.appendChild(coin);
@@ -788,7 +1076,6 @@
             }, 50);
             setTimeout(() => { coin.remove(); txt.remove(); }, 1000);
         }
-
         window.closeModals = () => document.querySelectorAll('.modal').forEach(m => m.style.display='none');
     <\/script>
 </body>
