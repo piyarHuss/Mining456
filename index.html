@@ -287,7 +287,7 @@
         </div>
     </div>
 
-    <!-- EGG GAME CODE (Updated for Attacks & Inventory) -->
+    <!-- EGG GAME CODE (Updated: Robust Stock Logic) -->
     <script>
         const eggGameCode = `
 <!DOCTYPE html>
@@ -330,19 +330,24 @@
         .main-hp-fill { width: 100%; height: 100%; background: linear-gradient(90deg, #ff00cc, #333399); transition: width 0.1s; }
         .main-hp-text { font-size: 12px; color: #fff; margin-top: 5px; font-weight: bold; text-shadow: 0 0 5px black; }
 
-        /* GIVEAWAY BUTTON & LABEL */
         .giveaway-wrapper { margin-top: 15px; z-index: 10; display:flex; flex-direction:column; align-items:center; }
         .giveaway-btn { background: linear-gradient(90deg, #ff00cc, #333399); border: 2px solid #ff00cc; padding: 10px 30px; border-radius: 50px; color: white; font-size: 16px; font-weight: 800; text-transform: uppercase; box-shadow: 0 0 15px rgba(255, 0, 204, 0.5); cursor: pointer; display: flex; align-items: center; gap: 8px; animation: pulse 2s infinite; }
         @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
         #giveaway-label-text { font-size: 10px; color: #ff00cc; margin-top: 5px; font-weight: bold; letter-spacing: 1px; text-shadow: 0 0 5px black; }
 
-        /* BIRD & WIDGET */
         .bird { position: absolute; width: 40px; height: 40px; font-size: 30px; z-index: 50; cursor: pointer; animation: flyBird 4s linear forwards; }
         @keyframes flyBird { from { left: -50px; top: 20%; } to { left: 110%; top: 20%; } }
         
-        .bird-widget { position: absolute; left: 10px; top: 120px; background: rgba(0,0,0,0.6); border: 1px solid #00ff88; border-radius: 50%; width: 50px; height: 50px; display: none; justify-content: center; align-items: center; cursor: pointer; z-index: 40; }
-        .bird-widget span { font-size: 24px; }
-        .bird-count { position: absolute; bottom: -5px; right: -5px; background: red; color: white; font-size: 10px; padding: 2px 5px; border-radius: 10px; font-weight: bold; }
+        .bird-widget { 
+            position: absolute; left: 10px; top: 120px; 
+            width: 50px; height: 50px; display: none; 
+            justify-content: center; align-items: center; 
+            cursor: pointer; z-index: 40; 
+            background: transparent;
+            border: none;
+        }
+        .bird-widget span { font-size: 40px; filter: drop-shadow(0 0 5px rgba(0,0,0,0.8)); }
+        .bird-count { position: absolute; bottom: 0px; right: 0px; background: red; color: white; font-size: 10px; padding: 2px 5px; border-radius: 10px; font-weight: bold; }
 
         .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 100; display: none; justify-content: center; align-items: center; flex-direction: column; }
         .modal-box { width: 95%; max-width: 400px; background: #141414; padding: 20px; border-radius: 20px; text-align: center; border: 1px solid #333; position: relative; max-height: 90vh; overflow-y: auto; display: flex; flex-direction: column; }
@@ -366,6 +371,7 @@
         .store-card { background: #2a2a2a; padding: 10px; border-radius: 10px; border: 1px solid #444; display: flex; flex-direction: column; align-items: center; }
         .store-card img { width: 40px; height: 40px; object-fit: contain; }
         .buy-btn { background: gold; color: black; border: none; padding: 4px 12px; border-radius: 20px; font-weight: bold; margin-top: 5px; cursor: pointer; font-size: 11px; }
+        .buy-btn:disabled { background: #555; color: #aaa; cursor: not-allowed; }
 
         .giveaway-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; overflow-y: auto; padding: 10px; width: 100%; margin-top: 10px; }
         .gv-card { background: transparent; border: none; display: flex; flex-direction: column; align-items: center; position: relative; min-height: 140px; justify-content: center; }
@@ -385,15 +391,15 @@
         @keyframes heavyShake { 0% { transform: translate(1px, 1px) rotate(0deg); } 20% { transform: translate(-3px, 0px) rotate(1deg); } 40% { transform: translate(1px, -1px) rotate(1deg); } 60% { transform: translate(-3px, 1px) rotate(0deg); } 80% { transform: translate(-1px, -1px) rotate(1deg); } 100% { transform: translate(1px, -2px) rotate(-1deg); } }
         @keyframes popIn { from{transform:scale(0);} to{transform:scale(1);} }
 
-        /* ARROW ATTACK & BROADCAST STYLES */
         .arrow-anim {
-            position: absolute;
-            font-size: 24px;
+            position: fixed; 
+            font-size: 50px; 
             color: #ff4444;
             font-weight: bold;
-            text-shadow: 0 0 5px red;
-            z-index: 150;
-            transition: all 0.5s ease-in;
+            text-shadow: 0 0 10px red;
+            z-index: 9999; 
+            transition: all 0.6s ease-in;
+            pointer-events: none;
         }
 
         .broadcast-toast {
@@ -416,9 +422,22 @@
         }
         @keyframes slideDown { from { top: -50px; } to { top: 60px; } }
 
-        .sold-out { filter: grayscale(1); opacity: 0.5; pointer-events: none; }
+        /* Store Styles */
+        .sold-out { 
+            /* Only fade the card slightly, name should be visible */
+            opacity: 0.8; 
+        }
+        
+        /* New Style for purchased button */
+        .sold-out-btn {
+            background-color: #ff4444 !important;
+            color: white !important;
+            cursor: not-allowed !important;
+            opacity: 1;
+            box-shadow: none;
+            border: 1px solid #ff0000;
+        }
 
-        /* Online Players Modal List */
         .player-row { display: flex; justify-content: space-between; padding: 8px; border-bottom: 1px solid #333; font-size: 14px; color: #eee; }
     </style>
 </head>
@@ -427,8 +446,6 @@
     <div id="global-broadcast" class="broadcast-toast"></div>
 
     <div class="game-container">
-        
-        <!-- Bird Widget -->
         <div id="bird-widget" class="bird-widget" onclick="openBirdAttack()">
             <span>🕊️</span>
             <div id="bird-count-badge" class="bird-count">0</div>
@@ -472,10 +489,8 @@
         </div>
 
         <div class="tap-zone">
-            <!-- Bird Spawning Zone -->
             <div id="bird-zone" style="position:absolute; width:100%; height:100%; top:0; left:0; pointer-events:none;"></div>
-            <!-- Arrow Container -->
-            <div id="arrow-zone" style="position:absolute; width:100%; height:100%; top:0; left:0; pointer-events:none; z-index:100;"></div>
+            <div id="arrow-zone" style="position:fixed; width:100vw; height:100vh; top:0; left:0; pointer-events:none; z-index:9999;"></div>
 
             <img id="main-char" src="">
             <div id="main-hp-container" class="main-hp-container">
@@ -526,7 +541,6 @@
         </div>
     </div>
     
-    <!-- SPECIAL ATTACK MODAL -->
     <div id="modal-bird" class="modal">
         <div class="modal-box">
              <div class="close-btn" onclick="closeModals()">✕</div>
@@ -588,11 +602,10 @@
             }
         }, 1000);
 
-        // --- BROADCAST LISTENER (NEW) ---
         onValue(ref(db, 'public_feed/last_buy'), (snap) => {
             if(snap.exists()) {
                 const d = snap.val();
-                if(d.ts && Date.now() - d.ts < 5000) { // Only show recent within 5 sec
+                if(d.ts && Date.now() - d.ts < 5000) { 
                     const toast = document.getElementById('global-broadcast');
                     toast.innerText = \`📢 \${d.user} bought \${d.item}!\`;
                     toast.style.display = "block";
@@ -601,7 +614,6 @@
             }
         });
 
-        // --- ONLINE PRESENCE ---
         const connectedRef = ref(db, ".info/connected");
         setTimeout(() => {
             if(userId !== 'guest') {
@@ -631,7 +643,6 @@
              users.forEach(u => { list.innerHTML += \`<div class="player-row"><span>\${u.name || 'Unknown'}</span> <span style="color:#00ff88; font-size:10px;">● Online</span></div>\`; });
         };
 
-        // 1. SETTINGS & VISUALS
         onValue(ref(db, 'admin/settings'), s => {
             const d = s.val() || {};
             if(d.backgroundImage) document.getElementById('app-background').style.backgroundImage = \`url('\${d.backgroundImage}')\`;
@@ -646,7 +657,6 @@
             if(d.birdDamagePercent) birdConfig.damagePercent = d.birdDamagePercent;
         });
 
-        // 2. DAILY CONFIG
         onValue(ref(db, 'admin/daily_config'), (snap) => {
             const data = snap.val();
             dailyConfig = [];
@@ -656,7 +666,6 @@
             }
         });
 
-        // 3. EGG STATUS & BIRD SPAWNER
         let birdInterval = null;
         setTimeout(() => {
             if(userId !== 'guest') {
@@ -666,7 +675,7 @@
                         activeEgg = eggData;
                         document.getElementById('main-char').src = eggData.image; 
                         document.getElementById('main-hp-container').style.display = "flex"; 
-                        document.getElementById('bird-widget').style.display = "flex";
+                        if(birdCount > 0) document.getElementById('bird-widget').style.display = "flex";
                         updateMainHpUI();
                         if(!birdInterval) birdInterval = setInterval(spawnBird, 3000);
                     } else {
@@ -697,8 +706,9 @@
             bird.style.top = (20 + Math.random() * 40) + "%"; 
             bird.style.pointerEvents = "auto"; 
             bird.onclick = function() {
-                 birdCount++;
+                 birdCount = 1; 
                  document.getElementById('bird-count-badge').innerText = birdCount;
+                 document.getElementById('bird-widget').style.display = "flex";
                  bird.remove();
             };
             zone.appendChild(bird);
@@ -706,7 +716,7 @@
         }
         
         window.openBirdAttack = () => {
-             if(birdCount <= 0) { alert("Catch a bird first!"); return; }
+             if(birdCount <= 0) { return; }
              const m = document.getElementById('modal-bird');
              document.getElementById('bird-req-text').innerText = \`Watch \${birdConfig.targetAds} Ads\`;
              document.getElementById('bird-effect-text').innerText = \`-\${birdConfig.damagePercent}% HP Damage\`;
@@ -744,10 +754,7 @@
              watchNextAd();
         };
         
-        // --- NEW ARROW ATTACK ANIMATION ---
         function triggerArrowStorm() {
-            const zone = document.getElementById('arrow-zone');
-            const eggRect = document.getElementById('main-char').getBoundingClientRect();
             const centerX = window.innerWidth / 2;
             const centerY = window.innerHeight / 2;
 
@@ -755,44 +762,33 @@
                 setTimeout(() => {
                     const arrow = document.createElement('div');
                     arrow.className = 'arrow-anim';
-                    arrow.innerText = '➳'; // Unicode Arrow
-                    
-                    // Random start positions (edges of screen)
+                    arrow.innerText = '➳'; 
                     const side = Math.floor(Math.random() * 4);
                     let startX, startY;
-                    if(side === 0) { startX = Math.random() * window.innerWidth; startY = -50; } // Top
-                    else if(side === 1) { startX = window.innerWidth + 50; startY = Math.random() * window.innerHeight; } // Right
-                    else if(side === 2) { startX = Math.random() * window.innerWidth; startY = window.innerHeight + 50; } // Bottom
-                    else { startX = -50; startY = Math.random() * window.innerHeight; } // Left
+                    if(side === 0) { startX = Math.random() * window.innerWidth; startY = -100; } 
+                    else if(side === 1) { startX = window.innerWidth + 100; startY = Math.random() * window.innerHeight; } 
+                    else if(side === 2) { startX = Math.random() * window.innerWidth; startY = window.innerHeight + 100; } 
+                    else { startX = -100; startY = Math.random() * window.innerHeight; } 
 
                     arrow.style.left = startX + 'px';
                     arrow.style.top = startY + 'px';
-                    
-                    // Calculate Rotation
                     const deltaX = centerX - startX;
                     const deltaY = centerY - startY;
                     const angle = Math.atan2(deltaY, deltaX) * (180/Math.PI);
                     arrow.style.transform = \`rotate(\${angle}deg)\`;
-                    
-                    zone.appendChild(arrow);
-                    
-                    // Animate to center
+                    document.body.appendChild(arrow); 
                     setTimeout(() => {
                         arrow.style.left = (centerX + (Math.random()*40 - 20)) + 'px';
                         arrow.style.top = (centerY + (Math.random()*40 - 20)) + 'px';
                         arrow.style.opacity = '0';
                     }, 50);
-
-                    // Remove
-                    setTimeout(() => arrow.remove(), 600);
+                    setTimeout(() => arrow.remove(), 700);
                 }, i * 50);
             }
         }
         
         function applyBirdDamage() {
              if(!activeEgg) return;
-             
-             // Trigger Visuals First
              triggerArrowStorm();
              document.getElementById('modal-bird').style.display = 'none';
 
@@ -802,14 +798,14 @@
                  if(newHp < 0) newHp = 0;
                  
                  update(ref(db, \`users/\${userId}/currentEgg\`), { hp: newHp }).then(() => {
-                     alert(\`BOOM! Dealt \${dmg} Damage!\`);
-                     birdCount--; 
+                     birdCount = 0;
                      document.getElementById('bird-count-badge').innerText = birdCount;
+                     document.getElementById('bird-widget').style.display = "none";
                      birdAdProgress = 0; 
                      document.getElementById('bird-attack-btn').disabled = false;
                      document.getElementById('bird-attack-btn').innerText = "START ATTACK";
                  });
-             }, 1500); // Wait for animation
+             }, 1000); 
         }
 
         document.getElementById('main-char').addEventListener('click', (e) => {
@@ -831,79 +827,121 @@
             }
         });
 
-        // 4. STORE LOGIC (MULTI-USER WITH TRANSACTION)
+        // 4. STORE LOGIC (FIXED: Handles undefined stock = Success)
         window.openStore = () => { 
             document.getElementById('modal-store').style.display='flex'; 
             const c=document.getElementById('store-container'); 
             c.innerHTML='Loading...'; 
-            onValue(ref(db,'admin/store_items'),s=>{ 
+            
+            // Listen real-time
+            onValue(ref(db,'admin/store_items'), s => { 
                 c.innerHTML=''; 
                 const d=s.val(); 
-                if(d) Object.keys(d).forEach(k=>{ 
-                    const item = d[k];
-                    // If stock is undefined, assume infinite (or 100), otherwise use value
-                    const stock = (item.stock !== undefined) ? item.stock : 999;
-                    const isSoldOut = stock <= 0;
-                    
-                    c.innerHTML += \`
-                    <div class="store-card \${isSoldOut ? 'sold-out' : ''}">
-                        <img src="\${item.image}">
-                        <div style="font-size:12px; font-weight:bold;">\${item.name}</div>
-                        <div style="font-size:10px; color:#aaa;">Stock: \${stock}</div>
-                        \${isSoldOut ? '<div style="color:red; font-size:10px; font-weight:bold;">SOLD OUT</div>' : 
-                        \`<button class="buy-btn" onclick="buyStore('\${k}')">Buy \${item.price}</button>\`}
-                    </div>\`; 
-                }); 
+                if(d) {
+                    Object.keys(d).forEach(k=>{ 
+                        const item = d[k];
+                        // FIXED: If stock is undefined, assume it is available (not sold out)
+                        const stock = (item.stock !== undefined) ? item.stock : 999;
+                        const isSoldOut = stock <= 0;
+                        
+                        c.innerHTML += \`
+                        <div class="store-card \${isSoldOut ? 'sold-out' : ''}">
+                            <img src="\${item.image}">
+                            <div style="font-size:12px; font-weight:bold;">\${item.name}</div>
+                            <div style="font-size:10px; color:#aaa;">Stock: \${stock}</div>
+                            \${isSoldOut 
+                                ? \`<button class="buy-btn sold-out-btn" disabled>SOLD OUT</button>\` 
+                                : \`<button class="buy-btn" onclick="buyStore('\${k}', \${item.price}, this)">Buy \${item.price}</button>\`
+                            }
+                        </div>\`; 
+                    }); 
+                } else {
+                    c.innerHTML = '<p style="color:white">Store Empty</p>';
+                }
             }); 
         };
 
-        window.buyStore = (k) => {
-            if(activeEgg) { alert("Finish breaking current egg!"); return; }
-            
-            // Step 1: Check Cost locally first
-            get(ref(db, 'admin/store_items/'+k)).then(s => {
-                const item = s.val();
-                if(!item) return;
-                
-                // Confirm purchase
-                if(window.parent.handleBuyItem) {
-                    window.parent.handleBuyItem(item.price).then(success => {
-                        if(success) {
-                            // Step 2: Run Transaction on Stock
-                            runTransaction(ref(db, \`admin/store_items/\${k}\`), (currentItem) => {
-                                if (currentItem) {
-                                    if (currentItem.stock > 0) {
-                                        currentItem.stock--; // Decrease stock
-                                        return currentItem;
-                                    } else {
-                                        return; // Abort if 0
-                                    }
-                                }
-                                return currentItem;
-                            }).then((result) => {
-                                if (result.committed) {
-                                    // SUCCESS: Assign Egg to User
-                                    set(ref(db, \`users/\${userId}/currentEgg\`), { name: item.name, image: item.image, reward: item.reward, maxHp: item.taps, hp: item.taps });
-                                    
-                                    // BROADCAST TO EVERYONE
-                                    set(ref(db, 'public_feed/last_buy'), { user: userName, item: item.name, ts: Date.now() });
+        window.buyStore = (k, price, btnElement) => {
+            if(btnElement) {
+                btnElement.disabled = true;
+                btnElement.innerText = "Checking...";
+            }
 
-                                    document.getElementById('modal-store').style.display='none';
-                                    alert("Purchase Successful!");
-                                } else {
-                                    // FAILED (Stock ran out during purchase)
-                                    alert("Sorry! Sold out just now.");
-                                    // Refund (Optional complexity, simplified here: coin lost but no egg. In real app, refund needed)
-                                    // For now assuming handleBuyItem is final.
-                                }
-                            });
-                        }
-                    });
+            // Client side Check
+            if(score < price) {
+                alert("Not enough coins!");
+                if(btnElement) { btnElement.disabled = false; btnElement.innerText = "Buy " + price; }
+                return;
+            }
+
+            if(activeEgg) { 
+                alert("Finish breaking current egg!"); 
+                if(btnElement) {
+                    btnElement.disabled = false; 
+                    btnElement.innerText = "Buy " + price; 
                 }
+                return; 
+            }
+            
+            // 1. RUN TRANSACTION (Check Stock)
+            runTransaction(ref(db, \`admin/store_items/\${k}\`), (currentItem) => {
+                // If item doesn't exist yet in cache, return undefined to retry
+                if (currentItem === undefined) return; 
+                
+                // If Item is null (deleted), abort
+                if (currentItem === null) return -1; 
+
+                // If Stock is missing, assume infinite/available and set default if you want, or just proceed
+                if (currentItem.stock === undefined || currentItem.stock === null) {
+                    // Safe to proceed, maybe initialize stock?
+                    // currentItem.stock = 99; 
+                    // currentItem.stock--;
+                    return currentItem; // Return same item, effectively approving
+                }
+
+                if (currentItem.stock > 0) {
+                    currentItem.stock--; 
+                    return currentItem;
+                } else {
+                    // Stock is 0 or less -> ABORT
+                    return; 
+                }
+            }).then((result) => {
+                if (result.committed) {
+                    // 2. Stock Secured. NOW Deduct Money.
+                    const itemData = result.snapshot.val();
+                    
+                    if(window.parent.handleBuyItem) {
+                        window.parent.handleBuyItem(price).then(success => {
+                            if(success) {
+                                // 3. Money Deducted. Grant Item.
+                                set(ref(db, \`users/\${userId}/currentEgg\`), { 
+                                    name: itemData.name, 
+                                    image: itemData.image, 
+                                    reward: itemData.reward, 
+                                    maxHp: itemData.taps, 
+                                    hp: itemData.taps 
+                                });
+                                set(ref(db, 'public_feed/last_buy'), { user: userName, item: itemData.name, ts: Date.now() });
+                                
+                                document.getElementById('modal-store').style.display='none';
+                                alert("Purchase Successful!");
+                            } else {
+                                alert("Error processing coins.");
+                            }
+                        });
+                    }
+                } else {
+                    // Transaction Aborted (Stock was 0)
+                    alert("Sold out!");
+                }
+            }).catch(e => {
+                console.error(e);
+                alert("Transaction failed.");
+                if(btnElement) { btnElement.disabled = false; btnElement.innerText = "Buy " + price; }
             });
         };
 
-        // 5. DAILY REWARDS LOGIC
         window.openDaily = () => { 
             document.getElementById('modal-daily').style.display='flex'; 
             get(ref(db, \`users/\${userId}/daily\`)).then((s) => { 
@@ -998,7 +1036,6 @@
             });
         }
 
-        // 6. GIVEAWAY LOGIC
         window.openGiveaway = () => { document.getElementById('modal-giveaway').style.display = 'flex'; renderGiveaway(); setInterval(renderGiveaway,1000); };
         onValue(ref(db, 'admin/giveaway'), s => { gvConfig = s.val() || {}; if(gvConfig.revealTime>Date.now()) allRewardsCache=null; renderGiveaway(); });
         onValue(ref(db, 'giveaway_orders'), s => { gvOrders = s.val() || {}; renderGiveaway(); });
@@ -1106,7 +1143,6 @@
         let userData = null;
         let appConfig = {};
         
-        // Cooldown vars
         const ZONE1_LIMIT = 10;
         const ZONE1_COOLDOWN_MS = 2 * 60 * 60 * 1000; 
         const ZONE1_REWARD = 40;
@@ -1118,10 +1154,8 @@
         let zoneTimerInterval = null;
         let eggGameLoaded = false;
         
-        // UI Loop for Mining
         let miningUiInterval = null;
 
-        // --- PARENT WINDOW FUNCTIONS FOR IRAME ---
         window.getExternalGameData = function() {
             if(!userData) return null;
             return {
@@ -1194,8 +1228,6 @@
             safeListen('zone2-btn', 'click', handleZone2Ad);
             safeListen('convert-trigger', 'click', handleCoinConversion);
 
-            // Mining Action Listener added dynamically in updateMiningUI to handle state changes better
-
             const ldr = document.getElementById('loader');
             if(ldr) ldr.style.display = 'none';
 
@@ -1226,7 +1258,7 @@
                 
                 if(miningUiInterval) clearInterval(miningUiInterval);
                 miningUiInterval = setInterval(updateMiningUI, 1000);
-                updateMiningUI(); // Run once immediately
+                updateMiningUI(); 
             } else {
                 currentUser = null;
                 userData = null;
@@ -1246,14 +1278,12 @@
                 if (userSnap.exists()) {
                     userData = userSnap.data();
                     let needsUpdate = false;
-                    // General fields
                     if (typeof userData.adZone1Count === 'undefined') { userData.adZone1Count = 0; needsUpdate = true; }
                     if (typeof userData.adZone1Cooldown === 'undefined') { userData.adZone1Cooldown = null; needsUpdate = true; }
                     if (typeof userData.adZone2Count === 'undefined') { userData.adZone2Count = 0; needsUpdate = true; }
                     if (typeof userData.adZone2Cooldown === 'undefined') { userData.adZone2Cooldown = null; needsUpdate = true; }
                     if (typeof userData.walletBalance === 'undefined') { userData.walletBalance = 0; needsUpdate = true; }
                     
-                    // NEW MINING FIELDS
                     if (typeof userData.miningAdsCount === 'undefined') { userData.miningAdsCount = 0; needsUpdate = true; }
                     if (typeof userData.miningCooldown === 'undefined') { userData.miningCooldown = null; needsUpdate = true; }
 
@@ -1273,7 +1303,6 @@
                         lastNotificationCheck: new Date(), createdAt: serverTimestamp(),
                         dailyAdCount: 0, lastAdWatchDate: new Date().toISOString().split('T')[0], isBlocked: false,
                         
-                        // New Mining Defaults
                         miningAdsCount: 0, miningCooldown: null,
 
                         adZone1Count: 0, adZone1Cooldown: null, adZone2Count: 0, adZone2Cooldown: null, walletBalance: 0 
@@ -1289,12 +1318,10 @@
             try {
                 const configSnap = await getDoc(configRef);
                 appConfig = configSnap.exists() ? configSnap.data() : {};
-                // Defaults
                 if(!appConfig.minWithdrawal) appConfig.minWithdrawal = 50;
                 if(!appConfig.paymentMethods) appConfig.paymentMethods = ["UPI", "Paytm"];
                 if(!appConfig.dailyAdLimit) appConfig.dailyAdLimit = 10;
                 
-                // Mining Defaults
                 if(!appConfig.miningReqAds) appConfig.miningReqAds = 15;
                 if(!appConfig.miningReward) appConfig.miningReward = 8000;
                 if(!appConfig.miningCooldownHours) appConfig.miningCooldownHours = 5;
@@ -1321,7 +1348,6 @@
                 });
             }
             updateDynamicPaymentFields(); updateAdsLeftCount(); updateZoneButtons(); 
-            // updateMiningUI is called separately via interval
         }
         
         function updateAdsLeftCount() {
