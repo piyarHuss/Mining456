@@ -287,7 +287,7 @@
         </div>
     </div>
 
-    <!-- EGG GAME CODE (Updated: Robust Stock Logic) -->
+    <!-- EGG GAME CODE (Updated: OWNED Logic Added) -->
     <script>
         const eggGameCode = `
 <!DOCTYPE html>
@@ -428,7 +428,7 @@
             opacity: 0.8; 
         }
         
-        /* New Style for purchased button */
+        /* New Style for purchased/sold out button */
         .sold-out-btn {
             background-color: #ff4444 !important;
             color: white !important;
@@ -827,38 +827,52 @@
             }
         });
 
-        // 4. STORE LOGIC (FIXED: Handles undefined stock = Success)
+        // 4. STORE LOGIC UPDATED (Fetch Owned Items + Check Stock)
         window.openStore = () => { 
             document.getElementById('modal-store').style.display='flex'; 
-            const c=document.getElementById('store-container'); 
+            const c = document.getElementById('store-container'); 
             c.innerHTML='Loading...'; 
             
-            // Listen real-time
-            onValue(ref(db,'admin/store_items'), s => { 
-                c.innerHTML=''; 
-                const d=s.val(); 
-                if(d) {
-                    Object.keys(d).forEach(k=>{ 
-                        const item = d[k];
-                        // FIXED: If stock is undefined, assume it is available (not sold out)
-                        const stock = (item.stock !== undefined) ? item.stock : 999;
-                        const isSoldOut = stock <= 0;
-                        
-                        c.innerHTML += \`
-                        <div class="store-card \${isSoldOut ? 'sold-out' : ''}">
-                            <img src="\${item.image}">
-                            <div style="font-size:12px; font-weight:bold;">\${item.name}</div>
-                            <div style="font-size:10px; color:#aaa;">Stock: \${stock}</div>
-                            \${isSoldOut 
-                                ? \`<button class="buy-btn sold-out-btn" disabled>SOLD OUT</button>\` 
-                                : \`<button class="buy-btn" onclick="buyStore('\${k}', \${item.price}, this)">Buy \${item.price}</button>\`
+            // Step 1: Fetch user's owned items
+            get(ref(db, \`users/\${userId}/ownedItems\`)).then((snap) => {
+                const ownedItems = snap.val() || {}; // This object holds what user owns
+
+                // Step 2: Listen to store items
+                onValue(ref(db,'admin/store_items'), s => { 
+                    c.innerHTML=''; 
+                    const d=s.val(); 
+                    if(d) {
+                        Object.keys(d).forEach(k=>{ 
+                            const item = d[k];
+                            const stock = (item.stock !== undefined) ? item.stock : 999;
+                            const isSoldOut = stock <= 0;
+                            const isOwned = ownedItems[k] === true; // Check if user owns it
+
+                            let btnHtml = '';
+                            if(isOwned) {
+                                // If owned, show "OWNED" button and disable it
+                                btnHtml = \`<button class="buy-btn sold-out-btn" disabled>OWNED</button>\`;
+                            } else if(isSoldOut) {
+                                // If sold out but not owned
+                                btnHtml = \`<button class="buy-btn sold-out-btn" disabled>SOLD OUT</button>\`;
+                            } else {
+                                // If available
+                                btnHtml = \`<button class="buy-btn" onclick="buyStore('\${k}', \${item.price}, this)">Buy \${item.price}</button>\`;
                             }
-                        </div>\`; 
-                    }); 
-                } else {
-                    c.innerHTML = '<p style="color:white">Store Empty</p>';
-                }
-            }); 
+                            
+                            c.innerHTML += \`
+                            <div class="store-card \${isSoldOut ? 'sold-out' : ''}">
+                                <img src="\${item.image}">
+                                <div style="font-size:12px; font-weight:bold;">\${item.name}</div>
+                                <div style="font-size:10px; color:#aaa;">Stock: \${stock}</div>
+                                \${btnHtml}
+                            </div>\`; 
+                        }); 
+                    } else {
+                        c.innerHTML = '<p style="color:white">Store Empty</p>';
+                    }
+                }, { onlyOnce: true }); // Avoid stacking listeners
+            });
         };
 
         window.buyStore = (k, price, btnElement) => {
@@ -885,36 +899,29 @@
             
             // 1. RUN TRANSACTION (Check Stock)
             runTransaction(ref(db, \`admin/store_items/\${k}\`), (currentItem) => {
-                // If item doesn't exist yet in cache, return undefined to retry
                 if (currentItem === undefined) return; 
-                
-                // If Item is null (deleted), abort
                 if (currentItem === null) return -1; 
-
-                // If Stock is missing, assume infinite/available and set default if you want, or just proceed
                 if (currentItem.stock === undefined || currentItem.stock === null) {
-                    // Safe to proceed, maybe initialize stock?
-                    // currentItem.stock = 99; 
-                    // currentItem.stock--;
-                    return currentItem; // Return same item, effectively approving
+                    return currentItem; 
                 }
-
                 if (currentItem.stock > 0) {
                     currentItem.stock--; 
                     return currentItem;
                 } else {
-                    // Stock is 0 or less -> ABORT
-                    return; 
+                    return; // Abort
                 }
             }).then((result) => {
                 if (result.committed) {
-                    // 2. Stock Secured. NOW Deduct Money.
                     const itemData = result.snapshot.val();
                     
                     if(window.parent.handleBuyItem) {
                         window.parent.handleBuyItem(price).then(success => {
                             if(success) {
                                 // 3. Money Deducted. Grant Item.
+                                
+                                // UPDATE: Add item to 'ownedItems' so they can't buy again
+                                update(ref(db, \`users/\${userId}/ownedItems\`), { [k]: true });
+
                                 set(ref(db, \`users/\${userId}/currentEgg\`), { 
                                     name: itemData.name, 
                                     image: itemData.image, 
@@ -932,7 +939,6 @@
                         });
                     }
                 } else {
-                    // Transaction Aborted (Stock was 0)
                     alert("Sold out!");
                 }
             }).catch(e => {
