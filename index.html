@@ -1,7 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <!-- MINING AD SCRIPT (Zone 10283653) -->
     <script src='//libtl.com/sdk.js' data-zone='10283653' data-sdk='show_10283653'></script>
+    
+    <!-- Other Ad Scripts -->
     <meta name="monetag" content="ad9e9cd11a419f3c0a5103c5bb5e151e">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -9,7 +12,6 @@
     
     <!-- Zone 1 Script -->
     <script src='//libtl.com/sdk.js' data-zone='9972147' data-sdk='show_9972147'></script>
-    
     <!-- Zone 2 Script -->
     <script src='//libtl.com/sdk.js' data-zone='9966888' data-sdk='show_9966888'></script>
     
@@ -42,29 +44,6 @@
         }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         
-        #mining-page { text-align: center; }
-        #mining-page h2 { 
-            color: #FFD700; padding: 15px; font-size: 28px;
-            text-shadow: 0 0 10px rgba(255,215,0,0.6);
-        }
-        .progress-container { display: flex; justify-content: center; margin-top: 40px; }
-        .circle { 
-            position: relative; display: inline-block; 
-            filter: drop-shadow(0 0 12px rgba(255,165,0,0.6));
-        }
-        #mining-page svg { transform: rotate(-90deg); }
-        #mining-page circle { fill: none; stroke-width: 14; stroke-linecap: round; }
-        #mining-page .bg { stroke: #2a2a2a; }
-        #mining-page .progress { transition: stroke-dashoffset 1s linear; }
-        .count-display { 
-            position: absolute; top: 50%; left: 50%; 
-            transform: translate(-50%, -50%); 
-            font-weight: bold; font-size: 24px;
-            background: linear-gradient(45deg, #FFD700, #FFA500);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            text-shadow: 0 0 10px rgba(255,215,0,0.7);
-        }
-        
         .convert-section { cursor: pointer; transition: background 0.2s; }
         .convert-section:active { opacity: 0.7; }
         .shine-anim { animation: shine 2s infinite; }
@@ -78,6 +57,12 @@
             overflow: hidden;
             border-radius: 8px;
             margin-top: 10px;
+        }
+        
+        /* New Mining Card Style */
+        .mining-card {
+            background: linear-gradient(135deg, #2c3e50, #000000);
+            border: 1px solid #4a5568;
         }
     </style>
 </head>
@@ -142,6 +127,40 @@
                     </div>
                 </div>
 
+                <!-- NEW MINING SECTION (15 Ads Logic) -->
+                <div class="mining-card p-4 rounded-lg shadow-lg relative overflow-hidden">
+                    <div class="flex justify-between items-start mb-2 relative z-10">
+                        <div>
+                            <h2 class="text-xl font-bold text-white flex items-center">
+                                <span class="text-3xl mr-2">⛏️</span> Mining Farm
+                            </h2>
+                            <p class="text-gray-300 text-xs mt-1">Watch Ads to Mine 8000 Coins!</p>
+                        </div>
+                        <div class="bg-black bg-opacity-40 px-3 py-1 rounded text-xs text-yellow-400 font-mono">
+                            Cooldown: 5 Hours
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4 relative z-10">
+                        <div class="flex justify-between text-xs mb-1">
+                            <span class="text-gray-300">Progress</span>
+                            <span id="mining-progress-text" class="text-accent font-bold">0 / 15 Ads</span>
+                        </div>
+                        <div class="w-full bg-gray-700 rounded-full h-3 mb-4">
+                            <div id="mining-progress-bar" class="bg-gradient-to-r from-yellow-500 to-orange-600 h-3 rounded-full transition-all duration-500" style="width: 0%"></div>
+                        </div>
+                        
+                        <button id="mining-start-btn" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-lg shadow-md transition-all flex justify-center items-center">
+                            Start Mining
+                        </button>
+                    </div>
+                    
+                    <!-- Background decoration -->
+                    <div class="absolute -right-5 -bottom-5 text-gray-800 opacity-20">
+                        <i data-lucide="pickaxe" style="width: 120px; height: 120px;"></i>
+                    </div>
+                </div>
+
                 <section>
                     <div class="flex justify-between items-center mb-3">
                         <div>
@@ -174,10 +193,6 @@
                         <div class="bg-orange-500 p-3 rounded-lg flex items-center justify-between text-black">
                             <div class="flex items-center space-x-3"><span class="text-3xl">🤩</span><div><h3 class="font-bold">Watch Short Ad</h3><p class="text-xs font-medium">Rewarded Interstitial</p></div></div>
                             <button class="bg-white text-orange-500 font-bold px-6 py-2 rounded-lg text-sm btn" onclick="claimReward('interstitial')">Claim</button>
-                        </div>
-                         <div class="card-bg p-3 rounded-lg flex items-center justify-between">
-                           <div class="flex items-center space-x-3"><span class="text-3xl">⛏️</span><div><h3 class="font-semibold">Play Mining</h3><p class="text-xs text-gray-400">Offline mining for 1 hour!</p></div></div>
-                           <button id="mining-btn" class="text-white font-bold px-4 py-2 rounded-lg text-sm btn flex items-center justify-center" style="min-width: 110px;"></button>
                         </div>
                     </div>
                 </section>
@@ -252,20 +267,6 @@
                 <div id="notifications-list" class="space-y-3"></div>
             </div>
 
-            <!-- MINING PAGE -->
-            <div id="mining-page" class="p-4 sub-page">
-                <button onclick="navigateTo('home-page')" class="absolute top-4 left-4 p-2 rounded-full bg-gray-800"><i data-lucide="arrow-left"></i></button>
-                <h2>Mining Coins</h2>
-                <div class="progress-container">
-                    <div class="circle" style="width:180px; height:180px;">
-                        <svg width="180" height="180"><defs><linearGradient id="hamsterGrad" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" style="stop-color:#FFD700;stop-opacity:1" /><stop offset="100%" style="stop-color:#FF8C00;stop-opacity:1" /></linearGradient></defs><circle class="bg" cx="90" cy="90" r="80"></circle><circle id="mining-progress-circle" class="progress" cx="90" cy="90" r="80" stroke="url(#hamsterGrad)"></circle></svg>
-                        <div class="count-display" id="mining-coin-count">🪙 0</div>
-                    </div>
-                </div>
-                <div class="mt-8"><p class="text-lg">Session Time Remaining:</p><p id="mining-timer" class="text-2xl font-bold text-accent">01:00:00</p></div>
-                 <div class="mt-4 card-bg p-4 rounded-lg"><p id="mining-status-text" class="text-gray-300">Mining session is active.</p></div>
-            </div>
-
         </main>
 
         <!-- BOTTOM NAV (Always Visible) -->
@@ -285,7 +286,7 @@
         </div>
     </div>
 
-    <!-- EGG GAME CODE (WITH LIMIT FIX) -->
+    <!-- EGG GAME CODE (KEPT SAME) -->
     <script>
         const eggGameCode = `
 <!DOCTYPE html>
@@ -808,7 +809,6 @@
         
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
         import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
-        // IMPORTED 'increment' HERE
         import { getFirestore, doc, setDoc, getDoc, updateDoc, collection, addDoc, serverTimestamp, query, where, getDocs, orderBy, limit, writeBatch, increment } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
         const app = initializeApp(firebaseConfig);
@@ -818,14 +818,8 @@
         let currentUser = null;
         let userData = null;
         let appConfig = {};
-        let miningInterval = null;
-        let zoneTimerInterval = null;
-        let eggGameLoaded = false;
-
-        const MINING_ADS_REQUIRED = 20;
-        const MINING_DURATION_MS = 3600 * 1000;
-        const MINING_REWARD = 1800; 
         
+        // Cooldown vars
         const ZONE1_LIMIT = 10;
         const ZONE1_COOLDOWN_MS = 2 * 60 * 60 * 1000; 
         const ZONE1_REWARD = 40;
@@ -833,6 +827,12 @@
         const ZONE2_LIMIT = 10;
         const ZONE2_COOLDOWN_MS = 3 * 60 * 60 * 1000; 
         const ZONE2_REWARD = 44;
+
+        let zoneTimerInterval = null;
+        let eggGameLoaded = false;
+        
+        // UI Loop for Mining
+        let miningUiInterval = null;
 
         // --- PARENT WINDOW FUNCTIONS FOR IRAME ---
         window.getExternalGameData = function() {
@@ -848,7 +848,6 @@
         window.handleBuyItem = async function(cost) {
             if(userData.balance >= cost) {
                 try {
-                    // Use increment for safety
                     const userRef = doc(db, "users", currentUser.uid);
                     await updateDoc(userRef, { balance: increment(-cost) });
                     userData.balance -= cost;
@@ -865,18 +864,15 @@
             }
         };
 
-        // FIXED REWARD ADDING LOGIC (Using increment to allow multiple simultaneous adds)
         window.handleAddReward = async function(amount) {
             try {
                 const userRef = doc(db, "users", currentUser.uid);
-                // ATOMIC INCREMENT: Prevents data loss if 4 eggs trigger at once
                 await updateDoc(userRef, { balance: increment(amount) });
                 userData.balance = (userData.balance || 0) + amount;
                 updateUI();
                 console.log(`Added ${amount} coins safely.`);
             } catch(e) { console.error("Reward Error:", e); }
         };
-        // -----------------------------------------
 
         window.onload = () => {
             function safeListen(id, event, func) {
@@ -906,10 +902,12 @@
             safeListen('withdraw-btn', 'click', handleWithdrawal);
             safeListen('apply-referral-btn', 'click', handleApplyReferralCode);
             safeListen('withdraw-method', 'change', updateDynamicPaymentFields);
-            safeListen('mining-btn', 'click', handleMiningButtonClick);
+            
             safeListen('zone1-btn', 'click', handleZone1Ad);
             safeListen('zone2-btn', 'click', handleZone2Ad);
             safeListen('convert-trigger', 'click', handleCoinConversion);
+
+            // Mining Action Listener added dynamically in updateMiningUI to handle state changes better
 
             const ldr = document.getElementById('loader');
             if(ldr) ldr.style.display = 'none';
@@ -930,7 +928,6 @@
                     return;
                 }
                 await fetchAppConfig();
-                await checkAndFinalizeMiningSession();
                 await checkNewNotifications();
                 updateUI();
                 showMainPage('app-container');
@@ -939,11 +936,16 @@
                 
                 if(zoneTimerInterval) clearInterval(zoneTimerInterval);
                 zoneTimerInterval = setInterval(updateZoneButtons, 1000);
+                
+                if(miningUiInterval) clearInterval(miningUiInterval);
+                miningUiInterval = setInterval(updateMiningUI, 1000);
+                updateMiningUI(); // Run once immediately
             } else {
                 currentUser = null;
                 userData = null;
                 showMainPage('auth-section');
                 if(zoneTimerInterval) clearInterval(zoneTimerInterval);
+                if(miningUiInterval) clearInterval(miningUiInterval);
             }
         }
         
@@ -957,16 +959,23 @@
                 if (userSnap.exists()) {
                     userData = userSnap.data();
                     let needsUpdate = false;
+                    // General fields
                     if (typeof userData.adZone1Count === 'undefined') { userData.adZone1Count = 0; needsUpdate = true; }
                     if (typeof userData.adZone1Cooldown === 'undefined') { userData.adZone1Cooldown = null; needsUpdate = true; }
                     if (typeof userData.adZone2Count === 'undefined') { userData.adZone2Count = 0; needsUpdate = true; }
                     if (typeof userData.adZone2Cooldown === 'undefined') { userData.adZone2Cooldown = null; needsUpdate = true; }
                     if (typeof userData.walletBalance === 'undefined') { userData.walletBalance = 0; needsUpdate = true; }
+                    
+                    // NEW MINING FIELDS
+                    if (typeof userData.miningAdsCount === 'undefined') { userData.miningAdsCount = 0; needsUpdate = true; }
+                    if (typeof userData.miningCooldown === 'undefined') { userData.miningCooldown = null; needsUpdate = true; }
+
                     if(needsUpdate) {
                         await updateDoc(userRef, {
                             adZone1Count: userData.adZone1Count, adZone1Cooldown: userData.adZone1Cooldown,
                             adZone2Count: userData.adZone2Count, adZone2Cooldown: userData.adZone2Cooldown,
-                            walletBalance: userData.walletBalance
+                            walletBalance: userData.walletBalance,
+                            miningAdsCount: userData.miningAdsCount, miningCooldown: userData.miningCooldown
                         });
                     }
                 } else {
@@ -976,7 +985,10 @@
                         balance: 50, referralCode: ownReferralCode, referredBy: null,
                         lastNotificationCheck: new Date(), createdAt: serverTimestamp(),
                         dailyAdCount: 0, lastAdWatchDate: new Date().toISOString().split('T')[0], isBlocked: false,
-                        miningAdsWatched: 0, miningSessionStartTime: null, isMiningActive: false,
+                        
+                        // New Mining Defaults
+                        miningAdsCount: 0, miningCooldown: null,
+
                         adZone1Count: 0, adZone1Cooldown: null, adZone2Count: 0, adZone2Cooldown: null, walletBalance: 0 
                     };
                     await setDoc(userRef, defaultUserData);
@@ -989,7 +1001,17 @@
             const configRef = doc(db, "config", "main");
             try {
                 const configSnap = await getDoc(configRef);
-                appConfig = configSnap.exists() ? configSnap.data() : { minWithdrawal: 50, paymentMethods: ["UPI", "Paytm"], dailyAdLimit: 10, coinValueCoins: 1000, coinValueInr: 10 };
+                appConfig = configSnap.exists() ? configSnap.data() : {};
+                // Defaults
+                if(!appConfig.minWithdrawal) appConfig.minWithdrawal = 50;
+                if(!appConfig.paymentMethods) appConfig.paymentMethods = ["UPI", "Paytm"];
+                if(!appConfig.dailyAdLimit) appConfig.dailyAdLimit = 10;
+                
+                // Mining Defaults
+                if(!appConfig.miningReqAds) appConfig.miningReqAds = 15;
+                if(!appConfig.miningReward) appConfig.miningReward = 8000;
+                if(!appConfig.miningCooldownHours) appConfig.miningCooldownHours = 5;
+
             } catch (error) { console.error("Error fetching app config:", error); }
         }
         
@@ -1011,7 +1033,8 @@
                     withdrawMethodSelect.appendChild(option);
                 });
             }
-            updateDynamicPaymentFields(); updateAdsLeftCount(); updateMiningButtonUI(); updateZoneButtons(); 
+            updateDynamicPaymentFields(); updateAdsLeftCount(); updateZoneButtons(); 
+            // updateMiningUI is called separately via interval
         }
         
         function updateAdsLeftCount() {
@@ -1126,13 +1149,11 @@
         }
 
         function navigateTo(pageId) {
-            if (miningInterval) { clearInterval(miningInterval); miningInterval = null; }
             document.querySelectorAll('.sub-page').forEach(p => p.classList.remove('active'));
             
             if (pageId === 'egg-page') {
                 const eggFrame = document.getElementById('egg-frame');
                 const eggPage = document.getElementById('egg-page');
-                // Ensure page is active first for dimensions
                 if (eggPage) { eggPage.style.display = 'block'; eggPage.classList.add('active'); }
                 
                 if (!eggGameLoaded && eggFrame && typeof eggGameCode !== 'undefined') {
@@ -1149,7 +1170,6 @@
                 if (link.dataset.page === pageId) link.classList.add('active', 'text-accent');
             });
             if (pageId === 'wallet-page') loadWithdrawalHistory();
-            if (pageId === 'mining-page') updateMiningPageUI();
         }
         window.navigateTo = navigateTo;
         
@@ -1248,55 +1268,137 @@
             else { copyReferralCode(); showAlert("Code copied!"); }
         }
         
-        function updateMiningButtonUI() {
-            const btn = document.getElementById('mining-btn'); if(!btn) return;
-            if (userData.isMiningActive) { btn.innerHTML = `<span>Play</span>`; btn.disabled = false; btn.classList.remove('bg-gray-500'); btn.classList.add('bg-blue-500'); } else if (userData.miningAdsWatched >= MINING_ADS_REQUIRED) { btn.innerHTML = `<span>Play</span>`; btn.disabled = false; btn.classList.remove('bg-gray-500'); btn.classList.add('bg-blue-500'); } else { btn.innerHTML = `<i data-lucide="lock" class="w-4 h-4 mr-2"></i> <span>Ads: ${userData.miningAdsWatched || 0}/${MINING_ADS_REQUIRED}</span>`; btn.disabled = false; btn.classList.remove('bg-blue-500'); btn.classList.add('bg-gray-500'); }
-            if(typeof lucide !== 'undefined') lucide.createIcons();
-        }
-        
-        async function handleMiningButtonClick() {
-            await fetchUserData(); if (userData.isMiningActive) navigateTo('mining-page'); else if (userData.miningAdsWatched >= MINING_ADS_REQUIRED) { await startNewMiningSession(); navigateTo('mining-page'); } else showAlert(`Watch ${MINING_ADS_REQUIRED - (userData.miningAdsWatched || 0)} more ads to mine.`);
-        }
-
-        async function startNewMiningSession() {
-            const ldr = document.getElementById('loader'); if(ldr) ldr.style.display = 'flex';
-            try { await updateDoc(doc(db, "users", currentUser.uid), { isMiningActive: true, miningSessionStartTime: serverTimestamp() }); await fetchUserData(); showAlert("Mining started!"); updateMiningButtonUI(); } catch(e) { console.error(e); showAlert("Error starting mining."); } if(ldr) ldr.style.display = 'none';
-        }
-
-        function updateMiningPageUI() {
-            if (miningInterval) clearInterval(miningInterval);
-            const coinCircle = document.getElementById("mining-progress-circle"); const coinDisplay = document.getElementById("mining-coin-count"); const timerDisplay = document.getElementById("mining-timer"); const statusText = document.getElementById("mining-status-text");
-            const radius = 80; const circumference = 2 * Math.PI * radius; if(coinCircle) coinCircle.style.strokeDasharray = circumference;
-            if (!userData.isMiningActive || !userData.miningSessionStartTime) { if(coinDisplay) coinDisplay.textContent = "🪙 0"; if(coinCircle) coinCircle.style.strokeDashoffset = circumference; if(timerDisplay) timerDisplay.textContent = "00:00:00"; if(statusText) statusText.textContent = "Inactive."; return; }
-            const startTime = userData.miningSessionStartTime.toDate().getTime();
-            miningInterval = setInterval(() => {
-                const now = Date.now(); const elapsedTime = now - startTime;
-                if (elapsedTime >= MINING_DURATION_MS) { clearInterval(miningInterval); if(timerDisplay) timerDisplay.textContent = "00:00:00"; if(coinDisplay) coinDisplay.textContent = `🪙 ${MINING_REWARD}`; if(coinCircle) coinCircle.style.strokeDashoffset = 0; if(statusText) statusText.textContent = "Finished! Reward pending."; return; }
-                const remainingTime = MINING_DURATION_MS - elapsedTime;
-                const hours = Math.floor(remainingTime / (1000 * 60 * 60)).toString().padStart(2, '0'); const minutes = Math.floor((remainingTime % (1000 * 60 * 60)) / (1000 * 60)).toString().padStart(2, '0'); const seconds = Math.floor((remainingTime % (1000 * 60)) / 1000).toString().padStart(2, '0');
-                if(timerDisplay) timerDisplay.textContent = `${hours}:${minutes}:${seconds}`; const coinsMined = Math.floor((elapsedTime / 1000) / 2); if(coinDisplay) coinDisplay.textContent = `🪙 ${coinsMined}`; const progress = elapsedTime / MINING_DURATION_MS; if(coinCircle) coinCircle.style.strokeDashoffset = circumference * (1 - progress); if(statusText) statusText.textContent = "Mining active...";
-            }, 1000);
-        }
-
-        async function checkAndFinalizeMiningSession() {
-            if (userData.isMiningActive && userData.miningSessionStartTime) {
-                const startTime = userData.miningSessionStartTime.toDate().getTime();
-                if (Date.now() - startTime >= MINING_DURATION_MS) {
-                    try { const newBalance = (userData.balance || 0) + MINING_REWARD; await updateDoc(doc(db, "users", currentUser.uid), { balance: increment(MINING_REWARD), isMiningActive: false, miningSessionStartTime: null, miningAdsWatched: 0 }); userData.balance = newBalance; userData.isMiningActive = false; userData.miningSessionStartTime = null; userData.miningAdsWatched = 0; showAlert(`Mining Finished! +${MINING_REWARD} Coins.`); updateUI(); } catch (e) { console.error(e); }
-                }
-            }
-        }
-        
         window.claimReward = async function(taskType) {
-            const today = new Date().toISOString().split('T')[0]; const isForMining = (!userData.isMiningActive && (userData.miningAdsWatched || 0) < MINING_ADS_REQUIRED);
+            const today = new Date().toISOString().split('T')[0];
             if (userData.lastAdWatchDate !== today) { await updateDoc(doc(db, "users", currentUser.uid), { dailyAdCount: 0, lastAdWatchDate: today }); userData.dailyAdCount = 0; userData.lastAdWatchDate = today; }
-            if (userData.dailyAdCount >= (appConfig.dailyAdLimit || 10) && !isForMining) return showAlert("Daily ad limit reached.");
+            if (userData.dailyAdCount >= (appConfig.dailyAdLimit || 10)) return showAlert("Daily ad limit reached.");
             if (typeof window.show_9972147 !== 'function') return showAlert("Ad not ready.");
             window.show_9972147().then(async () => {
-                let reward = 50, msg = ""; const newDaily = (userData.dailyAdCount || 0) + 1; let updates = { dailyAdCount: newDaily };
-                if (isForMining) { const newMining = (userData.miningAdsWatched || 0) + 1; updates.miningAdsWatched = newMining; reward = 0; msg = (newMining >= MINING_ADS_REQUIRED) ? "Mining Ads done! Start Mining." : `Ad watched (${newMining}/${MINING_ADS_REQUIRED})`; updateMiningButtonUI(); } else { msg = `+${reward} Coins!`; }
-                if (reward > 0) { updates.balance = increment(reward); } await updateDoc(doc(db, "users", currentUser.uid), updates); if(reward>0) userData.balance += reward; userData.dailyAdCount = newDaily; if(isForMining) userData.miningAdsWatched = (userData.miningAdsWatched || 0) + 1; showAlert(msg); updateUI();
+                let reward = 50; const newDaily = (userData.dailyAdCount || 0) + 1; 
+                let updates = { dailyAdCount: newDaily, balance: increment(reward) };
+                await updateDoc(doc(db, "users", currentUser.uid), updates); 
+                userData.balance += reward; userData.dailyAdCount = newDaily;
+                showAlert(`+${reward} Coins!`); updateUI();
             }).catch(e => { console.error(e); showAlert("Ad failed."); });
+        }
+
+        // --- NEW MINING LOGIC (15 Ads = 8000 Coins + 5 Hour Wait) ---
+        function updateMiningUI() {
+            if (!userData || !appConfig) return;
+            
+            const btn = document.getElementById('mining-start-btn');
+            const progressText = document.getElementById('mining-progress-text');
+            const progressBar = document.getElementById('mining-progress-bar');
+            
+            if (!btn) return;
+
+            const targetAds = appConfig.miningReqAds || 15;
+            const currentAds = userData.miningAdsCount || 0;
+            const reward = appConfig.miningReward || 8000;
+            
+            // Check Cooldown
+            const now = Date.now();
+            let cooldownTime = userData.miningCooldown ? userData.miningCooldown.toDate().getTime() : 0;
+
+            if (cooldownTime > now) {
+                // Cooldown Active
+                const diff = cooldownTime - now;
+                const h = Math.floor(diff / (1000 * 60 * 60));
+                const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                const s = Math.floor((diff % (1000 * 60)) / 1000);
+                
+                btn.disabled = true;
+                btn.className = "w-full bg-gray-700 text-gray-400 font-bold py-3 rounded-lg cursor-not-allowed shadow-none";
+                btn.innerHTML = `<i data-lucide="clock" class="inline w-4 h-4 mr-2"></i> Wait ${h}h ${m}m ${s}s`;
+                
+                if(progressText) progressText.innerText = `Completed!`;
+                if(progressBar) progressBar.style.width = "100%";
+                
+            } else {
+                // Ready to Watch
+                // Auto reset if logic stuck (e.g. cooldown finished but count high)
+                if (currentAds >= targetAds && cooldownTime < now && cooldownTime !== 0) {
+                     resetMiningState();
+                }
+
+                btn.disabled = false;
+                btn.className = "w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-lg shadow-md transition-all";
+                
+                const percentage = Math.min(100, (currentAds / targetAds) * 100);
+                
+                btn.innerText = `Watch Ad (${currentAds} / ${targetAds})`;
+                if(progressText) progressText.innerText = `${currentAds} / ${targetAds} Ads`;
+                if(progressBar) progressBar.style.width = `${percentage}%`;
+                
+                // Clear old listener
+                btn.onclick = handleMiningAdWatch;
+            }
+        }
+
+        async function resetMiningState() {
+            const userRef = doc(db, "users", currentUser.uid);
+            await updateDoc(userRef, { miningAdsCount: 0, miningCooldown: null });
+            userData.miningAdsCount = 0;
+            userData.miningCooldown = null;
+            updateMiningUI();
+        }
+
+        async function handleMiningAdWatch() {
+            // Safety check for cooldown
+            const now = Date.now();
+            let cooldownTime = userData.miningCooldown ? userData.miningCooldown.toDate().getTime() : 0;
+            if (cooldownTime > now) return showAlert("Please wait for cooldown.");
+
+            const btn = document.getElementById('mining-start-btn');
+            if(btn) { btn.disabled = true; btn.innerText = "Loading Ad..."; }
+
+            // Use your specific SDK code (10283653)
+            if (typeof window.show_10283653 !== 'function') {
+                if(btn) btn.disabled = false;
+                return showAlert("Ad script not loaded. Check internet.");
+            }
+
+            window.show_10283653('pop').then(async () => {
+                // Ad Success
+                const userRef = doc(db, "users", currentUser.uid);
+                const targetAds = appConfig.miningReqAds || 15;
+                const reward = appConfig.miningReward || 8000;
+                const cooldownHours = appConfig.miningCooldownHours || 5;
+
+                // Increment locally first for speed
+                let newCount = (userData.miningAdsCount || 0) + 1;
+                userData.miningAdsCount = newCount;
+
+                if (newCount >= targetAds) {
+                    // TARGET REACHED: Give Reward & Set Cooldown
+                    const cooldownMs = cooldownHours * 60 * 60 * 1000;
+                    const unlockTime = new Date(Date.now() + cooldownMs);
+                    
+                    await updateDoc(userRef, {
+                        balance: increment(reward),
+                        miningAdsCount: 0,
+                        miningCooldown: unlockTime
+                    });
+
+                    // Update Local Data
+                    userData.balance += reward;
+                    userData.miningAdsCount = 0;
+                    userData.miningCooldown = { toDate: () => unlockTime };
+
+                    showAlert(`🎉 CONGRATS! You mined ${reward} Coins! Come back in ${cooldownHours} hours.`);
+                } else {
+                    // JUST INCREMENT
+                    await updateDoc(userRef, { miningAdsCount: increment(1) });
+                }
+                
+                updateUI(); // Update coin balance text
+                updateMiningUI(); // Update button text
+
+            }).catch(e => {
+                console.error(e);
+                showAlert("Ad failed to load or closed early.");
+                updateMiningUI(); // Restore button
+            });
         }
 
         function showAlert(message) { document.getElementById('alert-message').textContent = message; document.getElementById('custom-alert').classList.remove('hidden'); document.getElementById('alert-ok-btn').onclick = () => { document.getElementById('custom-alert').classList.add('hidden'); }; }
