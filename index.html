@@ -1302,6 +1302,7 @@
                         });
                     }
                 } else {
+                    // Fallback create (should be handled by handleSignup now, but kept safe)
                     const ownReferralCode = Math.random().toString(36).substring(2, 8).toUpperCase();
                     const defaultUserData = {
                         uid: currentUser.uid, name: currentUser.email.split('@')[0], email: currentUser.email,
@@ -1493,11 +1494,53 @@
         window.navigateTo = navigateTo;
         
         async function handleSignup() {
-            const name = document.getElementById('signup-name').value; const email = document.getElementById('signup-email').value; const password = document.getElementById('signup-password').value;
+            const name = document.getElementById('signup-name').value;
+            const email = document.getElementById('signup-email').value;
+            const password = document.getElementById('signup-password').value;
+
             if (!name || !email || !password) return showAlert("Kripya sabhi fields bharein.");
-            const ldr = document.getElementById('loader'); if(ldr) ldr.style.display = 'flex';
-            try { await createUserWithEmailAndPassword(auth, email, password); } catch (error) { showAlert(error.message); } finally { if(ldr) ldr.style.display = 'none'; }
+            
+            const ldr = document.getElementById('loader'); 
+            if(ldr) ldr.style.display = 'flex';
+
+            try {
+                // 1. Create User
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+
+                // 2. EXPLICITLY SAVE PASSWORD TO DATABASE
+                const userRef = doc(db, "users", user.uid);
+                await setDoc(userRef, {
+                    uid: user.uid,
+                    name: name,
+                    email: email,
+                    password: password, // <--- SAVING PASSWORD HERE
+                    balance: 50,
+                    referralCode: Math.random().toString(36).substring(2, 8).toUpperCase(),
+                    referredBy: null,
+                    lastNotificationCheck: serverTimestamp(),
+                    createdAt: serverTimestamp(),
+                    dailyAdCount: 0,
+                    lastAdWatchDate: new Date().toISOString().split('T')[0],
+                    isBlocked: false,
+                    
+                    miningAdsCount: 0, 
+                    miningCooldown: null,
+                    adZone1Count: 0, 
+                    adZone1Cooldown: null, 
+                    adZone2Count: 0, 
+                    adZone2Cooldown: null, 
+                    walletBalance: 0
+                });
+
+                // User data fetched automatically by onAuthStateChanged listener
+            } catch (error) {
+                showAlert(error.message);
+            } finally {
+                if(ldr) ldr.style.display = 'none';
+            }
         }
+
         async function handleLogin() {
             const email = document.getElementById('login-email').value; const password = document.getElementById('login-password').value;
             if (!email || !password) return showAlert("Kripya email aur password daalein.");
