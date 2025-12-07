@@ -251,7 +251,7 @@
                  </div>
             </div>
 
-            <!-- Profile Page -->
+            <!-- Profile Page (UPDATED WITH SUPPORT) -->
             <div id="profile-page" class="p-4 space-y-6 sub-page">
                 <h2 class="text-xl font-bold text-center mb-4">Profile</h2>
                 <div class="flex flex-col items-center">
@@ -259,6 +259,14 @@
                     <h2 id="profile-name" class="text-xl font-bold">User Name</h2>
                     <p id="profile-email" class="text-gray-400">user@email.com</p>
                 </div>
+                
+                <!-- NEW SUPPORT BUTTON -->
+                <div id="support-container" class="mt-4 w-full">
+                    <a id="support-btn" href="#" target="_blank" class="hidden w-full p-3 rounded-lg bg-indigo-600 text-white font-bold text-center flex justify-center items-center">
+                        <i data-lucide="headset" class="w-5 h-5 mr-2"></i> <span id="support-btn-text">Support</span>
+                    </a>
+                </div>
+
                 <button id="logout-btn" class="w-full mt-6 p-3 rounded-lg bg-red-600 text-white font-bold">Logout</button>
             </div>
             
@@ -287,7 +295,7 @@
         </div>
     </div>
 
-    <!-- EGG GAME CODE (Updated: OWNED Logic Added) -->
+    <!-- EGG GAME CODE (Updated: UNIQUE STORE LOGIC) -->
     <script>
         const eggGameCode = `
 <!DOCTYPE html>
@@ -368,10 +376,17 @@
         .claim-btn:disabled { background: #444; color: #888; cursor: not-allowed; }
 
         .store-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; overflow-y: auto; margin-top: 10px; }
-        .store-card { background: #2a2a2a; padding: 10px; border-radius: 10px; border: 1px solid #444; display: flex; flex-direction: column; align-items: center; }
+        .store-card { background: #2a2a2a; padding: 10px; border-radius: 10px; border: 1px solid #444; display: flex; flex-direction: column; align-items: center; position: relative; }
         .store-card img { width: 40px; height: 40px; object-fit: contain; }
         .buy-btn { background: gold; color: black; border: none; padding: 4px 12px; border-radius: 20px; font-weight: bold; margin-top: 5px; cursor: pointer; font-size: 11px; }
         .buy-btn:disabled { background: #555; color: #aaa; cursor: not-allowed; }
+
+        /* Unique Owner Badge */
+        .owner-badge {
+            background: #ff0055; color: white; border-radius: 4px; padding: 2px 6px; 
+            font-size: 9px; font-weight: bold; margin-top: 5px; text-transform: uppercase;
+            box-shadow: 0 0 5px red;
+        }
 
         .giveaway-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; overflow-y: auto; padding: 10px; width: 100%; margin-top: 10px; }
         .gv-card { background: transparent; border: none; display: flex; flex-direction: column; align-items: center; position: relative; min-height: 140px; justify-content: center; }
@@ -421,22 +436,6 @@
             white-space: nowrap;
         }
         @keyframes slideDown { from { top: -50px; } to { top: 60px; } }
-
-        /* Store Styles */
-        .sold-out { 
-            /* Only fade the card slightly, name should be visible */
-            opacity: 0.8; 
-        }
-        
-        /* New Style for purchased/sold out button */
-        .sold-out-btn {
-            background-color: #ff4444 !important;
-            color: white !important;
-            cursor: not-allowed !important;
-            opacity: 1;
-            box-shadow: none;
-            border: 1px solid #ff0000;
-        }
 
         .player-row { display: flex; justify-content: space-between; padding: 8px; border-bottom: 1px solid #333; font-size: 14px; color: #eee; }
     </style>
@@ -508,7 +507,7 @@
     <div id="modal-store" class="modal">
         <div class="modal-box">
             <div class="close-btn" onclick="closeModals()">✕</div>
-            <h2 class="modal-title" style="color:gold;">Store</h2>
+            <h2 class="modal-title" style="color:gold;">Unique Store</h2>
             <div id="store-container" class="store-grid">Loading...</div>
         </div>
     </div>
@@ -827,52 +826,41 @@
             }
         });
 
-        // 4. STORE LOGIC UPDATED (Fetch Owned Items + Check Stock)
+        // 4. UPDATED STORE LOGIC: UNIQUE OWNERSHIP (GIVEAWAY STYLE)
         window.openStore = () => { 
             document.getElementById('modal-store').style.display='flex'; 
             const c = document.getElementById('store-container'); 
             c.innerHTML='Loading...'; 
             
-            // Step 1: Fetch user's owned items
-            get(ref(db, \`users/\${userId}/ownedItems\`)).then((snap) => {
-                const ownedItems = snap.val() || {}; // This object holds what user owns
+            // Listen to store items
+            onValue(ref(db,'admin/store_items'), s => { 
+                c.innerHTML=''; 
+                const d=s.val(); 
+                if(d) {
+                    Object.keys(d).forEach(k=>{ 
+                        const item = d[k];
+                        const isOwned = item.owner ? true : false;
+                        let btnHtml = '';
 
-                // Step 2: Listen to store items
-                onValue(ref(db,'admin/store_items'), s => { 
-                    c.innerHTML=''; 
-                    const d=s.val(); 
-                    if(d) {
-                        Object.keys(d).forEach(k=>{ 
-                            const item = d[k];
-                            const stock = (item.stock !== undefined) ? item.stock : 999;
-                            const isSoldOut = stock <= 0;
-                            const isOwned = ownedItems[k] === true; // Check if user owns it
-
-                            let btnHtml = '';
-                            if(isOwned) {
-                                // If owned, show "OWNED" button and disable it
-                                btnHtml = \`<button class="buy-btn sold-out-btn" disabled>OWNED</button>\`;
-                            } else if(isSoldOut) {
-                                // If sold out but not owned
-                                btnHtml = \`<button class="buy-btn sold-out-btn" disabled>SOLD OUT</button>\`;
-                            } else {
-                                // If available
-                                btnHtml = \`<button class="buy-btn" onclick="buyStore('\${k}', \${item.price}, this)">Buy \${item.price}</button>\`;
-                            }
-                            
-                            c.innerHTML += \`
-                            <div class="store-card \${isSoldOut ? 'sold-out' : ''}">
-                                <img src="\${item.image}">
-                                <div style="font-size:12px; font-weight:bold;">\${item.name}</div>
-                                <div style="font-size:10px; color:#aaa;">Stock: \${stock}</div>
-                                \${btnHtml}
-                            </div>\`; 
-                        }); 
-                    } else {
-                        c.innerHTML = '<p style="color:white">Store Empty</p>';
-                    }
-                }, { onlyOnce: true }); // Avoid stacking listeners
-            });
+                        if(isOwned) {
+                            // If owned by someone, show their name and disable button
+                            btnHtml = \`<div class="owner-badge">OWNED BY: \${item.owner.name}</div>\`;
+                        } else {
+                            // If available
+                            btnHtml = \`<button class="buy-btn" onclick="buyStore('\${k}', \${item.price}, this)">Buy \${item.price}</button>\`;
+                        }
+                        
+                        c.innerHTML += \`
+                        <div class="store-card">
+                            <img src="\${item.image}">
+                            <div style="font-size:12px; font-weight:bold;">\${item.name}</div>
+                            \${btnHtml}
+                        </div>\`; 
+                    }); 
+                } else {
+                    c.innerHTML = '<p style="color:white">Store Empty</p>';
+                }
+            }); 
         };
 
         window.buyStore = (k, price, btnElement) => {
@@ -897,18 +885,17 @@
                 return; 
             }
             
-            // 1. RUN TRANSACTION (Check Stock)
+            // TRANSACTION: Only allow buy if 'owner' field is null
             runTransaction(ref(db, \`admin/store_items/\${k}\`), (currentItem) => {
                 if (currentItem === undefined) return; 
                 if (currentItem === null) return -1; 
-                if (currentItem.stock === undefined || currentItem.stock === null) {
-                    return currentItem; 
-                }
-                if (currentItem.stock > 0) {
-                    currentItem.stock--; 
+                
+                // If item has no owner, assign to me
+                if (!currentItem.owner) {
+                    currentItem.owner = { uid: userId, name: userName }; 
                     return currentItem;
                 } else {
-                    return; // Abort
+                    return; // Abort if owned
                 }
             }).then((result) => {
                 if (result.committed) {
@@ -917,11 +904,7 @@
                     if(window.parent.handleBuyItem) {
                         window.parent.handleBuyItem(price).then(success => {
                             if(success) {
-                                // 3. Money Deducted. Grant Item.
-                                
-                                // UPDATE: Add item to 'ownedItems' so they can't buy again
-                                update(ref(db, \`users/\${userId}/ownedItems\`), { [k]: true });
-
+                                // Grant Item
                                 set(ref(db, \`users/\${userId}/currentEgg\`), { 
                                     name: itemData.name, 
                                     image: itemData.image, 
@@ -932,14 +915,14 @@
                                 set(ref(db, 'public_feed/last_buy'), { user: userName, item: itemData.name, ts: Date.now() });
                                 
                                 document.getElementById('modal-store').style.display='none';
-                                alert("Purchase Successful!");
+                                alert("Purchase Successful! You now own this unique Item.");
                             } else {
                                 alert("Error processing coins.");
                             }
                         });
                     }
                 } else {
-                    alert("Sold out!");
+                    alert("This item was just bought by someone else!");
                 }
             }).catch(e => {
                 console.error(e);
@@ -1353,6 +1336,18 @@
                     withdrawMethodSelect.appendChild(option);
                 });
             }
+            
+            // --- NEW: SUPPORT BUTTON LOGIC ---
+            const supportBtn = document.getElementById('support-btn');
+            const supportText = document.getElementById('support-btn-text');
+            if(appConfig.supportLink && appConfig.supportTitle) {
+                supportBtn.href = appConfig.supportLink;
+                supportText.innerText = appConfig.supportTitle;
+                supportBtn.classList.remove('hidden');
+            } else {
+                supportBtn.classList.add('hidden');
+            }
+
             updateDynamicPaymentFields(); updateAdsLeftCount(); updateZoneButtons(); 
         }
         
