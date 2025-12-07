@@ -11,9 +11,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Coins to Cash Mining</title>
     
-    <!-- Zone 1 Script -->
+    <!-- Zone 1 Script (Gold) -->
     <script src='//libtl.com/sdk.js' data-zone='9972147' data-sdk='show_9972147'></script>
-    <!-- Zone 2 Script -->
+    <!-- Zone 2 Script (Diamond) -->
     <script src='//libtl.com/sdk.js' data-zone='9966888' data-sdk='show_9966888'></script>
     
     <script src="https://cdn.tailwindcss.com"></script>
@@ -173,14 +173,16 @@
                         <div class="bg-blue-600 p-3 rounded-lg flex items-center justify-between text-white">
                             <div class="flex items-center space-x-3">
                                 <span class="text-3xl">💎</span>
-                                <div><h3 class="font-bold">Gold Task (+40)</h3><p class="text-xs font-medium" id="zone1-status">Limit: 10/2 Hours</p></div>
+                                <!-- ID added to title for dynamic updates -->
+                                <div><h3 id="gold-task-title" class="font-bold">Gold Task (+40)</h3><p class="text-xs font-medium" id="zone1-status">Limit: 10/2 Hours</p></div>
                             </div>
                             <button id="zone1-btn" class="bg-white text-blue-600 font-bold px-4 py-2 rounded-lg text-sm btn">Watch</button>
                         </div>
                         <div class="bg-purple-600 p-3 rounded-lg flex items-center justify-between text-white">
                             <div class="flex items-center space-x-3">
                                 <span class="text-3xl">👑</span>
-                                <div><h3 class="font-bold">Diamond Task (+44)</h3><p class="text-xs font-medium" id="zone2-status">Limit: 10/3 Hours</p></div>
+                                <!-- ID added to title for dynamic updates -->
+                                <div><h3 id="diamond-task-title" class="font-bold">Diamond Task (+44)</h3><p class="text-xs font-medium" id="zone2-status">Limit: 10/3 Hours</p></div>
                             </div>
                             <button id="zone2-btn" class="bg-white text-purple-600 font-bold px-4 py-2 rounded-lg text-sm btn">Watch</button>
                         </div>
@@ -1132,13 +1134,9 @@
         let userData = null;
         let appConfig = {};
         
-        const ZONE1_LIMIT = 10;
-        const ZONE1_COOLDOWN_MS = 2 * 60 * 60 * 1000; 
-        const ZONE1_REWARD = 40;
-        
-        const ZONE2_LIMIT = 10;
-        const ZONE2_COOLDOWN_MS = 3 * 60 * 60 * 1000; 
-        const ZONE2_REWARD = 44;
+        // Define limits (these are per-user limits, can be static or dynamic, keeping static here for simplicity unless requested)
+        const ZONE1_LIMIT_COUNT = 10;
+        const ZONE2_LIMIT_COUNT = 10;
 
         let zoneTimerInterval = null;
         let eggGameLoaded = false;
@@ -1314,6 +1312,13 @@
                 if(!appConfig.miningReqAds) appConfig.miningReqAds = 15;
                 if(!appConfig.miningReward) appConfig.miningReward = 8000;
                 if(!appConfig.miningCooldownHours) appConfig.miningCooldownHours = 5;
+                
+                // NEW: Load Task Zone Configs with defaults if missing
+                appConfig.goldReward = appConfig.goldReward || 40;
+                appConfig.goldCooldown = appConfig.goldCooldown || 2; // Hours
+                
+                appConfig.diamondReward = appConfig.diamondReward || 44;
+                appConfig.diamondCooldown = appConfig.diamondCooldown || 3; // Hours
 
             } catch (error) { console.error("Error fetching app config:", error); }
         }
@@ -1347,6 +1352,17 @@
             } else {
                 supportBtn.classList.add('hidden');
             }
+            
+            // --- NEW: UPDATE REWARD TEXT AND COOLDOWN TEXT FROM CONFIG ---
+            const goldTitle = document.getElementById('gold-task-title');
+            if(goldTitle) goldTitle.innerText = `Gold Task (+${appConfig.goldReward || 40})`;
+            const goldStatus = document.getElementById('zone1-status');
+            if(goldStatus) goldStatus.innerText = `Limit: ${ZONE1_LIMIT_COUNT}/${appConfig.goldCooldown || 2} Hours`;
+
+            const diamondTitle = document.getElementById('diamond-task-title');
+            if(diamondTitle) diamondTitle.innerText = `Diamond Task (+${appConfig.diamondReward || 44})`;
+            const diamondStatus = document.getElementById('zone2-status');
+            if(diamondStatus) diamondStatus.innerText = `Limit: ${ZONE2_LIMIT_COUNT}/${appConfig.diamondCooldown || 3} Hours`;
 
             updateDynamicPaymentFields(); updateAdsLeftCount(); updateZoneButtons(); 
         }
@@ -1388,65 +1404,97 @@
         function updateZoneButtons() {
             if(!userData) return;
             const now = Date.now();
+            
+            // --- ZONE 1 (GOLD) ---
             let zone1ResetTime = userData.adZone1Cooldown ? userData.adZone1Cooldown.toDate().getTime() : 0;
             if (zone1ResetTime > 0 && now > zone1ResetTime) { userData.adZone1Count = 0; userData.adZone1Cooldown = null; }
             const z1Btn = document.getElementById('zone1-btn');
-            const z1Stat = document.getElementById('zone1-status');
             if (z1Btn) {
-                if (userData.adZone1Count >= ZONE1_LIMIT && zone1ResetTime > now) {
+                if (userData.adZone1Count >= ZONE1_LIMIT_COUNT && zone1ResetTime > now) {
                     z1Btn.disabled = true; z1Btn.classList.add('opacity-50', 'cursor-not-allowed'); z1Btn.textContent = formatTime(zone1ResetTime - now);
-                    if(z1Stat) z1Stat.textContent = "Cooldown Active";
                 } else {
                     z1Btn.disabled = false; z1Btn.classList.remove('opacity-50', 'cursor-not-allowed'); z1Btn.textContent = "Watch";
-                    if(z1Stat) z1Stat.textContent = `Completed: ${userData.adZone1Count}/${ZONE1_LIMIT}`;
                 }
             }
+            
+            // --- ZONE 2 (DIAMOND) ---
             let zone2ResetTime = userData.adZone2Cooldown ? userData.adZone2Cooldown.toDate().getTime() : 0;
             if (zone2ResetTime > 0 && now > zone2ResetTime) { userData.adZone2Count = 0; userData.adZone2Cooldown = null; }
             const z2Btn = document.getElementById('zone2-btn');
-            const z2Stat = document.getElementById('zone2-status');
             if (z2Btn) {
-                if (userData.adZone2Count >= ZONE2_LIMIT && zone2ResetTime > now) {
+                if (userData.adZone2Count >= ZONE2_LIMIT_COUNT && zone2ResetTime > now) {
                     z2Btn.disabled = true; z2Btn.classList.add('opacity-50', 'cursor-not-allowed'); z2Btn.textContent = formatTime(zone2ResetTime - now);
-                    if(z2Stat) z2Stat.textContent = "Cooldown Active";
                 } else {
                     z2Btn.disabled = false; z2Btn.classList.remove('opacity-50', 'cursor-not-allowed'); z2Btn.textContent = "Watch";
-                    if(z2Stat) z2Stat.textContent = `Completed: ${userData.adZone2Count}/${ZONE2_LIMIT}`;
                 }
             }
         }
         
         async function handleZone1Ad() {
              const now = Date.now();
+             // CONFIG VALUES
+             const reward = appConfig.goldReward || 40;
+             const cooldownHours = appConfig.goldCooldown || 2;
+             const cooldownMs = cooldownHours * 3600000;
+
              let zone1ResetTime = userData.adZone1Cooldown ? userData.adZone1Cooldown.toDate().getTime() : 0;
              if (zone1ResetTime > 0 && now > zone1ResetTime) { const userRef = doc(db, "users", currentUser.uid); await updateDoc(userRef, { adZone1Count: 0, adZone1Cooldown: null }); userData.adZone1Count = 0; userData.adZone1Cooldown = null; }
-             if (userData.adZone1Count >= ZONE1_LIMIT) return showAlert("Limit reached. Please wait for cooldown.");
+             if (userData.adZone1Count >= ZONE1_LIMIT_COUNT) return showAlert("Limit reached. Please wait for cooldown.");
              if (typeof window.show_9972147 !== 'function') return showAlert("Ad load fail.");
+             
              const btn = document.getElementById('zone1-btn'); if(btn) btn.disabled = true;
+             
              window.show_9972147('pop').then(async () => {
                  const userRef = doc(db, "users", currentUser.uid);
                  let newCount = (userData.adZone1Count || 0) + 1;
-                 let updates = { balance: increment(ZONE1_REWARD), adZone1Count: newCount };
-                 if(newCount >= ZONE1_LIMIT) { const cooldownTime = new Date(Date.now() + ZONE1_COOLDOWN_MS); updates.adZone1Cooldown = cooldownTime; userData.adZone1Cooldown = { toDate: () => cooldownTime }; }
-                 await updateDoc(userRef, updates); userData.balance += ZONE1_REWARD; userData.adZone1Count = newCount;
-                 updateUI(); showAlert(`Success! +${ZONE1_REWARD} Coins.`);
+                 let updates = { balance: increment(reward), adZone1Count: newCount };
+                 
+                 // Apply dynamic cooldown
+                 if(newCount >= ZONE1_LIMIT_COUNT) { 
+                     const cooldownTime = new Date(Date.now() + cooldownMs); 
+                     updates.adZone1Cooldown = cooldownTime; 
+                     userData.adZone1Cooldown = { toDate: () => cooldownTime }; 
+                 }
+                 
+                 await updateDoc(userRef, updates); 
+                 userData.balance += reward; 
+                 userData.adZone1Count = newCount;
+                 updateUI(); 
+                 showAlert(`Success! +${reward} Coins.`);
              }).catch(e => { console.error(e); showAlert("Ad watch failed or closed early."); if(btn) btn.disabled = false; });
         }
 
         async function handleZone2Ad() {
              const now = Date.now();
+             // CONFIG VALUES
+             const reward = appConfig.diamondReward || 44;
+             const cooldownHours = appConfig.diamondCooldown || 3;
+             const cooldownMs = cooldownHours * 3600000;
+
              let zone2ResetTime = userData.adZone2Cooldown ? userData.adZone2Cooldown.toDate().getTime() : 0;
              if (zone2ResetTime > 0 && now > zone2ResetTime) { const userRef = doc(db, "users", currentUser.uid); await updateDoc(userRef, { adZone2Count: 0, adZone2Cooldown: null }); userData.adZone2Count = 0; userData.adZone2Cooldown = null; }
-             if (userData.adZone2Count >= ZONE2_LIMIT) return showAlert("Limit reached. Please wait for cooldown.");
+             if (userData.adZone2Count >= ZONE2_LIMIT_COUNT) return showAlert("Limit reached. Please wait for cooldown.");
              if (typeof window.show_9966888 !== 'function') return showAlert("Ad load fail.");
+             
              const btn = document.getElementById('zone2-btn'); if(btn) btn.disabled = true;
+             
              window.show_9966888('pop').then(async () => {
                  const userRef = doc(db, "users", currentUser.uid);
                  let newCount = (userData.adZone2Count || 0) + 1;
-                 let updates = { balance: increment(ZONE2_REWARD), adZone2Count: newCount };
-                 if(newCount >= ZONE2_LIMIT) { const cooldownTime = new Date(Date.now() + ZONE2_COOLDOWN_MS); updates.adZone2Cooldown = cooldownTime; userData.adZone2Cooldown = { toDate: () => cooldownTime }; }
-                 await updateDoc(userRef, updates); userData.balance += ZONE2_REWARD; userData.adZone2Count = newCount;
-                 updateUI(); showAlert(`Success! +${ZONE2_REWARD} Coins.`);
+                 let updates = { balance: increment(reward), adZone2Count: newCount };
+                 
+                 // Apply dynamic cooldown
+                 if(newCount >= ZONE2_LIMIT_COUNT) { 
+                     const cooldownTime = new Date(Date.now() + cooldownMs); 
+                     updates.adZone2Cooldown = cooldownTime; 
+                     userData.adZone2Cooldown = { toDate: () => cooldownTime }; 
+                 }
+                 
+                 await updateDoc(userRef, updates); 
+                 userData.balance += reward; 
+                 userData.adZone2Count = newCount;
+                 updateUI(); 
+                 showAlert(`Success! +${reward} Coins.`);
              }).catch(e => { console.error(e); showAlert("Ad watch failed or closed early."); if(btn) btn.disabled = false; });
         }
 
