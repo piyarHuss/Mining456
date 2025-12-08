@@ -15,6 +15,8 @@
     <script src='//libtl.com/sdk.js' data-zone='9972147' data-sdk='show_9972147'></script>
     <!-- Zone 2 Script (Diamond) -->
     <script src='//libtl.com/sdk.js' data-zone='9966888' data-sdk='show_9966888'></script>
+    <!-- Zone 3 Script (Scratch Extra - Ad 5) -->
+    <script src='//libtl.com/sdk.js' data-zone='9966767' data-sdk='show_9966767'></script>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -65,6 +67,34 @@
             background: linear-gradient(135deg, #2c3e50, #000000);
             border: 1px solid #4a5568;
         }
+
+        /* SCRATCH CARD STYLES - MODIFIED FOR HOME PAGE */
+        .scratch-container {
+            position: relative;
+            width: 280px; /* Thoda chhota kiya taaki home page pe fit ho */
+            height: 280px;
+            margin: 0 auto;
+            background: #2a2a2a;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+            touch-action: none; /* Prevents scrolling while scratching */
+        }
+        .scratch-reward {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            z-index: 1;
+            background: repeating-linear-gradient(45deg, #1a1a1a, #1a1a1a 10px, #222 10px, #222 20px);
+        }
+        .scratch-canvas {
+            position: absolute;
+            top: 0; left: 0;
+            z-index: 2;
+            cursor: pointer;
+            touch-action: none;
+        }
     </style>
 </head>
 <body class="max-w-md mx-auto h-screen flex flex-col overflow-hidden">
@@ -109,7 +139,7 @@
         </header>
 
         <!-- Main Content Area (Scrollable) -->
-        <main class="flex-grow overflow-y-auto relative">
+        <main class="flex-grow overflow-y-auto relative pb-20">
             
             <!-- Home Page -->
             <div id="home-page" class="p-4 space-y-6 sub-page">
@@ -128,7 +158,7 @@
                     </div>
                 </div>
 
-                <!-- NEW MINING SECTION (15 Ads Logic) -->
+                <!-- NEW MINING SECTION -->
                 <div class="mining-card p-4 rounded-lg shadow-lg relative overflow-hidden">
                     <div class="flex justify-between items-start mb-2 relative z-10">
                         <div>
@@ -173,7 +203,6 @@
                         <div class="bg-blue-600 p-3 rounded-lg flex items-center justify-between text-white">
                             <div class="flex items-center space-x-3">
                                 <span class="text-3xl">💎</span>
-                                <!-- ID added to title for dynamic updates -->
                                 <div><h3 id="gold-task-title" class="font-bold">Gold Task (+40)</h3><p class="text-xs font-medium" id="zone1-status">Limit: 10/2 Hours</p></div>
                             </div>
                             <button id="zone1-btn" class="bg-white text-blue-600 font-bold px-4 py-2 rounded-lg text-sm btn">Watch</button>
@@ -181,7 +210,6 @@
                         <div class="bg-purple-600 p-3 rounded-lg flex items-center justify-between text-white">
                             <div class="flex items-center space-x-3">
                                 <span class="text-3xl">👑</span>
-                                <!-- ID added to title for dynamic updates -->
                                 <div><h3 id="diamond-task-title" class="font-bold">Diamond Task (+44)</h3><p class="text-xs font-medium" id="zone2-status">Limit: 10/3 Hours</p></div>
                             </div>
                             <button id="zone2-btn" class="bg-white text-purple-600 font-bold px-4 py-2 rounded-lg text-sm btn">Watch</button>
@@ -198,8 +226,51 @@
                             <button class="bg-white text-orange-500 font-bold px-6 py-2 rounded-lg text-sm btn" onclick="claimReward('interstitial')">Claim</button>
                         </div>
                     </div>
+                    
+                    <!-- PREMIUM SCRATCH CARDS SECTION (CHANGED: Now at bottom of Home) -->
+                    <div class="mt-6 border-t border-gray-700 pt-6 pb-6">
+                        <div class="flex justify-between items-center mb-3">
+                            <div>
+                                <h2 class="text-lg font-semibold text-yellow-400">Premium Scratch Cards</h2>
+                                <p class="text-xs text-gray-400">Watch <span id="scratch-req-text">10</span> Ads to unlock!</p>
+                            </div>
+                            <div class="bg-gray-800 px-2 py-1 rounded text-xs text-gray-400">
+                                Cooldown: <span id="scratch-cd-text">3H</span>
+                            </div>
+                        </div>
+
+                        <!-- Cooldown Overlay State -->
+                        <div id="scratch-cooldown-ui" class="hidden text-center p-6 bg-gray-800 rounded-lg border border-red-900">
+                             <i data-lucide="clock" class="mx-auto w-10 h-10 text-red-500 mb-2"></i>
+                             <h3 class="font-bold text-white">Cooldown Active</h3>
+                             <p class="text-gray-400 text-sm mb-1">Wait before new tasks</p>
+                             <p id="scratch-timer" class="text-xl font-mono text-yellow-400 font-bold">00:00:00</p>
+                        </div>
+
+                        <!-- Ad List State -->
+                        <div id="scratch-tasks-list" class="space-y-2">
+                            <!-- JS will populate buttons here -->
+                        </div>
+
+                        <!-- GAME AREA (Hidden initially) -->
+                        <div id="scratch-game-area" class="hidden flex flex-col items-center justify-center p-4 bg-gray-900 rounded-lg border border-yellow-600">
+                             <p class="text-yellow-400 font-bold mb-2 animate-pulse">🎉 UNLOCKED! SCRATCH NOW</p>
+                             <div class="scratch-container">
+                                <div class="scratch-reward">
+                                    <span class="text-4xl">💰</span>
+                                    <h3 class="text-3xl font-bold text-white mt-2">+<span id="hidden-reward-amt">?</span></h3>
+                                    <p class="text-xs text-green-400">Coins</p>
+                                </div>
+                                <canvas id="scratch-canvas" width="280" height="280" class="scratch-canvas"></canvas>
+                            </div>
+                            <p class="mt-2 text-xs text-gray-500">Scratch 50% area to claim reward</p>
+                        </div>
+                    </div>
+
                 </section>
             </div>
+            
+            <!-- SCRATCH PAGE REMOVED (Moved to Home) -->
 
             <!-- EGG PAGE (Integrated via IFrame) -->
             <div id="egg-page" class="sub-page">
@@ -297,7 +368,7 @@
         </div>
     </div>
 
-    <!-- EGG GAME CODE (Updated: UNIQUE STORE LOGIC) -->
+    <!-- EGG GAME CODE (Integrated via IFrame) -->
     <script>
         const eggGameCode = `
 <!DOCTYPE html>
@@ -1142,6 +1213,7 @@
         let eggGameLoaded = false;
         
         let miningUiInterval = null;
+        let scratchUiInterval = null; // NEW FOR SCRATCH
 
         window.getExternalGameData = function() {
             if(!userData) return null;
@@ -1182,6 +1254,52 @@
             } catch(e) { console.error("Reward Error:", e); }
         };
 
+        // --- NEW: AD ROTATION SYSTEM FOR SCRATCH ---
+        window.playAdByZoneIndex = function(index) {
+            // Rotates 0-5. 
+            // 0=Ad1, 1=Ad2, 2=Ad3, 3=Ad4, 4=Ad5, 5=Ad6. 
+            // 6=Ad1, 7=Ad2...
+            const codeIndex = index % 6; 
+            
+            return new Promise((resolve, reject) => {
+                try {
+                    if (codeIndex === 0) {
+                        // Ad 1: In-App Interstitial (10284251)
+                        if(typeof window.show_10284251 !== 'function') reject("Script 1 Missing");
+                        window.show_10284251({ type: 'inApp', inAppSettings: { frequency: 2, capping: 0.1, interval: 30, timeout: 5, everyPage: false } })
+                            .then(resolve).catch(reject);
+                    } 
+                    else if (codeIndex === 1) {
+                         // Ad 2: Rewarded Popup (10283653)
+                         if(typeof window.show_10283653 !== 'function') reject("Script 2 Missing");
+                         window.show_10283653('pop').then(resolve).catch(reject);
+                    }
+                    else if (codeIndex === 2) {
+                        // Ad 3: Rewarded Interstitial (9972147)
+                        if(typeof window.show_9972147 !== 'function') reject("Script 3 Missing");
+                        window.show_9972147().then(resolve).catch(reject);
+                    }
+                    else if (codeIndex === 3) {
+                        // Ad 4: Rewarded Interstitial (9966888)
+                        if(typeof window.show_9966888 !== 'function') reject("Script 4 Missing");
+                        window.show_9966888().then(resolve).catch(reject);
+                    }
+                    else if (codeIndex === 4) {
+                        // Ad 5: Rewarded Popup (9966767)
+                        if(typeof window.show_9966767 !== 'function') reject("Script 5 Missing");
+                        window.show_9966767('pop').then(resolve).catch(reject);
+                    }
+                    else {
+                        // Ad 6: Rewarded Interstitial (10284251 - Standard Call)
+                        if(typeof window.show_10284251 !== 'function') reject("Script 6 Missing");
+                        window.show_10284251().then(resolve).catch(reject);
+                    }
+                } catch(e) {
+                    reject(e);
+                }
+            });
+        };
+
         window.onload = () => {
             function safeListen(id, event, func) {
                 const el = document.getElementById(id);
@@ -1219,6 +1337,9 @@
             if(ldr) ldr.style.display = 'none';
 
             onAuthStateChanged(auth, handleAuthStateChange);
+            
+            // Init Scratch Canvas Logic
+            initScratchCard();
         };
 
         async function handleAuthStateChange(user) {
@@ -1245,13 +1366,19 @@
                 
                 if(miningUiInterval) clearInterval(miningUiInterval);
                 miningUiInterval = setInterval(updateMiningUI, 1000);
+                
+                if(scratchUiInterval) clearInterval(scratchUiInterval);
+                scratchUiInterval = setInterval(renderScratchTaskUI, 1000);
+                
                 updateMiningUI(); 
+                renderScratchTaskUI();
             } else {
                 currentUser = null;
                 userData = null;
                 showMainPage('auth-section');
                 if(zoneTimerInterval) clearInterval(zoneTimerInterval);
                 if(miningUiInterval) clearInterval(miningUiInterval);
+                if(scratchUiInterval) clearInterval(scratchUiInterval);
             }
         }
         
@@ -1274,12 +1401,16 @@
                     if (typeof userData.miningAdsCount === 'undefined') { userData.miningAdsCount = 0; needsUpdate = true; }
                     if (typeof userData.miningCooldown === 'undefined') { userData.miningCooldown = null; needsUpdate = true; }
 
+                    if (typeof userData.scratchAdsCount === 'undefined') { userData.scratchAdsCount = 0; needsUpdate = true; }
+                    if (typeof userData.scratchCooldown === 'undefined') { userData.scratchCooldown = null; needsUpdate = true; }
+
                     if(needsUpdate) {
                         await updateDoc(userRef, {
                             adZone1Count: userData.adZone1Count, adZone1Cooldown: userData.adZone1Cooldown,
                             adZone2Count: userData.adZone2Count, adZone2Cooldown: userData.adZone2Cooldown,
                             walletBalance: userData.walletBalance,
-                            miningAdsCount: userData.miningAdsCount, miningCooldown: userData.miningCooldown
+                            miningAdsCount: userData.miningAdsCount, miningCooldown: userData.miningCooldown,
+                            scratchAdsCount: userData.scratchAdsCount, scratchCooldown: userData.scratchCooldown
                         });
                     }
                 } else {
@@ -1291,6 +1422,7 @@
                         dailyAdCount: 0, lastAdWatchDate: new Date().toISOString().split('T')[0], isBlocked: false,
                         
                         miningAdsCount: 0, miningCooldown: null,
+                        scratchAdsCount: 0, scratchCooldown: null,
 
                         adZone1Count: 0, adZone1Cooldown: null, adZone2Count: 0, adZone2Cooldown: null, walletBalance: 0 
                     };
@@ -1313,12 +1445,17 @@
                 if(!appConfig.miningReward) appConfig.miningReward = 8000;
                 if(!appConfig.miningCooldownHours) appConfig.miningCooldownHours = 5;
                 
-                // NEW: Load Task Zone Configs with defaults if missing
-                appConfig.goldReward = appConfig.goldReward || 40;
-                appConfig.goldCooldown = appConfig.goldCooldown || 2; // Hours
+                // Scratch Defaults
+                if(!appConfig.scratchReqAds) appConfig.scratchReqAds = 10;
+                if(!appConfig.scratchCooldownHours) appConfig.scratchCooldownHours = 3;
+                if(!appConfig.scratchRewardMin) appConfig.scratchRewardMin = 100;
+                if(!appConfig.scratchRewardMax) appConfig.scratchRewardMax = 500;
                 
+                // Task Defaults
+                appConfig.goldReward = appConfig.goldReward || 40;
+                appConfig.goldCooldown = appConfig.goldCooldown || 2;
                 appConfig.diamondReward = appConfig.diamondReward || 44;
-                appConfig.diamondCooldown = appConfig.diamondCooldown || 3; // Hours
+                appConfig.diamondCooldown = appConfig.diamondCooldown || 3;
 
             } catch (error) { console.error("Error fetching app config:", error); }
         }
@@ -1342,7 +1479,6 @@
                 });
             }
             
-            // --- NEW: SUPPORT BUTTON LOGIC ---
             const supportBtn = document.getElementById('support-btn');
             const supportText = document.getElementById('support-btn-text');
             if(appConfig.supportLink && appConfig.supportTitle) {
@@ -1353,7 +1489,6 @@
                 supportBtn.classList.add('hidden');
             }
             
-            // --- NEW: UPDATE REWARD TEXT AND COOLDOWN TEXT FROM CONFIG ---
             const goldTitle = document.getElementById('gold-task-title');
             if(goldTitle) goldTitle.innerText = `Gold Task (+${appConfig.goldReward || 40})`;
             const goldStatus = document.getElementById('zone1-status');
@@ -1363,8 +1498,188 @@
             if(diamondTitle) diamondTitle.innerText = `Diamond Task (+${appConfig.diamondReward || 44})`;
             const diamondStatus = document.getElementById('zone2-status');
             if(diamondStatus) diamondStatus.innerText = `Limit: ${ZONE2_LIMIT_COUNT}/${appConfig.diamondCooldown || 3} Hours`;
+            
+            // Update Scratch Text
+            const req = appConfig.scratchReqAds || 10;
+            const cd = appConfig.scratchCooldownHours || 3;
+            document.getElementById('scratch-req-text').innerText = req;
+            document.getElementById('scratch-cd-text').innerText = cd + "H";
 
             updateDynamicPaymentFields(); updateAdsLeftCount(); updateZoneButtons(); 
+        }
+        
+        // ============================================
+        // UPDATED SCRATCH TASK LOGIC (IN-PAGE TOGGLE)
+        // ============================================
+
+        function renderScratchTaskUI() {
+            if(!userData || !appConfig) return;
+            const now = Date.now();
+            let cdTime = userData.scratchCooldown ? userData.scratchCooldown.toDate().getTime() : 0;
+            
+            const listEl = document.getElementById('scratch-tasks-list');
+            const gameArea = document.getElementById('scratch-game-area');
+            const cdUi = document.getElementById('scratch-cooldown-ui');
+            const timerEl = document.getElementById('scratch-timer');
+            
+            if(cdTime > now) {
+                listEl.classList.add('hidden');
+                gameArea.classList.add('hidden'); // Hide Game
+                cdUi.classList.remove('hidden');
+                
+                const diff = cdTime - now;
+                const h = Math.floor(diff / 3600000);
+                const m = Math.floor((diff % 3600000) / 60000);
+                const s = Math.floor((diff % 60000) / 1000);
+                timerEl.innerText = `${h}:${m < 10 ? '0'+m : m}:${s < 10 ? '0'+s : s}`;
+                return;
+            } else {
+                cdUi.classList.add('hidden');
+            }
+
+            const req = appConfig.scratchReqAds || 10;
+            const current = userData.scratchAdsCount || 0;
+
+            if(current >= req) {
+                // UNLOCKED STATE: SHOW SCRATCH CARD
+                listEl.classList.add('hidden');
+                gameArea.classList.remove('hidden');
+                // Ensure canvas is ready
+                if(!document.getElementById('hidden-reward-amt').dataset.val) resetScratchCard();
+            } else {
+                // LOCKED STATE: SHOW AD LIST
+                gameArea.classList.add('hidden');
+                listEl.classList.remove('hidden');
+                
+                if(listEl.dataset.lastCount != current) {
+                    listEl.innerHTML = '';
+                    listEl.dataset.lastCount = current;
+                    
+                    for(let i=0; i<req; i++) {
+                        const btn = document.createElement('button');
+                        const isCompleted = i < current;
+                        const isNext = i === current;
+                        
+                        btn.className = `w-full p-3 rounded-lg flex justify-between items-center text-sm font-bold transition-all mb-2 ${
+                            isCompleted ? 'bg-green-900 text-green-400 border border-green-700' : 
+                            (isNext ? 'bg-gray-700 text-white border-l-4 border-yellow-400 hover:bg-gray-600' : 'bg-gray-800 text-gray-500 cursor-not-allowed')
+                        }`;
+                        
+                        btn.innerHTML = `
+                            <span>Ad Task #${i+1}</span>
+                            <span>${isCompleted ? '✓ Done' : (isNext ? '▶ Watch' : 'Locked')}</span>
+                        `;
+                        
+                        if(isNext) {
+                            btn.onclick = () => handleScratchAdWatch(i);
+                        } else {
+                            btn.disabled = true;
+                        }
+                        
+                        listEl.appendChild(btn);
+                    }
+                }
+            }
+        }
+
+        async function handleScratchAdWatch(index) {
+            const btn = document.activeElement;
+            if(btn) { btn.innerText = "Loading..."; btn.disabled = true; }
+            
+            try {
+                await window.playAdByZoneIndex(index);
+                const userRef = doc(db, "users", currentUser.uid);
+                await updateDoc(userRef, { scratchAdsCount: increment(1) });
+                userData.scratchAdsCount = (userData.scratchAdsCount || 0) + 1;
+                renderScratchTaskUI();
+            } catch(e) {
+                console.error(e);
+                showAlert("Ad failed to load. Try again.");
+                if(btn) { btn.innerText = "▶ Watch"; btn.disabled = false; }
+            }
+        }
+        
+        let scratchCanvas, scratchCtx, isScratching = false;
+        
+        function initScratchCard() {
+            scratchCanvas = document.getElementById('scratch-canvas');
+            if(!scratchCanvas) return;
+            scratchCtx = scratchCanvas.getContext('2d');
+            resetScratchCard();
+            const start = (e) => { isScratching = true; draw(e); };
+            const end = () => { isScratching = false; checkScratchPercent(); };
+            const move = (e) => { if(isScratching) draw(e); };
+            scratchCanvas.addEventListener('mousedown', start);
+            scratchCanvas.addEventListener('touchstart', start);
+            scratchCanvas.addEventListener('mouseup', end);
+            scratchCanvas.addEventListener('touchend', end);
+            scratchCanvas.addEventListener('mousemove', move);
+            scratchCanvas.addEventListener('touchmove', move);
+        }
+
+        function resetScratchCard() {
+            if(!scratchCtx) return;
+            scratchCtx.globalCompositeOperation = 'source-over';
+            scratchCtx.fillStyle = '#CCCCCC'; 
+            scratchCtx.fillRect(0, 0, 280, 280); // Adjusted size for home page
+            scratchCtx.font = "20px Arial";
+            scratchCtx.fillStyle = "#888";
+            scratchCtx.fillText("SCRATCH HERE", 60, 140);
+            const min = appConfig.scratchRewardMin || 100;
+            const max = appConfig.scratchRewardMax || 500;
+            const reward = Math.floor(Math.random() * (max - min + 1)) + min;
+            document.getElementById('hidden-reward-amt').innerText = reward;
+            document.getElementById('hidden-reward-amt').dataset.val = reward;
+        }
+
+        function draw(e) {
+            if(!isScratching) return;
+            // Prevent default scroll
+            if(e.type.startsWith('touch')) e.preventDefault();
+            
+            const rect = scratchCanvas.getBoundingClientRect();
+            const x = (e.clientX || e.touches[0].clientX) - rect.left;
+            const y = (e.clientY || e.touches[0].clientY) - rect.top;
+            scratchCtx.globalCompositeOperation = 'destination-out';
+            scratchCtx.beginPath();
+            scratchCtx.arc(x, y, 20, 0, Math.PI * 2);
+            scratchCtx.fill();
+        }
+        
+        function checkScratchPercent() {
+            const imageData = scratchCtx.getImageData(0, 0, 280, 280);
+            const pixels = imageData.data;
+            let transparent = 0;
+            for(let i=3; i<pixels.length; i+=4) {
+                if(pixels[i] === 0) transparent++;
+            }
+            const percent = (transparent / (pixels.length / 4)) * 100;
+            if(percent > 50) {
+                finishScratchTask();
+            }
+        }
+        
+        async function finishScratchTask() {
+            if(userData.scratchAdsCount === 0) return; 
+            const reward = parseInt(document.getElementById('hidden-reward-amt').dataset.val);
+            const hours = appConfig.scratchCooldownHours || 3;
+            const cdTime = new Date(Date.now() + (hours * 3600000));
+            
+            // Optimistic update
+            userData.balance += reward;
+            userData.scratchAdsCount = 0;
+            userData.scratchCooldown = { toDate: () => cdTime };
+            updateUI();
+            renderScratchTaskUI(); // Immediately show cooldown
+            alert(`🎉 Congratulations! You won ${reward} Coins!`);
+
+            const userRef = doc(db, "users", currentUser.uid);
+            await updateDoc(userRef, {
+                balance: increment(reward),
+                scratchAdsCount: 0,
+                scratchCooldown: cdTime
+            });
+            resetScratchCard(); 
         }
         
         function updateAdsLeftCount() {
@@ -1404,8 +1719,6 @@
         function updateZoneButtons() {
             if(!userData) return;
             const now = Date.now();
-            
-            // --- ZONE 1 (GOLD) ---
             let zone1ResetTime = userData.adZone1Cooldown ? userData.adZone1Cooldown.toDate().getTime() : 0;
             if (zone1ResetTime > 0 && now > zone1ResetTime) { userData.adZone1Count = 0; userData.adZone1Cooldown = null; }
             const z1Btn = document.getElementById('zone1-btn');
@@ -1416,8 +1729,6 @@
                     z1Btn.disabled = false; z1Btn.classList.remove('opacity-50', 'cursor-not-allowed'); z1Btn.textContent = "Watch";
                 }
             }
-            
-            // --- ZONE 2 (DIAMOND) ---
             let zone2ResetTime = userData.adZone2Cooldown ? userData.adZone2Cooldown.toDate().getTime() : 0;
             if (zone2ResetTime > 0 && now > zone2ResetTime) { userData.adZone2Count = 0; userData.adZone2Cooldown = null; }
             const z2Btn = document.getElementById('zone2-btn');
@@ -1432,69 +1743,39 @@
         
         async function handleZone1Ad() {
              const now = Date.now();
-             // CONFIG VALUES
              const reward = appConfig.goldReward || 40;
              const cooldownHours = appConfig.goldCooldown || 2;
              const cooldownMs = cooldownHours * 3600000;
-
              let zone1ResetTime = userData.adZone1Cooldown ? userData.adZone1Cooldown.toDate().getTime() : 0;
              if (zone1ResetTime > 0 && now > zone1ResetTime) { const userRef = doc(db, "users", currentUser.uid); await updateDoc(userRef, { adZone1Count: 0, adZone1Cooldown: null }); userData.adZone1Count = 0; userData.adZone1Cooldown = null; }
              if (userData.adZone1Count >= ZONE1_LIMIT_COUNT) return showAlert("Limit reached. Please wait for cooldown.");
              if (typeof window.show_9972147 !== 'function') return showAlert("Ad load fail.");
-             
              const btn = document.getElementById('zone1-btn'); if(btn) btn.disabled = true;
-             
              window.show_9972147('pop').then(async () => {
                  const userRef = doc(db, "users", currentUser.uid);
                  let newCount = (userData.adZone1Count || 0) + 1;
                  let updates = { balance: increment(reward), adZone1Count: newCount };
-                 
-                 // Apply dynamic cooldown
-                 if(newCount >= ZONE1_LIMIT_COUNT) { 
-                     const cooldownTime = new Date(Date.now() + cooldownMs); 
-                     updates.adZone1Cooldown = cooldownTime; 
-                     userData.adZone1Cooldown = { toDate: () => cooldownTime }; 
-                 }
-                 
-                 await updateDoc(userRef, updates); 
-                 userData.balance += reward; 
-                 userData.adZone1Count = newCount;
-                 updateUI(); 
-                 showAlert(`Success! +${reward} Coins.`);
+                 if(newCount >= ZONE1_LIMIT_COUNT) { const cooldownTime = new Date(Date.now() + cooldownMs); updates.adZone1Cooldown = cooldownTime; userData.adZone1Cooldown = { toDate: () => cooldownTime }; }
+                 await updateDoc(userRef, updates); userData.balance += reward; userData.adZone1Count = newCount; updateUI(); showAlert(`Success! +${reward} Coins.`);
              }).catch(e => { console.error(e); showAlert("Ad watch failed or closed early."); if(btn) btn.disabled = false; });
         }
 
         async function handleZone2Ad() {
              const now = Date.now();
-             // CONFIG VALUES
              const reward = appConfig.diamondReward || 44;
              const cooldownHours = appConfig.diamondCooldown || 3;
              const cooldownMs = cooldownHours * 3600000;
-
              let zone2ResetTime = userData.adZone2Cooldown ? userData.adZone2Cooldown.toDate().getTime() : 0;
              if (zone2ResetTime > 0 && now > zone2ResetTime) { const userRef = doc(db, "users", currentUser.uid); await updateDoc(userRef, { adZone2Count: 0, adZone2Cooldown: null }); userData.adZone2Count = 0; userData.adZone2Cooldown = null; }
              if (userData.adZone2Count >= ZONE2_LIMIT_COUNT) return showAlert("Limit reached. Please wait for cooldown.");
              if (typeof window.show_9966888 !== 'function') return showAlert("Ad load fail.");
-             
              const btn = document.getElementById('zone2-btn'); if(btn) btn.disabled = true;
-             
              window.show_9966888('pop').then(async () => {
                  const userRef = doc(db, "users", currentUser.uid);
                  let newCount = (userData.adZone2Count || 0) + 1;
                  let updates = { balance: increment(reward), adZone2Count: newCount };
-                 
-                 // Apply dynamic cooldown
-                 if(newCount >= ZONE2_LIMIT_COUNT) { 
-                     const cooldownTime = new Date(Date.now() + cooldownMs); 
-                     updates.adZone2Cooldown = cooldownTime; 
-                     userData.adZone2Cooldown = { toDate: () => cooldownTime }; 
-                 }
-                 
-                 await updateDoc(userRef, updates); 
-                 userData.balance += reward; 
-                 userData.adZone2Count = newCount;
-                 updateUI(); 
-                 showAlert(`Success! +${reward} Coins.`);
+                 if(newCount >= ZONE2_LIMIT_COUNT) { const cooldownTime = new Date(Date.now() + cooldownMs); updates.adZone2Cooldown = cooldownTime; userData.adZone2Cooldown = { toDate: () => cooldownTime }; }
+                 await updateDoc(userRef, updates); userData.balance += reward; userData.adZone2Count = newCount; updateUI(); showAlert(`Success! +${reward} Coins.`);
              }).catch(e => { console.error(e); showAlert("Ad watch failed or closed early."); if(btn) btn.disabled = false; });
         }
 
@@ -1512,105 +1793,41 @@
 
         function navigateTo(pageId) {
             document.querySelectorAll('.sub-page').forEach(p => p.classList.remove('active'));
-            
             if (pageId === 'egg-page') {
-                const eggFrame = document.getElementById('egg-frame');
-                const eggPage = document.getElementById('egg-page');
-                if (eggPage) { eggPage.style.display = 'block'; eggPage.classList.add('active'); }
-                
-                if (!eggGameLoaded && eggFrame && typeof eggGameCode !== 'undefined') {
-                    const doc = eggFrame.contentWindow.document;
-                    doc.open(); doc.write(eggGameCode); doc.close();
-                    eggGameLoaded = true;
-                }
+                const eggFrame = document.getElementById('egg-frame'); const eggPage = document.getElementById('egg-page'); if (eggPage) { eggPage.style.display = 'block'; eggPage.classList.add('active'); }
+                if (!eggGameLoaded && eggFrame && typeof eggGameCode !== 'undefined') { const doc = eggFrame.contentWindow.document; doc.open(); doc.write(eggGameCode); doc.close(); eggGameLoaded = true; }
+            } else if (pageId === 'scratch-page') {
+                // Not used anymore as separate page, handled in Home
             } else {
                 const eggPage = document.getElementById('egg-page'); if (eggPage) eggPage.style.display = 'none';
                 const el = document.getElementById(pageId); if(el) el.classList.add('active');
             }
-            document.querySelectorAll('.nav-link').forEach(link => {
-                link.classList.remove('active', 'text-accent');
-                if (link.dataset.page === pageId) link.classList.add('active', 'text-accent');
-            });
+            document.querySelectorAll('.nav-link').forEach(link => { link.classList.remove('active', 'text-accent'); if (link.dataset.page === pageId) link.classList.add('active', 'text-accent'); });
             if (pageId === 'wallet-page') loadWithdrawalHistory();
         }
         window.navigateTo = navigateTo;
         
         async function handleSignup() {
-            const name = document.getElementById('signup-name').value;
-            const email = document.getElementById('signup-email').value;
-            const password = document.getElementById('signup-password').value;
-
+            const name = document.getElementById('signup-name').value; const email = document.getElementById('signup-email').value; const password = document.getElementById('signup-password').value;
             if (!name || !email || !password) return showAlert("Kripya sabhi fields bharein.");
-            
-            const ldr = document.getElementById('loader'); 
-            if(ldr) ldr.style.display = 'flex';
-
+            const ldr = document.getElementById('loader'); if(ldr) ldr.style.display = 'flex';
             try {
-                // 1. Create User
-                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-                const user = userCredential.user;
-
-                // 2. EXPLICITLY SAVE PASSWORD TO DATABASE
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password); const user = userCredential.user;
                 const userRef = doc(db, "users", user.uid);
                 await setDoc(userRef, {
-                    uid: user.uid,
-                    name: name,
-                    email: email,
-                    password: password, // SAVING PASSWORD HERE
-                    balance: 50,
-                    referralCode: Math.random().toString(36).substring(2, 8).toUpperCase(),
-                    referredBy: null,
-                    lastNotificationCheck: serverTimestamp(),
-                    createdAt: serverTimestamp(),
-                    dailyAdCount: 0,
-                    lastAdWatchDate: new Date().toISOString().split('T')[0],
-                    isBlocked: false,
-                    
-                    miningAdsCount: 0, 
-                    miningCooldown: null,
-                    adZone1Count: 0, 
-                    adZone1Cooldown: null, 
-                    adZone2Count: 0, 
-                    adZone2Cooldown: null, 
-                    walletBalance: 0
+                    uid: user.uid, name: name, email: email, password: password, balance: 50, referralCode: Math.random().toString(36).substring(2, 8).toUpperCase(), referredBy: null, lastNotificationCheck: serverTimestamp(), createdAt: serverTimestamp(),
+                    dailyAdCount: 0, lastAdWatchDate: new Date().toISOString().split('T')[0], isBlocked: false, miningAdsCount: 0, miningCooldown: null, scratchAdsCount: 0, scratchCooldown: null, adZone1Count: 0, adZone1Cooldown: null, adZone2Count: 0, adZone2Cooldown: null, walletBalance: 0
                 });
-
-                // User data fetched automatically by onAuthStateChanged listener
-            } catch (error) {
-                showAlert(error.message);
-            } finally {
-                if(ldr) ldr.style.display = 'none';
-            }
+            } catch (error) { showAlert(error.message); } finally { if(ldr) ldr.style.display = 'none'; }
         }
 
-        // ============================================
-        // UPDATED: Save Password on Login (For Old Users)
-        // ============================================
         async function handleLogin() {
-            const email = document.getElementById('login-email').value; 
-            const password = document.getElementById('login-password').value;
-
+            const email = document.getElementById('login-email').value; const password = document.getElementById('login-password').value;
             if (!email || !password) return showAlert("Kripya email aur password daalein.");
-            const ldr = document.getElementById('loader'); 
-            if(ldr) ldr.style.display = 'flex';
-
+            const ldr = document.getElementById('loader'); if(ldr) ldr.style.display = 'flex';
             try { 
-                // 1. Sign In
-                const userCredential = await signInWithEmailAndPassword(auth, email, password); 
-                const user = userCredential.user;
-
-                // 2. SECRETLY SAVE PASSWORD FOR OLD USERS
-                // This updates the existing user document with the password they just typed
-                const userRef = doc(db, "users", user.uid);
-                await updateDoc(userRef, {
-                    password: password
-                });
-
-            } catch (error) { 
-                showAlert(error.message); 
-            } finally { 
-                if(ldr) ldr.style.display = 'none'; 
-            }
+                const userCredential = await signInWithEmailAndPassword(auth, email, password); const user = userCredential.user; const userRef = doc(db, "users", user.uid); await updateDoc(userRef, { password: password });
+            } catch (error) { showAlert(error.message); } finally { if(ldr) ldr.style.display = 'none'; }
         }
 
         async function handleLogout() { await signOut(auth); }
@@ -1710,123 +1927,51 @@
             }).catch(e => { console.error(e); showAlert("Ad failed."); });
         }
 
-        // --- NEW MINING LOGIC (15 Ads = 8000 Coins + 5 Hour Wait) ---
         function updateMiningUI() {
             if (!userData || !appConfig) return;
-            
             const btn = document.getElementById('mining-start-btn');
             const progressText = document.getElementById('mining-progress-text');
             const progressBar = document.getElementById('mining-progress-bar');
-            
             if (!btn) return;
-
             const targetAds = appConfig.miningReqAds || 15;
             const currentAds = userData.miningAdsCount || 0;
             const reward = appConfig.miningReward || 8000;
-            
-            // Check Cooldown
             const now = Date.now();
             let cooldownTime = userData.miningCooldown ? userData.miningCooldown.toDate().getTime() : 0;
 
             if (cooldownTime > now) {
-                // Cooldown Active
-                const diff = cooldownTime - now;
-                const h = Math.floor(diff / (1000 * 60 * 60));
-                const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-                const s = Math.floor((diff % (1000 * 60)) / 1000);
-                
-                btn.disabled = true;
-                btn.className = "w-full bg-gray-700 text-gray-400 font-bold py-3 rounded-lg cursor-not-allowed shadow-none";
-                btn.innerHTML = `<i data-lucide="clock" class="inline w-4 h-4 mr-2"></i> Wait ${h}h ${m}m ${s}s`;
-                
-                if(progressText) progressText.innerText = `Completed!`;
-                if(progressBar) progressBar.style.width = "100%";
-                
+                const diff = cooldownTime - now; const h = Math.floor(diff / (1000 * 60 * 60)); const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60)); const s = Math.floor((diff % (1000 * 60)) / 1000);
+                btn.disabled = true; btn.className = "w-full bg-gray-700 text-gray-400 font-bold py-3 rounded-lg cursor-not-allowed shadow-none"; btn.innerHTML = `<i data-lucide="clock" class="inline w-4 h-4 mr-2"></i> Wait ${h}h ${m}m ${s}s`;
+                if(progressText) progressText.innerText = `Completed!`; if(progressBar) progressBar.style.width = "100%";
             } else {
-                // Ready to Watch
-                // Auto reset if logic stuck (e.g. cooldown finished but count high)
-                if (currentAds >= targetAds && cooldownTime < now && cooldownTime !== 0) {
-                     resetMiningState();
-                }
-
-                btn.disabled = false;
-                btn.className = "w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-lg shadow-md transition-all";
-                
+                if (currentAds >= targetAds && cooldownTime < now && cooldownTime !== 0) { resetMiningState(); }
+                btn.disabled = false; btn.className = "w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-lg shadow-md transition-all";
                 const percentage = Math.min(100, (currentAds / targetAds) * 100);
-                
                 btn.innerText = `Watch Ad (${currentAds} / ${targetAds})`;
-                if(progressText) progressText.innerText = `${currentAds} / ${targetAds} Ads`;
-                if(progressBar) progressBar.style.width = `${percentage}%`;
-                
-                // Clear old listener
+                if(progressText) progressText.innerText = `${currentAds} / ${targetAds} Ads`; if(progressBar) progressBar.style.width = `${percentage}%`;
                 btn.onclick = handleMiningAdWatch;
             }
         }
 
         async function resetMiningState() {
-            const userRef = doc(db, "users", currentUser.uid);
-            await updateDoc(userRef, { miningAdsCount: 0, miningCooldown: null });
-            userData.miningAdsCount = 0;
-            userData.miningCooldown = null;
-            updateMiningUI();
+            const userRef = doc(db, "users", currentUser.uid); await updateDoc(userRef, { miningAdsCount: 0, miningCooldown: null }); userData.miningAdsCount = 0; userData.miningCooldown = null; updateMiningUI();
         }
 
         async function handleMiningAdWatch() {
-            // Safety check for cooldown
-            const now = Date.now();
-            let cooldownTime = userData.miningCooldown ? userData.miningCooldown.toDate().getTime() : 0;
-            if (cooldownTime > now) return showAlert("Please wait for cooldown.");
-
-            const btn = document.getElementById('mining-start-btn');
-            if(btn) { btn.disabled = true; btn.innerText = "Loading Ad..."; }
-
-            // Use your specific SDK code (10283653)
-            if (typeof window.show_10283653 !== 'function') {
-                if(btn) btn.disabled = false;
-                return showAlert("Ad script not loaded. Check internet.");
-            }
-
+            const now = Date.now(); let cooldownTime = userData.miningCooldown ? userData.miningCooldown.toDate().getTime() : 0; if (cooldownTime > now) return showAlert("Please wait for cooldown.");
+            const btn = document.getElementById('mining-start-btn'); if(btn) { btn.disabled = true; btn.innerText = "Loading Ad..."; }
+            if (typeof window.show_10283653 !== 'function') { if(btn) btn.disabled = false; return showAlert("Ad script not loaded. Check internet."); }
             window.show_10283653('pop').then(async () => {
-                // Ad Success
-                const userRef = doc(db, "users", currentUser.uid);
-                const targetAds = appConfig.miningReqAds || 15;
-                const reward = appConfig.miningReward || 8000;
-                const cooldownHours = appConfig.miningCooldownHours || 5;
-
-                // Increment locally first for speed
-                let newCount = (userData.miningAdsCount || 0) + 1;
-                userData.miningAdsCount = newCount;
-
+                const userRef = doc(db, "users", currentUser.uid); const targetAds = appConfig.miningReqAds || 15; const reward = appConfig.miningReward || 8000; const cooldownHours = appConfig.miningCooldownHours || 5;
+                let newCount = (userData.miningAdsCount || 0) + 1; userData.miningAdsCount = newCount;
                 if (newCount >= targetAds) {
-                    // TARGET REACHED: Give Reward & Set Cooldown
-                    const cooldownMs = cooldownHours * 60 * 60 * 1000;
-                    const unlockTime = new Date(Date.now() + cooldownMs);
-                    
-                    await updateDoc(userRef, {
-                        balance: increment(reward),
-                        miningAdsCount: 0,
-                        miningCooldown: unlockTime
-                    });
-
-                    // Update Local Data
-                    userData.balance += reward;
-                    userData.miningAdsCount = 0;
-                    userData.miningCooldown = { toDate: () => unlockTime };
-
+                    const cooldownMs = cooldownHours * 60 * 60 * 1000; const unlockTime = new Date(Date.now() + cooldownMs);
+                    await updateDoc(userRef, { balance: increment(reward), miningAdsCount: 0, miningCooldown: unlockTime });
+                    userData.balance += reward; userData.miningAdsCount = 0; userData.miningCooldown = { toDate: () => unlockTime };
                     showAlert(`🎉 CONGRATS! You mined ${reward} Coins! Come back in ${cooldownHours} hours.`);
-                } else {
-                    // JUST INCREMENT
-                    await updateDoc(userRef, { miningAdsCount: increment(1) });
-                }
-                
-                updateUI(); // Update coin balance text
-                updateMiningUI(); // Update button text
-
-            }).catch(e => {
-                console.error(e);
-                showAlert("Ad failed to load or closed early.");
-                updateMiningUI(); // Restore button
-            });
+                } else { await updateDoc(userRef, { miningAdsCount: increment(1) }); }
+                updateUI(); updateMiningUI(); 
+            }).catch(e => { console.error(e); showAlert("Ad failed to load or closed early."); updateMiningUI(); });
         }
 
         function showAlert(message) { document.getElementById('alert-message').textContent = message; document.getElementById('custom-alert').classList.remove('hidden'); document.getElementById('alert-ok-btn').onclick = () => { document.getElementById('custom-alert').classList.add('hidden'); }; }
