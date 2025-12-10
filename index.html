@@ -6,6 +6,9 @@
     <!-- DAILY/BIRD AD SCRIPT (Zone 10284251 - Requested) -->
     <script src='//libtl.com/sdk.js' data-zone='10284251' data-sdk='show_10284251'></script>
     
+    <!-- ADSGRAM SCRIPT (Added) -->
+    <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
+
     <meta name="monetag" content="ad9e9cd11a419f3c0a5103c5bb5e151e">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -270,8 +273,6 @@
                 </section>
             </div>
             
-            <!-- SCRATCH PAGE REMOVED (Moved to Home) -->
-
             <!-- EGG PAGE (Integrated via IFrame) -->
             <div id="egg-page" class="sub-page">
                 <iframe id="egg-frame" style="width: 100%; height: 100%; border: none;"></iframe>
@@ -305,22 +306,33 @@
                 </div>
             </div>
 
-            <!-- Refer Page -->
-            <div id="refer-page" class="p-4 space-y-6 sub-page">
-                 <h2 class="text-xl font-bold text-center">Refer & Earn</h2>
-                 <div class="card-bg p-6 rounded-lg text-center">
-                     <p class="text-gray-400 mb-2">Aapka Referral Code</p>
-                     <div class="bg-gray-800 p-3 rounded-lg flex items-center justify-center mb-4">
-                         <span id="referral-code" class="text-2xl font-bold tracking-widest">LOADING...</span>
-                         <button id="copy-code-btn" class="ml-4"><i data-lucide="copy" class="w-6 h-6 text-gray-400"></i></button>
+            <!-- RUPEES PAGE (ADSGRAM) -->
+            <div id="rupees-page" class="p-4 space-y-6 sub-page">
+                 <h2 class="text-xl font-bold text-center text-green-400">Earn Rupees</h2>
+                 
+                 <div class="card-bg p-6 rounded-lg text-center border border-green-700 shadow-lg">
+                     <p class="text-gray-300 mb-2 font-semibold">Daily Rupee Task</p>
+                     
+                     <div class="mb-4">
+                        <p class="text-4xl mb-2">💵</p>
+                        <h3 class="text-2xl font-bold text-white">₹ <span id="rupee-task-reward">0.010</span></h3>
+                        <p class="text-xs text-gray-500">Adds to Wallet Instantly</p>
                      </div>
-                     <p class="text-sm text-gray-300">Apne dosto ke saath code share karein.</p>
-                 </div>
-                 <button id="share-btn" class="w-full p-3 rounded-lg btn-accent">Apna Code Share Karein</button>
-                 <div class="card-bg p-4 rounded-lg mt-6">
-                    <h3 class="font-semibold mb-3 text-center">Kisi ka Referral Code Hai?</h3>
-                    <input id="enter-referral-code" type="text" placeholder="Yahan code daalein" class="w-full p-3 rounded-lg input-field mb-3">
-                    <button id="apply-referral-btn" class="w-full p-3 rounded-lg btn-outline-accent">Code Apply Karein</button>
+
+                     <div class="bg-gray-800 p-4 rounded-lg mb-4">
+                         <div class="flex justify-between text-xs mb-1">
+                             <span class="text-gray-400">Progress</span>
+                             <span class="text-green-400 font-bold"><span id="rupee-ads-count">0</span> / <span id="rupee-ads-target">10</span> Ads</span>
+                         </div>
+                         <div class="w-full bg-gray-700 rounded-full h-2">
+                             <div id="rupee-progress-bar" class="bg-green-500 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+                         </div>
+                     </div>
+
+                     <button id="rupee-ad-btn" class="w-full p-3 rounded-lg bg-green-600 hover:bg-green-500 text-white font-bold transition-all shadow-md flex items-center justify-center">
+                         <i data-lucide="play-circle" class="w-5 h-5 mr-2"></i> Watch Ad
+                     </button>
+                     <p class="text-xs text-gray-500 mt-3">Powered by AdsGram</p>
                  </div>
             </div>
 
@@ -351,12 +363,13 @@
 
         </main>
 
-        <!-- BOTTOM NAV (Always Visible) -->
+        <!-- BOTTOM NAV (UPDATED: Refer Hata diya, Rupees Laga diya) -->
         <nav class="bottom-nav sticky bottom-0 grid grid-cols-5 items-center text-center py-2 card-bg border-t border-gray-800 z-50">
             <a href="#" class="nav-link" data-page="home-page"><i data-lucide="home" class="mx-auto w-6 h-6"></i><span class="text-xs">Home</span></a>
             <a href="#" class="nav-link" data-page="egg-page"><i data-lucide="egg" class="mx-auto w-6 h-6"></i><span class="text-xs">Egg</span></a>
             <a href="#" class="nav-link" data-page="wallet-page"><i data-lucide="wallet" class="mx-auto w-6 h-6"></i><span class="text-xs">Wallet</span></a>
-            <a href="#" class="nav-link" data-page="refer-page"><i data-lucide="users" class="mx-auto w-6 h-6"></i><span class="text-xs">Refer</span></a>
+            <!-- Rupees Button -->
+            <a href="#" class="nav-link" data-page="rupees-page"><i data-lucide="indian-rupee" class="mx-auto w-6 h-6"></i><span class="text-xs">Rupees</span></a>
             <a href="#" class="nav-link" data-page="profile-page"><i data-lucide="user" class="mx-auto w-6 h-6"></i><span class="text-xs">Profile</span></a>
         </nav>
     </div>
@@ -1205,7 +1218,6 @@
         let userData = null;
         let appConfig = {};
         
-        // Define limits (these are per-user limits, can be static or dynamic, keeping static here for simplicity unless requested)
         const ZONE1_LIMIT_COUNT = 10;
         const ZONE2_LIMIT_COUNT = 10;
 
@@ -1213,7 +1225,10 @@
         let eggGameLoaded = false;
         
         let miningUiInterval = null;
-        let scratchUiInterval = null; // NEW FOR SCRATCH
+        let scratchUiInterval = null; 
+
+        // AdsGram Controller
+        window.AdsgramController = undefined;
 
         window.getExternalGameData = function() {
             if(!userData) return null;
@@ -1254,49 +1269,31 @@
             } catch(e) { console.error("Reward Error:", e); }
         };
 
-        // --- NEW: AD ROTATION SYSTEM FOR SCRATCH ---
+        // --- AD ROTATION SYSTEM FOR SCRATCH ---
         window.playAdByZoneIndex = function(index) {
-            // Rotates 0-5. 
-            // 0=Ad1, 1=Ad2, 2=Ad3, 3=Ad4, 4=Ad5, 5=Ad6. 
-            // 6=Ad1, 7=Ad2...
             const codeIndex = index % 6; 
-            
             return new Promise((resolve, reject) => {
                 try {
                     if (codeIndex === 0) {
-                        // Ad 1: In-App Interstitial (10284251)
                         if(typeof window.show_10284251 !== 'function') reject("Script 1 Missing");
-                        window.show_10284251({ type: 'inApp', inAppSettings: { frequency: 2, capping: 0.1, interval: 30, timeout: 5, everyPage: false } })
-                            .then(resolve).catch(reject);
-                    } 
-                    else if (codeIndex === 1) {
-                         // Ad 2: Rewarded Popup (10283653)
+                        window.show_10284251({ type: 'inApp', inAppSettings: { frequency: 2, capping: 0.1, interval: 30, timeout: 5, everyPage: false } }).then(resolve).catch(reject);
+                    } else if (codeIndex === 1) {
                          if(typeof window.show_10283653 !== 'function') reject("Script 2 Missing");
                          window.show_10283653('pop').then(resolve).catch(reject);
-                    }
-                    else if (codeIndex === 2) {
-                        // Ad 3: Rewarded Interstitial (9972147)
+                    } else if (codeIndex === 2) {
                         if(typeof window.show_9972147 !== 'function') reject("Script 3 Missing");
                         window.show_9972147().then(resolve).catch(reject);
-                    }
-                    else if (codeIndex === 3) {
-                        // Ad 4: Rewarded Interstitial (9966888)
+                    } else if (codeIndex === 3) {
                         if(typeof window.show_9966888 !== 'function') reject("Script 4 Missing");
                         window.show_9966888().then(resolve).catch(reject);
-                    }
-                    else if (codeIndex === 4) {
-                        // Ad 5: Rewarded Popup (9966767)
+                    } else if (codeIndex === 4) {
                         if(typeof window.show_9966767 !== 'function') reject("Script 5 Missing");
                         window.show_9966767('pop').then(resolve).catch(reject);
-                    }
-                    else {
-                        // Ad 6: Rewarded Interstitial (10284251 - Standard Call)
+                    } else {
                         if(typeof window.show_10284251 !== 'function') reject("Script 6 Missing");
                         window.show_10284251().then(resolve).catch(reject);
                     }
-                } catch(e) {
-                    reject(e);
-                }
+                } catch(e) { reject(e); }
             });
         };
 
@@ -1318,27 +1315,26 @@
                     e.preventDefault();
                     const pageId = link.dataset.page;
                     if (pageId === 'wallet-page') loadWithdrawalHistory();
+                    if (pageId === 'rupees-page') updateRupeeUI(); 
                     navigateTo(pageId);
                 });
             });
 
             safeListen('notification-bell', 'click', () => { navigateTo('notifications-page'); loadNotifications(); });
-            safeListen('copy-code-btn', 'click', copyReferralCode);
-            safeListen('share-btn', 'click', shareReferralCode);
             safeListen('withdraw-btn', 'click', handleWithdrawal);
-            safeListen('apply-referral-btn', 'click', handleApplyReferralCode);
             safeListen('withdraw-method', 'change', updateDynamicPaymentFields);
             
             safeListen('zone1-btn', 'click', handleZone1Ad);
             safeListen('zone2-btn', 'click', handleZone2Ad);
             safeListen('convert-trigger', 'click', handleCoinConversion);
+            
+            // New Listener for Rupees Ad
+            safeListen('rupee-ad-btn', 'click', handleRupeeAdWatch);
 
             const ldr = document.getElementById('loader');
             if(ldr) ldr.style.display = 'none';
 
             onAuthStateChanged(auth, handleAuthStateChange);
-            
-            // Init Scratch Canvas Logic
             initScratchCard();
         };
 
@@ -1372,6 +1368,7 @@
                 
                 updateMiningUI(); 
                 renderScratchTaskUI();
+                updateRupeeUI();
             } else {
                 currentUser = null;
                 userData = null;
@@ -1392,6 +1389,10 @@
                 if (userSnap.exists()) {
                     userData = userSnap.data();
                     let needsUpdate = false;
+                    
+                    // Defaults for existing users
+                    if (typeof userData.rupeeAdCount === 'undefined') { userData.rupeeAdCount = 0; needsUpdate = true; }
+                    
                     if (typeof userData.adZone1Count === 'undefined') { userData.adZone1Count = 0; needsUpdate = true; }
                     if (typeof userData.adZone1Cooldown === 'undefined') { userData.adZone1Cooldown = null; needsUpdate = true; }
                     if (typeof userData.adZone2Count === 'undefined') { userData.adZone2Count = 0; needsUpdate = true; }
@@ -1406,6 +1407,7 @@
 
                     if(needsUpdate) {
                         await updateDoc(userRef, {
+                            rupeeAdCount: userData.rupeeAdCount,
                             adZone1Count: userData.adZone1Count, adZone1Cooldown: userData.adZone1Cooldown,
                             adZone2Count: userData.adZone2Count, adZone2Cooldown: userData.adZone2Cooldown,
                             walletBalance: userData.walletBalance,
@@ -1414,22 +1416,22 @@
                         });
                     }
                 } else {
-                    const ownReferralCode = Math.random().toString(36).substring(2, 8).toUpperCase();
                     const defaultUserData = {
                         uid: currentUser.uid, name: currentUser.email.split('@')[0], email: currentUser.email,
-                        balance: 50, referralCode: ownReferralCode, referredBy: null,
+                        balance: 50, referralCode: Math.random().toString(36).substring(2, 8).toUpperCase(), referredBy: null,
                         lastNotificationCheck: new Date(), createdAt: serverTimestamp(),
                         dailyAdCount: 0, lastAdWatchDate: new Date().toISOString().split('T')[0], isBlocked: false,
                         
                         miningAdsCount: 0, miningCooldown: null,
                         scratchAdsCount: 0, scratchCooldown: null,
+                        rupeeAdCount: 0,
 
                         adZone1Count: 0, adZone1Cooldown: null, adZone2Count: 0, adZone2Cooldown: null, walletBalance: 0 
                     };
                     await setDoc(userRef, defaultUserData);
                     userData = defaultUserData;
                 }
-            } catch (error) { console.error("Error fetching user data:", error); showAlert("User data load karne mein error aayi."); }
+            } catch (error) { console.error("Error fetching user data:", error); showAlert("User data load error."); }
         }
 
         async function fetchAppConfig() {
@@ -1437,21 +1439,23 @@
             try {
                 const configSnap = await getDoc(configRef);
                 appConfig = configSnap.exists() ? configSnap.data() : {};
+                
+                // Rupee Page Defaults (Admin Control)
+                if(!appConfig.rupeeReqAds) appConfig.rupeeReqAds = 10;
+                if(!appConfig.rupeeRewardAmount) appConfig.rupeeRewardAmount = 0.010;
+
                 if(!appConfig.minWithdrawal) appConfig.minWithdrawal = 50;
                 if(!appConfig.paymentMethods) appConfig.paymentMethods = ["UPI", "Paytm"];
-                if(!appConfig.dailyAdLimit) appConfig.dailyAdLimit = 10;
                 
                 if(!appConfig.miningReqAds) appConfig.miningReqAds = 15;
                 if(!appConfig.miningReward) appConfig.miningReward = 8000;
                 if(!appConfig.miningCooldownHours) appConfig.miningCooldownHours = 5;
                 
-                // Scratch Defaults
                 if(!appConfig.scratchReqAds) appConfig.scratchReqAds = 10;
                 if(!appConfig.scratchCooldownHours) appConfig.scratchCooldownHours = 3;
                 if(!appConfig.scratchRewardMin) appConfig.scratchRewardMin = 100;
                 if(!appConfig.scratchRewardMax) appConfig.scratchRewardMax = 500;
                 
-                // Task Defaults
                 appConfig.goldReward = appConfig.goldReward || 40;
                 appConfig.goldCooldown = appConfig.goldCooldown || 2;
                 appConfig.diamondReward = appConfig.diamondReward || 44;
@@ -1465,9 +1469,8 @@
             const balance = userData.balance || 0;
             const wallet = userData.walletBalance || 0;
             setText('coin-balance', balance); setText('wallet-coin-balance', balance);
-            setText('home-rupee-balance', wallet.toFixed(2)); setText('wallet-rupee-balance', wallet.toFixed(2));
+            setText('home-rupee-balance', wallet.toFixed(3)); setText('wallet-rupee-balance', wallet.toFixed(3));
             setText('profile-name', userData.name || 'No Name'); setText('profile-email', userData.email || 'No Email');
-            setText('referral-code', userData.referralCode || '...');
             setText('min-withdrawal-info', `${appConfig.minWithdrawal || 50}`); 
             setText('coin-value-info', `${appConfig.coinValueCoins || 1000} Coins = ₹${appConfig.coinValueInr || 10}`);
             const withdrawMethodSelect = document.getElementById('withdraw-method');
@@ -1505,12 +1508,75 @@
             document.getElementById('scratch-req-text').innerText = req;
             document.getElementById('scratch-cd-text').innerText = cd + "H";
 
-            updateDynamicPaymentFields(); updateAdsLeftCount(); updateZoneButtons(); 
+            updateDynamicPaymentFields(); updateAdsLeftCount(); updateZoneButtons(); updateRupeeUI();
+        }
+
+        // ==========================
+        // NEW: RUPEE PAGE LOGIC
+        // ==========================
+        function updateRupeeUI() {
+            if(!userData || !appConfig) return;
+            
+            const target = appConfig.rupeeReqAds || 10;
+            const current = userData.rupeeAdCount || 0;
+            const reward = appConfig.rupeeRewardAmount || 0.010;
+
+            setText('rupee-ads-count', current);
+            setText('rupee-ads-target', target);
+            setText('rupee-task-reward', reward.toFixed(3));
+            
+            const percent = Math.min(100, (current / target) * 100);
+            const bar = document.getElementById('rupee-progress-bar');
+            if(bar) bar.style.width = percent + "%";
+        }
+
+        async function handleRupeeAdWatch() {
+            const btn = document.getElementById('rupee-ad-btn');
+            
+            // Correct way to call AdsGram based on the docs in the image
+            const AdController = window.Adsgram.init({ blockId: "int-18902" });
+
+            btn.disabled = true;
+            btn.innerHTML = "Loading...";
+
+            AdController.show().then(async (result) => {
+                // User watched ad
+                const userRef = doc(db, "users", currentUser.uid);
+                const target = appConfig.rupeeReqAds || 10;
+                const reward = appConfig.rupeeRewardAmount || 0.010;
+                
+                let newCount = (userData.rupeeAdCount || 0) + 1;
+                let updates = {};
+
+                if(newCount >= target) {
+                    // Task Completed
+                    updates.rupeeAdCount = 0;
+                    updates.walletBalance = increment(reward);
+                    userData.rupeeAdCount = 0;
+                    userData.walletBalance += reward;
+                    showAlert(`🎉 Task Complete! ₹${reward.toFixed(3)} added to wallet.`);
+                } else {
+                    updates.rupeeAdCount = newCount;
+                    userData.rupeeAdCount = newCount;
+                }
+
+                await updateDoc(userRef, updates);
+                updateUI();
+                btn.disabled = false;
+                btn.innerHTML = `<i data-lucide="play-circle" class="inline w-5 h-5 mr-1"></i> Watch Ad`;
+                lucide.createIcons();
+            }).catch((result) => {
+                // Ad failed or closed
+                console.log(result);
+                btn.disabled = false;
+                btn.innerHTML = `<i data-lucide="play-circle" class="inline w-5 h-5 mr-1"></i> Watch Ad`;
+                lucide.createIcons();
+            });
         }
         
-        // ============================================
-        // UPDATED SCRATCH TASK LOGIC (IN-PAGE TOGGLE)
-        // ============================================
+        // ==========================
+        // EXISTING LOGIC PRESERVED
+        // ==========================
 
         function renderScratchTaskUI() {
             if(!userData || !appConfig) return;
@@ -1541,13 +1607,10 @@
             const current = userData.scratchAdsCount || 0;
 
             if(current >= req) {
-                // UNLOCKED STATE: SHOW SCRATCH CARD
                 listEl.classList.add('hidden');
                 gameArea.classList.remove('hidden');
-                // Ensure canvas is ready
                 if(!document.getElementById('hidden-reward-amt').dataset.val) resetScratchCard();
             } else {
-                // LOCKED STATE: SHOW AD LIST
                 gameArea.classList.add('hidden');
                 listEl.classList.remove('hidden');
                 
@@ -1621,7 +1684,7 @@
             if(!scratchCtx) return;
             scratchCtx.globalCompositeOperation = 'source-over';
             scratchCtx.fillStyle = '#CCCCCC'; 
-            scratchCtx.fillRect(0, 0, 280, 280); // Adjusted size for home page
+            scratchCtx.fillRect(0, 0, 280, 280);
             scratchCtx.font = "20px Arial";
             scratchCtx.fillStyle = "#888";
             scratchCtx.fillText("SCRATCH HERE", 60, 140);
@@ -1634,9 +1697,7 @@
 
         function draw(e) {
             if(!isScratching) return;
-            // Prevent default scroll
             if(e.type.startsWith('touch')) e.preventDefault();
-            
             const rect = scratchCanvas.getBoundingClientRect();
             const x = (e.clientX || e.touches[0].clientX) - rect.left;
             const y = (e.clientY || e.touches[0].clientY) - rect.top;
@@ -1665,12 +1726,11 @@
             const hours = appConfig.scratchCooldownHours || 3;
             const cdTime = new Date(Date.now() + (hours * 3600000));
             
-            // Optimistic update
             userData.balance += reward;
             userData.scratchAdsCount = 0;
             userData.scratchCooldown = { toDate: () => cdTime };
             updateUI();
-            renderScratchTaskUI(); // Immediately show cooldown
+            renderScratchTaskUI(); 
             alert(`🎉 Congratulations! You won ${reward} Coins!`);
 
             const userRef = doc(db, "users", currentUser.uid);
@@ -1796,8 +1856,6 @@
             if (pageId === 'egg-page') {
                 const eggFrame = document.getElementById('egg-frame'); const eggPage = document.getElementById('egg-page'); if (eggPage) { eggPage.style.display = 'block'; eggPage.classList.add('active'); }
                 if (!eggGameLoaded && eggFrame && typeof eggGameCode !== 'undefined') { const doc = eggFrame.contentWindow.document; doc.open(); doc.write(eggGameCode); doc.close(); eggGameLoaded = true; }
-            } else if (pageId === 'scratch-page') {
-                // Not used anymore as separate page, handled in Home
             } else {
                 const eggPage = document.getElementById('egg-page'); if (eggPage) eggPage.style.display = 'none';
                 const el = document.getElementById(pageId); if(el) el.classList.add('active');
@@ -1816,7 +1874,7 @@
                 const userRef = doc(db, "users", user.uid);
                 await setDoc(userRef, {
                     uid: user.uid, name: name, email: email, password: password, balance: 50, referralCode: Math.random().toString(36).substring(2, 8).toUpperCase(), referredBy: null, lastNotificationCheck: serverTimestamp(), createdAt: serverTimestamp(),
-                    dailyAdCount: 0, lastAdWatchDate: new Date().toISOString().split('T')[0], isBlocked: false, miningAdsCount: 0, miningCooldown: null, scratchAdsCount: 0, scratchCooldown: null, adZone1Count: 0, adZone1Cooldown: null, adZone2Count: 0, adZone2Cooldown: null, walletBalance: 0
+                    dailyAdCount: 0, lastAdWatchDate: new Date().toISOString().split('T')[0], isBlocked: false, miningAdsCount: 0, miningCooldown: null, scratchAdsCount: 0, scratchCooldown: null, adZone1Count: 0, adZone1Cooldown: null, adZone2Count: 0, adZone2Cooldown: null, walletBalance: 0, rupeeAdCount: 0
                 });
             } catch (error) { showAlert(error.message); } finally { if(ldr) ldr.style.display = 'none'; }
         }
@@ -1872,26 +1930,6 @@
                 }
             } catch (error) { console.error(error); if(historyList) historyList.innerHTML = '<p class="text-red-400">Error loading history.</p>'; }
         }
-        async function handleApplyReferralCode() {
-            if (userData.referredBy) return showAlert("Referral already used.");
-            const codeInput = document.getElementById('enter-referral-code'); const code = codeInput.value.trim().toUpperCase();
-            if (!code) return showAlert("Kripya ek code daalein."); if (code === userData.referralCode) return showAlert("Cannot use own code.");
-            const ldr = document.getElementById('loader'); if(ldr) ldr.style.display = 'flex';
-            await applyReferralBonus(code, true); codeInput.value = ''; if(ldr) ldr.style.display = 'none';
-        }
-        async function applyReferralBonus(referrerCode, isManualApply = false) {
-            const usersRef = collection(db, "users"); const q = query(usersRef, where("referralCode", "==", referrerCode));
-            try {
-                const querySnapshot = await getDocs(q);
-                if (!querySnapshot.empty) {
-                    const referrerDoc = querySnapshot.docs[0]; const batch = writeBatch(db);
-                    batch.update(doc(db, "users", referrerDoc.id), { balance: increment(100) });
-                    batch.update(doc(db, "users", currentUser.uid), { balance: increment(100), referredBy: referrerCode });
-                    await batch.commit(); userData.balance += 100; userData.referredBy = referrerCode;
-                    updateUI(); if(isManualApply) showAlert("Code applied! +100 Coins.");
-                } else { if(isManualApply) showAlert("Invalid code."); }
-            } catch(error) { console.error(error); if(isManualApply) showAlert("Error applying code."); }
-        }
         
         async function handleWithdrawal() {
             const amount = parseFloat(document.getElementById('withdraw-amount').value); const method = document.getElementById('withdraw-method').value;
@@ -1905,12 +1943,6 @@
                 await addDoc(collection(db, "withdrawals"), { userId: currentUser.uid, userName: userData.name, userEmail: userData.email, amount: amount, method: method, paymentDetail: paymentDetail, status: "pending", requestedAt: serverTimestamp() });
                 showAlert("Request submitted!"); document.getElementById('withdraw-amount').value = ''; if(paymentDetailInput) paymentDetailInput.value = ''; updateUI();
             } catch (error) { showAlert("Error: " + error.message); } finally { if(ldr) ldr.style.display = 'none'; }
-        }
-        function copyReferralCode() { navigator.clipboard.writeText(userData.referralCode).then(() => showAlert("Copied!")).catch(() => showAlert("Failed copy.")); }
-        function shareReferralCode() {
-            const text = `Join CashReward! Code: ${userData.referralCode}`;
-            if (navigator.share) navigator.share({ title: 'CashReward', text: text, url: window.location.href }).catch(console.error);
-            else { copyReferralCode(); showAlert("Code copied!"); }
         }
         
         window.claimReward = async function(taskType) {
