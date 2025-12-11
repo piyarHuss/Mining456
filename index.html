@@ -1,10 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- MINING AD SCRIPT (Zone 10283653 - Mining) -->
-    <script src='//libtl.com/sdk.js' data-zone='10283653' data-sdk='show_10283653'></script>
-    <!-- DAILY/BIRD AD SCRIPT (Zone 10284251 - Requested) -->
+    <!-- SCRIPT LOADER FOR ALL AD ZONES -->
+    
+    <!-- Mining Ad Script (Zone 10284251) -->
     <script src='//libtl.com/sdk.js' data-zone='10284251' data-sdk='show_10284251'></script>
+    
+    <!-- Gold Task Script (Zone 10283653) -->
+    <script src='//libtl.com/sdk.js' data-zone='10283653' data-sdk='show_10283653'></script>
+    
+    <!-- Diamond Task Script (Zone 9972147) -->
+    <script src='//libtl.com/sdk.js' data-zone='9972147' data-sdk='show_9972147'></script>
+    
+    <!-- Scratch Card Scripts (9966888 & 9966767) -->
+    <script src='//libtl.com/sdk.js' data-zone='9966888' data-sdk='show_9966888'></script>
+    <script src='//libtl.com/sdk.js' data-zone='9966767' data-sdk='show_9966767'></script>
     
     <!-- ADSGRAM SCRIPT -->
     <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
@@ -14,18 +24,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Coins to Cash Mining</title>
     
-    <!-- Zone 1 Script (Gold) -->
-    <script src='//libtl.com/sdk.js' data-zone='9972147' data-sdk='show_9972147'></script>
-    <!-- Zone 2 Script (Diamond) -->
-    <script src='//libtl.com/sdk.js' data-zone='9966888' data-sdk='show_9966888'></script>
-    <!-- Zone 3 Script (Scratch Extra - Ad 5) -->
-    <script src='//libtl.com/sdk.js' data-zone='9966767' data-sdk='show_9966767'></script>
-    
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        /* ORIGINAL STYLES RESTORED */
+        /* STYLES */
         body { font-family: 'Inter', sans-serif; background-color: #121212; color: #ffffff; overscroll-behavior: none; }
         .dark-bg { background-color: #121212; }
         .card-bg { background-color: #1e1e1e; }
@@ -56,7 +59,7 @@
         .shine-anim { animation: shine 2s infinite; }
         @keyframes shine { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
 
-        /* FIXED EGG PAGE STYLES */
+        /* EGG PAGE STYLES */
         #egg-page {
             height: calc(100vh - 140px);
             width: 100%;
@@ -66,7 +69,7 @@
             margin-top: 10px;
         }
         
-        /* New Mining Card Style */
+        /* Mining Card Style */
         .mining-card {
             background: linear-gradient(135deg, #2c3e50, #000000);
             border: 1px solid #4a5568;
@@ -306,7 +309,7 @@
                 </div>
             </div>
 
-            <!-- RUPEES PAGE (UPDATED: 2 TASKS + COOLDOWN CONTROLLED BY ADMIN) -->
+            <!-- RUPEES PAGE (3 TASKS) -->
             <div id="rupees-page" class="p-4 space-y-6 sub-page">
                  <h2 class="text-xl font-bold text-center text-green-400">Earn Rupees</h2>
                  
@@ -314,12 +317,10 @@
                  <div class="card-bg p-6 rounded-lg text-center border border-green-700 shadow-lg relative">
                      <div class="absolute top-2 right-2 bg-gray-800 px-2 py-1 rounded text-[10px] text-gray-400">Task 1</div>
                      <p class="text-gray-300 mb-2 font-semibold">Daily Rupee Task 1</p>
-                     
                      <div class="mb-4">
                         <p class="text-4xl mb-2">💵</p>
                         <h3 class="text-2xl font-bold text-white">₹ <span id="rupee-task-reward-1">0.010</span></h3>
                      </div>
-
                      <div class="bg-gray-800 p-4 rounded-lg mb-4">
                          <div class="flex justify-between text-xs mb-1">
                              <span class="text-gray-400">Progress</span>
@@ -329,7 +330,6 @@
                              <div id="rupee-progress-bar-1" class="bg-green-500 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
                          </div>
                      </div>
-
                      <button id="rupee-ad-btn-1" class="w-full p-3 rounded-lg bg-green-600 hover:bg-green-500 text-white font-bold transition-all shadow-md flex items-center justify-center">
                          <i data-lucide="play-circle" class="w-5 h-5 mr-2"></i> Watch Ad
                      </button>
@@ -340,12 +340,10 @@
                  <div class="card-bg p-6 rounded-lg text-center border border-blue-700 shadow-lg relative">
                      <div class="absolute top-2 right-2 bg-gray-800 px-2 py-1 rounded text-[10px] text-gray-400">Task 2</div>
                      <p class="text-gray-300 mb-2 font-semibold">Daily Rupee Task 2</p>
-                     
                      <div class="mb-4">
                         <p class="text-4xl mb-2">💰</p>
                         <h3 class="text-2xl font-bold text-white">₹ <span id="rupee-task-reward-2">0.010</span></h3>
                      </div>
-
                      <div class="bg-gray-800 p-4 rounded-lg mb-4">
                          <div class="flex justify-between text-xs mb-1">
                              <span class="text-gray-400">Progress</span>
@@ -355,11 +353,33 @@
                              <div id="rupee-progress-bar-2" class="bg-blue-500 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
                          </div>
                      </div>
-
                      <button id="rupee-ad-btn-2" class="w-full p-3 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-bold transition-all shadow-md flex items-center justify-center">
                          <i data-lucide="play-circle" class="w-5 h-5 mr-2"></i> Watch Ad
                      </button>
                      <p id="rupee-timer-2" class="hidden text-yellow-400 font-mono mt-2 font-bold">Wait: 00:00:00</p>
+                 </div>
+
+                 <!-- TASK 3 (NEW - Block ID: int-18957, Purple Theme, Minute Cooldown) -->
+                 <div class="card-bg p-6 rounded-lg text-center border border-purple-700 shadow-lg relative">
+                     <div class="absolute top-2 right-2 bg-gray-800 px-2 py-1 rounded text-[10px] text-gray-400">Task 3</div>
+                     <p class="text-gray-300 mb-2 font-semibold">Quick Rupee Task</p>
+                     <div class="mb-4">
+                        <p class="text-4xl mb-2">⚡</p>
+                        <h3 class="text-2xl font-bold text-white">₹ <span id="rupee-task-reward-3">0.010</span></h3>
+                     </div>
+                     <div class="bg-gray-800 p-4 rounded-lg mb-4">
+                         <div class="flex justify-between text-xs mb-1">
+                             <span class="text-gray-400">Progress</span>
+                             <span class="text-purple-400 font-bold"><span id="rupee-ads-count-3">0</span> / <span id="rupee-ads-target-3">10</span> Ads</span>
+                         </div>
+                         <div class="w-full bg-gray-700 rounded-full h-2">
+                             <div id="rupee-progress-bar-3" class="bg-purple-500 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+                         </div>
+                     </div>
+                     <button id="rupee-ad-btn-3" class="w-full p-3 rounded-lg bg-purple-600 hover:bg-purple-500 text-white font-bold transition-all shadow-md flex items-center justify-center">
+                         <i data-lucide="play-circle" class="w-5 h-5 mr-2"></i> Watch Ad
+                     </button>
+                     <p id="rupee-timer-3" class="hidden text-yellow-400 font-mono mt-2 font-bold">Wait: 00:00:00</p>
                  </div>
                  
                  <p class="text-xs text-center text-gray-500 mt-4">Powered by AdsGram</p>
@@ -396,7 +416,6 @@
             <a href="#" class="nav-link" data-page="home-page"><i data-lucide="home" class="mx-auto w-6 h-6"></i><span class="text-xs">Home</span></a>
             <a href="#" class="nav-link" data-page="egg-page"><i data-lucide="egg" class="mx-auto w-6 h-6"></i><span class="text-xs">Egg</span></a>
             <a href="#" class="nav-link" data-page="wallet-page"><i data-lucide="wallet" class="mx-auto w-6 h-6"></i><span class="text-xs">Wallet</span></a>
-            <!-- Rupees Button -->
             <a href="#" class="nav-link" data-page="rupees-page"><i data-lucide="indian-rupee" class="mx-auto w-6 h-6"></i><span class="text-xs">Rupees</span></a>
             <a href="#" class="nav-link" data-page="profile-page"><i data-lucide="user" class="mx-auto w-6 h-6"></i><span class="text-xs">Profile</span></a>
         </nav>
@@ -1255,7 +1274,6 @@
         let miningUiInterval = null;
         let scratchUiInterval = null; 
         
-        // NEW TIMER VAR FOR RUPEES
         let rupeeUiInterval = null;
 
         window.getExternalGameData = function() {
@@ -1297,29 +1315,25 @@
             } catch(e) { console.error("Reward Error:", e); }
         };
 
-        // --- AD ROTATION SYSTEM FOR SCRATCH ---
         window.playAdByZoneIndex = function(index) {
-            const codeIndex = index % 6; 
+            const codeIndex = index % 5; 
             return new Promise((resolve, reject) => {
                 try {
                     if (codeIndex === 0) {
-                        if(typeof window.show_10284251 !== 'function') reject("Script 1 Missing");
-                        window.show_10284251({ type: 'inApp', inAppSettings: { frequency: 2, capping: 0.1, interval: 30, timeout: 5, everyPage: false } }).then(resolve).catch(reject);
+                        if(typeof window.show_9966888 !== 'function') reject("Script 9966888 Missing");
+                        window.show_9966888().then(() => { alert('You have seen an ad!'); resolve(); }).catch(reject);
                     } else if (codeIndex === 1) {
-                         if(typeof window.show_10283653 !== 'function') reject("Script 2 Missing");
-                         window.show_10283653('pop').then(resolve).catch(reject);
+                         if(typeof window.show_9966767 !== 'function') reject("Script 9966767 Missing");
+                         window.show_9966767().then(() => { alert('You have seen an ad!'); resolve(); }).catch(reject);
                     } else if (codeIndex === 2) {
-                        if(typeof window.show_9972147 !== 'function') reject("Script 3 Missing");
-                        window.show_9972147().then(resolve).catch(reject);
+                        if(typeof window.show_10284251 !== 'function') reject("Script 10284251 Missing");
+                        window.show_10284251().then(() => { alert('You have seen an ad!'); resolve(); }).catch(reject);
                     } else if (codeIndex === 3) {
-                        if(typeof window.show_9966888 !== 'function') reject("Script 4 Missing");
-                        window.show_9966888().then(resolve).catch(reject);
-                    } else if (codeIndex === 4) {
-                        if(typeof window.show_9966767 !== 'function') reject("Script 5 Missing");
-                        window.show_9966767('pop').then(resolve).catch(reject);
+                        if(typeof window.show_10283653 !== 'function') reject("Script 10283653 Missing");
+                        window.show_10283653().then(() => { alert('You have seen an ad!'); resolve(); }).catch(reject);
                     } else {
-                        if(typeof window.show_10284251 !== 'function') reject("Script 6 Missing");
-                        window.show_10284251().then(resolve).catch(reject);
+                        if(typeof window.show_9972147 !== 'function') reject("Script 9972147 Missing");
+                        window.show_9972147().then(() => { alert('You have seen an ad!'); resolve(); }).catch(reject);
                     }
                 } catch(e) { reject(e); }
             });
@@ -1356,9 +1370,10 @@
             safeListen('zone2-btn', 'click', handleZone2Ad);
             safeListen('convert-trigger', 'click', handleCoinConversion);
             
-            // RUPEES BUTTONS (2 TASKS)
+            // RUPEES BUTTONS (3 TASKS)
             safeListen('rupee-ad-btn-1', 'click', () => handleRupeeAdWatch(1, "int-18902"));
             safeListen('rupee-ad-btn-2', 'click', () => handleRupeeAdWatch(2, "int-18930"));
+            safeListen('rupee-ad-btn-3', 'click', () => handleRupeeAdWatch(3, "int-18957")); // NEW LISTENER
 
             const ldr = document.getElementById('loader');
             if(ldr) ldr.style.display = 'none';
@@ -1424,12 +1439,15 @@
                     userData = userSnap.data();
                     let needsUpdate = false;
                     
-                    // Defaults for existing users (TASK 1 & 2)
                     if (typeof userData.rupeeAdCount1 === 'undefined') { userData.rupeeAdCount1 = 0; needsUpdate = true; }
                     if (typeof userData.rupeeCooldown1 === 'undefined') { userData.rupeeCooldown1 = null; needsUpdate = true; }
                     
                     if (typeof userData.rupeeAdCount2 === 'undefined') { userData.rupeeAdCount2 = 0; needsUpdate = true; }
                     if (typeof userData.rupeeCooldown2 === 'undefined') { userData.rupeeCooldown2 = null; needsUpdate = true; }
+
+                    // NEW: Defaults for Task 3
+                    if (typeof userData.rupeeAdCount3 === 'undefined') { userData.rupeeAdCount3 = 0; needsUpdate = true; }
+                    if (typeof userData.rupeeCooldown3 === 'undefined') { userData.rupeeCooldown3 = null; needsUpdate = true; }
                     
                     if (typeof userData.adZone1Count === 'undefined') { userData.adZone1Count = 0; needsUpdate = true; }
                     if (typeof userData.adZone1Cooldown === 'undefined') { userData.adZone1Cooldown = null; needsUpdate = true; }
@@ -1447,6 +1465,7 @@
                         await updateDoc(userRef, {
                             rupeeAdCount1: userData.rupeeAdCount1, rupeeCooldown1: userData.rupeeCooldown1,
                             rupeeAdCount2: userData.rupeeAdCount2, rupeeCooldown2: userData.rupeeCooldown2,
+                            rupeeAdCount3: userData.rupeeAdCount3, rupeeCooldown3: userData.rupeeCooldown3, // NEW
                             adZone1Count: userData.adZone1Count, adZone1Cooldown: userData.adZone1Cooldown,
                             adZone2Count: userData.adZone2Count, adZone2Cooldown: userData.adZone2Cooldown,
                             walletBalance: userData.walletBalance,
@@ -1466,6 +1485,7 @@
                         
                         rupeeAdCount1: 0, rupeeCooldown1: null,
                         rupeeAdCount2: 0, rupeeCooldown2: null,
+                        rupeeAdCount3: 0, rupeeCooldown3: null, // NEW
 
                         adZone1Count: 0, adZone1Cooldown: null, adZone2Count: 0, adZone2Cooldown: null, walletBalance: 0 
                     };
@@ -1487,9 +1507,13 @@
                 
                 if(!appConfig.rupeeReqAds2) appConfig.rupeeReqAds2 = 10;
                 if(!appConfig.rupeeReward2) appConfig.rupeeReward2 = 0.010;
+
+                // NEW: Defaults for Task 3
+                if(!appConfig.rupeeReqAds3) appConfig.rupeeReqAds3 = 10;
+                if(!appConfig.rupeeReward3) appConfig.rupeeReward3 = 0.010;
+                if(appConfig.rupeeCooldownMinutes3 === undefined) appConfig.rupeeCooldownMinutes3 = 2; // Default 2 Minutes
                 
-                // <--- ADMIN COOLDOWN SETTING CHECK --->
-                if(appConfig.rupeeCooldownHours === undefined) appConfig.rupeeCooldownHours = 1; // Default 1 Hour
+                if(appConfig.rupeeCooldownHours === undefined) appConfig.rupeeCooldownHours = 1;
 
                 if(!appConfig.minWithdrawal) appConfig.minWithdrawal = 50;
                 if(!appConfig.paymentMethods) appConfig.paymentMethods = ["UPI", "Paytm"];
@@ -1549,7 +1573,6 @@
             const diamondStatus = document.getElementById('zone2-status');
             if(diamondStatus) diamondStatus.innerText = `Limit: ${ZONE2_LIMIT_COUNT}/${appConfig.diamondCooldown || 3} Hours`;
             
-            // Update Scratch Text
             const req = appConfig.scratchReqAds || 10;
             const cd = appConfig.scratchCooldownHours || 3;
             document.getElementById('scratch-req-text').innerText = req;
@@ -1558,9 +1581,6 @@
             updateDynamicPaymentFields(); updateAdsLeftCount(); updateZoneButtons(); updateRupeeUI();
         }
 
-        // ==========================
-        // NEW: RUPEE PAGE LOGIC (2 TASKS & COOLDOWN)
-        // ==========================
         function updateRupeeUI() {
             if(!userData || !appConfig) return;
             const now = Date.now();
@@ -1581,21 +1601,17 @@
             const timer1 = document.getElementById('rupee-timer-1');
 
             if (cd1 > now) {
-                // In Cooldown
                 btn1.disabled = true;
                 btn1.classList.add('bg-gray-600', 'cursor-not-allowed');
                 btn1.classList.remove('bg-green-600', 'hover:bg-green-500');
                 btn1.innerText = "Task 1 Locked";
-                
                 timer1.classList.remove('hidden');
                 timer1.innerText = "Wait: " + formatTime(cd1 - now);
             } else {
-                // Active
                 if(current1 >= target1 && cd1 < now && cd1 !== 0) { 
                     userData.rupeeAdCount1 = 0; 
                     userData.rupeeCooldown1 = null; 
                 }
-                
                 btn1.disabled = false;
                 btn1.classList.remove('bg-gray-600', 'cursor-not-allowed');
                 btn1.classList.add('bg-green-600', 'hover:bg-green-500');
@@ -1619,27 +1635,58 @@
             const timer2 = document.getElementById('rupee-timer-2');
 
             if (cd2 > now) {
-                // In Cooldown
                 btn2.disabled = true;
                 btn2.classList.add('bg-gray-600', 'cursor-not-allowed');
                 btn2.classList.remove('bg-blue-600', 'hover:bg-blue-500');
                 btn2.innerText = "Task 2 Locked";
-                
                 timer2.classList.remove('hidden');
                 timer2.innerText = "Wait: " + formatTime(cd2 - now);
             } else {
-                 // Active
                 if(current2 >= target2 && cd2 < now && cd2 !== 0) { 
                     userData.rupeeAdCount2 = 0; 
                     userData.rupeeCooldown2 = null; 
                 }
-
                 btn2.disabled = false;
                 btn2.classList.remove('bg-gray-600', 'cursor-not-allowed');
                 btn2.classList.add('bg-blue-600', 'hover:bg-blue-500');
                 btn2.innerHTML = `<i data-lucide="play-circle" class="w-5 h-5 mr-2"></i> Watch Ad`;
                 timer2.classList.add('hidden');
             }
+
+            // --- TASK 3 (NEW) ---
+            const target3 = appConfig.rupeeReqAds3 || 10;
+            const current3 = userData.rupeeAdCount3 || 0;
+            const reward3 = appConfig.rupeeReward3 || 0.010;
+            let cd3 = userData.rupeeCooldown3 ? userData.rupeeCooldown3.toDate().getTime() : 0;
+            
+            setText('rupee-ads-count-3', current3);
+            setText('rupee-ads-target-3', target3);
+            setText('rupee-task-reward-3', reward3.toFixed(3));
+            const bar3 = document.getElementById('rupee-progress-bar-3');
+            if(bar3) bar3.style.width = Math.min(100, (current3 / target3) * 100) + "%";
+            
+            const btn3 = document.getElementById('rupee-ad-btn-3');
+            const timer3 = document.getElementById('rupee-timer-3');
+
+            if (cd3 > now) {
+                btn3.disabled = true;
+                btn3.classList.add('bg-gray-600', 'cursor-not-allowed');
+                btn3.classList.remove('bg-purple-600', 'hover:bg-purple-500');
+                btn3.innerText = "Task 3 Locked";
+                timer3.classList.remove('hidden');
+                timer3.innerText = "Wait: " + formatTime(cd3 - now);
+            } else {
+                if(current3 >= target3 && cd3 < now && cd3 !== 0) { 
+                    userData.rupeeAdCount3 = 0; 
+                    userData.rupeeCooldown3 = null; 
+                }
+                btn3.disabled = false;
+                btn3.classList.remove('bg-gray-600', 'cursor-not-allowed');
+                btn3.classList.add('bg-purple-600', 'hover:bg-purple-500');
+                btn3.innerHTML = `<i data-lucide="play-circle" class="w-5 h-5 mr-2"></i> Watch Ad`;
+                timer3.classList.add('hidden');
+            }
+
             lucide.createIcons();
         }
 
@@ -1648,10 +1695,13 @@
             
             // Check Cooldown again
             const now = Date.now();
-            let cd = taskNum === 1 ? (userData.rupeeCooldown1?.toDate().getTime() || 0) : (userData.rupeeCooldown2?.toDate().getTime() || 0);
+            let cd = 0;
+            if(taskNum === 1) cd = userData.rupeeCooldown1?.toDate().getTime() || 0;
+            if(taskNum === 2) cd = userData.rupeeCooldown2?.toDate().getTime() || 0;
+            if(taskNum === 3) cd = userData.rupeeCooldown3?.toDate().getTime() || 0;
+
             if (cd > now) return showAlert("Please wait for cooldown.");
 
-            // AdsGram Init
             const AdController = window.Adsgram.init({ blockId: blockId });
 
             btn.disabled = true;
@@ -1660,45 +1710,52 @@
             AdController.show().then(async (result) => {
                 const userRef = doc(db, "users", currentUser.uid);
                 
-                const target = taskNum === 1 ? (appConfig.rupeeReqAds1 || 10) : (appConfig.rupeeReqAds2 || 10);
-                const reward = taskNum === 1 ? (appConfig.rupeeReward1 || 0.010) : (appConfig.rupeeReward2 || 0.010);
-                const currentCount = taskNum === 1 ? (userData.rupeeAdCount1 || 0) : (userData.rupeeAdCount2 || 0);
+                let target = 10, reward = 0.010, currentCount = 0;
+                
+                if(taskNum === 1) { target = appConfig.rupeeReqAds1 || 10; reward = appConfig.rupeeReward1 || 0.010; currentCount = userData.rupeeAdCount1 || 0; }
+                if(taskNum === 2) { target = appConfig.rupeeReqAds2 || 10; reward = appConfig.rupeeReward2 || 0.010; currentCount = userData.rupeeAdCount2 || 0; }
+                if(taskNum === 3) { target = appConfig.rupeeReqAds3 || 10; reward = appConfig.rupeeReward3 || 0.010; currentCount = userData.rupeeAdCount3 || 0; }
                 
                 let newCount = currentCount + 1;
                 let updates = {};
 
                 if(newCount >= target) {
-                    // Task Completed -> Add Money, Reset Count, Set Cooldown
-                    
-                    // <--- THIS VARIABLE IS CONTROLLED BY ADMIN PANEL --->
-                    const cooldownHours = appConfig.rupeeCooldownHours || 1; 
-                    const cooldownTime = new Date(Date.now() + (cooldownHours * 60 * 60 * 1000));
-                    
                     updates.walletBalance = increment(reward);
                     userData.walletBalance += reward;
 
-                    if(taskNum === 1) {
-                        updates.rupeeAdCount1 = 0;
-                        updates.rupeeCooldown1 = cooldownTime;
-                        userData.rupeeAdCount1 = 0;
-                        userData.rupeeCooldown1 = { toDate: () => cooldownTime };
+                    if(taskNum === 3) {
+                         // MINUTE BASED COOLDOWN FOR TASK 3
+                         const cooldownMinutes = appConfig.rupeeCooldownMinutes3 || 2; 
+                         const cooldownTime = new Date(Date.now() + (cooldownMinutes * 60 * 1000));
+                         
+                         updates.rupeeAdCount3 = 0;
+                         updates.rupeeCooldown3 = cooldownTime;
+                         userData.rupeeAdCount3 = 0;
+                         userData.rupeeCooldown3 = { toDate: () => cooldownTime };
+
                     } else {
-                        updates.rupeeAdCount2 = 0;
-                        updates.rupeeCooldown2 = cooldownTime;
-                        userData.rupeeAdCount2 = 0;
-                        userData.rupeeCooldown2 = { toDate: () => cooldownTime };
+                         // HOUR BASED COOLDOWN FOR TASK 1 & 2
+                         const cooldownHours = appConfig.rupeeCooldownHours || 1; 
+                         const cooldownTime = new Date(Date.now() + (cooldownHours * 60 * 60 * 1000));
+                         
+                         if(taskNum === 1) {
+                            updates.rupeeAdCount1 = 0;
+                            updates.rupeeCooldown1 = cooldownTime;
+                            userData.rupeeAdCount1 = 0;
+                            userData.rupeeCooldown1 = { toDate: () => cooldownTime };
+                         } else {
+                            updates.rupeeAdCount2 = 0;
+                            updates.rupeeCooldown2 = cooldownTime;
+                            userData.rupeeAdCount2 = 0;
+                            userData.rupeeCooldown2 = { toDate: () => cooldownTime };
+                         }
                     }
                     
                     showAlert(`🎉 Task ${taskNum} Complete! ₹${reward.toFixed(3)} added. Cooldown started.`);
                 } else {
-                    // Increment
-                    if(taskNum === 1) {
-                        updates.rupeeAdCount1 = newCount;
-                        userData.rupeeAdCount1 = newCount;
-                    } else {
-                        updates.rupeeAdCount2 = newCount;
-                        userData.rupeeAdCount2 = newCount;
-                    }
+                    if(taskNum === 1) { updates.rupeeAdCount1 = newCount; userData.rupeeAdCount1 = newCount; }
+                    if(taskNum === 2) { updates.rupeeAdCount2 = newCount; userData.rupeeAdCount2 = newCount; }
+                    if(taskNum === 3) { updates.rupeeAdCount3 = newCount; userData.rupeeAdCount3 = newCount; }
                 }
 
                 await updateDoc(userRef, updates);
@@ -1946,9 +2003,13 @@
              let zone1ResetTime = userData.adZone1Cooldown ? userData.adZone1Cooldown.toDate().getTime() : 0;
              if (zone1ResetTime > 0 && now > zone1ResetTime) { const userRef = doc(db, "users", currentUser.uid); await updateDoc(userRef, { adZone1Count: 0, adZone1Cooldown: null }); userData.adZone1Count = 0; userData.adZone1Cooldown = null; }
              if (userData.adZone1Count >= ZONE1_LIMIT_COUNT) return showAlert("Limit reached. Please wait for cooldown.");
-             if (typeof window.show_9972147 !== 'function') return showAlert("Ad load fail.");
+             
+             // NEW AD CODE (10283653)
+             if (typeof window.show_10283653 !== 'function') return showAlert("Ad load fail. Script Missing");
              const btn = document.getElementById('zone1-btn'); if(btn) btn.disabled = true;
-             window.show_9972147('pop').then(async () => {
+             
+             window.show_10283653().then(async () => {
+                 alert('You have seen an ad!');
                  const userRef = doc(db, "users", currentUser.uid);
                  let newCount = (userData.adZone1Count || 0) + 1;
                  let updates = { balance: increment(reward), adZone1Count: newCount };
@@ -1965,9 +2026,13 @@
              let zone2ResetTime = userData.adZone2Cooldown ? userData.adZone2Cooldown.toDate().getTime() : 0;
              if (zone2ResetTime > 0 && now > zone2ResetTime) { const userRef = doc(db, "users", currentUser.uid); await updateDoc(userRef, { adZone2Count: 0, adZone2Cooldown: null }); userData.adZone2Count = 0; userData.adZone2Cooldown = null; }
              if (userData.adZone2Count >= ZONE2_LIMIT_COUNT) return showAlert("Limit reached. Please wait for cooldown.");
-             if (typeof window.show_9966888 !== 'function') return showAlert("Ad load fail.");
+             
+             // NEW AD CODE (9972147)
+             if (typeof window.show_9972147 !== 'function') return showAlert("Ad load fail. Script Missing");
              const btn = document.getElementById('zone2-btn'); if(btn) btn.disabled = true;
-             window.show_9966888('pop').then(async () => {
+             
+             window.show_9972147().then(async () => {
+                 alert('You have seen an ad!');
                  const userRef = doc(db, "users", currentUser.uid);
                  let newCount = (userData.adZone2Count || 0) + 1;
                  let updates = { balance: increment(reward), adZone2Count: newCount };
@@ -2131,8 +2196,12 @@
         async function handleMiningAdWatch() {
             const now = Date.now(); let cooldownTime = userData.miningCooldown ? userData.miningCooldown.toDate().getTime() : 0; if (cooldownTime > now) return showAlert("Please wait for cooldown.");
             const btn = document.getElementById('mining-start-btn'); if(btn) { btn.disabled = true; btn.innerText = "Loading Ad..."; }
-            if (typeof window.show_10283653 !== 'function') { if(btn) btn.disabled = false; return showAlert("Ad script not loaded. Check internet."); }
-            window.show_10283653('pop').then(async () => {
+            
+            // NEW AD CODE (10284251)
+            if (typeof window.show_10284251 !== 'function') { if(btn) btn.disabled = false; return showAlert("Ad script not loaded. Check internet."); }
+            
+            window.show_10284251().then(async () => {
+                alert('You have seen an ad!');
                 const userRef = doc(db, "users", currentUser.uid); const targetAds = appConfig.miningReqAds || 15; const reward = appConfig.miningReward || 8000; const cooldownHours = appConfig.miningCooldownHours || 5;
                 let newCount = (userData.miningAdsCount || 0) + 1; userData.miningAdsCount = newCount;
                 if (newCount >= targetAds) {
