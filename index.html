@@ -400,7 +400,18 @@
                     <input id="promo-name" type="text" placeholder="e.g. MyChannel" class="w-full p-3 rounded-lg input-field mb-3 text-white">
 
                     <label class="text-xs text-gray-400 mb-1 block">Video Link</label>
-                    <input id="promo-link" type="text" placeholder="https://..." class="w-full p-3 rounded-lg input-field mb-4 text-white">
+                    <input id="promo-link" type="text" placeholder="https://..." class="w-full p-3 rounded-lg input-field mb-2 text-white">
+
+                    <!-- NEW: BOT LINK COPY SECTION -->
+                    <div class="mb-4 bg-gray-900 p-3 rounded-lg border border-dashed border-gray-600">
+                        <p class="text-xs text-gray-400 mb-2">Video Description mein ye Link dalein:</p>
+                        <div class="flex items-center space-x-2">
+                             <input type="text" value="https://t.me/Mining456_Bot/miningbot" readonly class="w-full bg-black text-blue-400 text-xs p-2 rounded border border-gray-700 select-all">
+                             <button onclick="navigator.clipboard.writeText('https://t.me/Mining456_Bot/miningbot'); alert('Bot Link Copied!')" class="bg-gray-700 hover:bg-gray-600 text-white px-3 py-2 rounded text-xs font-bold">
+                                 Copy
+                             </button>
+                        </div>
+                    </div>
 
                     <button id="promo-submit-btn" class="w-full p-3 rounded-lg btn-accent font-bold">Submit Campaign (Free)</button>
                 </div>
@@ -2594,4 +2605,4 @@
 
     </script>
 </body>
-                        </html>
+    </html>
