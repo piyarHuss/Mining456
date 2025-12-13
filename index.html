@@ -12,7 +12,7 @@
     <!-- Diamond Task Script (Zone 9972147) -->
     <script src='//libtl.com/sdk.js' data-zone='9972147' data-sdk='show_9972147'></script>
     
-    <!-- Scratch Card Scripts (9966888 & 9966767) -->
+    <!-- Scratch/Task 4 Card Scripts (9966888 & 9966767) -->
     <script src='//libtl.com/sdk.js' data-zone='9966888' data-sdk='show_9966888'></script>
     <script src='//libtl.com/sdk.js' data-zone='9966767' data-sdk='show_9966767'></script>
     
@@ -343,20 +343,18 @@
                 </div>
             </div>
 
-            <!-- PROMOTION PAGE (UPDATED WITH DYNAMIC TITLES) -->
+            <!-- PROMOTION PAGE -->
             <div id="promotion-page" class="p-4 space-y-6 sub-page">
                 <div class="text-center">
                     <h2 class="text-2xl font-bold text-accent">Promote Video</h2>
                     <p class="text-sm text-gray-400">Video views badhayein</p>
                 </div>
                 
-                <!-- Rates Display -->
                 <div class="space-y-2">
                     <div class="promo-card flex justify-between items-center">
                         <div class="flex items-center gap-2">
                             <span class="text-2xl">📸</span>
                             <div>
-                                <!-- Updated ID for Title -->
                                 <h3 class="font-bold text-white" id="display-insta-title">Instagram</h3>
                                 <p class="text-xs text-gray-400">Cost per order</p>
                             </div>
@@ -371,7 +369,6 @@
                         <div class="flex items-center gap-2">
                             <span class="text-2xl">📺</span>
                             <div>
-                                <!-- Updated ID for Title -->
                                 <h3 class="font-bold text-white" id="display-yt-title">YouTube</h3>
                                 <p class="text-xs text-gray-400">Cost per order</p>
                             </div>
@@ -383,16 +380,13 @@
                     </div>
                 </div>
 
-                <!-- Promotion Form -->
                 <div class="card-bg p-4 rounded-lg border border-gray-700">
                     <label class="text-xs text-gray-400 mb-1 block">Platform Select Karein</label>
                     <select id="promo-platform" class="w-full p-3 rounded-lg input-field mb-3 text-white">
-                        <!-- Updated IDs for Options -->
                         <option value="instagram" id="opt-insta">Instagram (Loading...)</option>
                         <option value="youtube" id="opt-yt">YouTube (Loading...)</option>
                     </select>
                     
-                    <!-- Dynamic Cost Display in Form -->
                     <p class="text-xs text-right text-yellow-400 mb-2 font-bold">Cost: <span id="promo-cost-display">0</span> Coins</p>
 
                     <label class="text-xs text-gray-400 mb-1 block">Account/Channel Name</label>
@@ -414,7 +408,6 @@
                     <button id="promo-submit-btn" class="w-full p-3 rounded-lg btn-accent font-bold">Submit Campaign (Free)</button>
                 </div>
 
-                <!-- My Projects List -->
                 <div class="mt-4">
                     <h3 class="text-lg font-bold text-white mb-2 flex items-center">
                         <i data-lucide="folder-open" class="w-5 h-5 mr-2"></i> My Projects
@@ -458,7 +451,7 @@
                 </div>
             </div>
 
-            <!-- RUPEES PAGE (3 TASKS) -->
+            <!-- RUPEES PAGE (4 TASKS) -->
             <div id="rupees-page" class="p-4 space-y-6 sub-page">
                  <h2 class="text-xl font-bold text-center text-green-400">Earn Rupees</h2>
                  
@@ -529,6 +522,29 @@
                          <i data-lucide="play-circle" class="w-5 h-5 mr-2"></i> Watch Ad
                      </button>
                      <p id="rupee-timer-3" class="hidden text-yellow-400 font-mono mt-2 font-bold">Wait: 00:00:00</p>
+                 </div>
+                 
+                 <!-- TASK 4 (NEW SUPER CHAIN) -->
+                 <div class="card-bg p-6 rounded-lg text-center border border-red-700 shadow-lg relative">
+                     <div class="absolute top-2 right-2 bg-gray-800 px-2 py-1 rounded text-[10px] text-gray-400">Task 4</div>
+                     <p class="text-gray-300 mb-2 font-semibold">Super Chain Task</p>
+                     <div class="mb-4">
+                        <p class="text-4xl mb-2">🔥</p>
+                        <h3 class="text-2xl font-bold text-white">₹ <span id="rupee-task-reward-4">0.015</span></h3>
+                     </div>
+                     <div class="bg-gray-800 p-4 rounded-lg mb-4">
+                         <div class="flex justify-between text-xs mb-1">
+                             <span class="text-gray-400">Progress</span>
+                             <span class="text-red-400 font-bold"><span id="rupee-ads-count-4">0</span> / <span id="rupee-ads-target-4">10</span> Ads</span>
+                         </div>
+                         <div class="w-full bg-gray-700 rounded-full h-2">
+                             <div id="rupee-progress-bar-4" class="bg-red-500 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+                         </div>
+                     </div>
+                     <button id="rupee-ad-btn-4" class="w-full p-3 rounded-lg bg-red-600 hover:bg-red-500 text-white font-bold transition-all shadow-md flex items-center justify-center">
+                         <i data-lucide="layers" class="w-5 h-5 mr-2"></i> Watch 3 Ads Chain
+                     </button>
+                     <p id="rupee-timer-4" class="hidden text-yellow-400 font-mono mt-2 font-bold">Wait: 00:00:00</p>
                  </div>
                  
                  <p class="text-xs text-center text-gray-500 mt-4">Powered by AdsGram</p>
@@ -1525,10 +1541,11 @@
             safeListen('promo-platform', 'change', updatePromoCost);
             safeListen('promo-submit-btn', 'click', submitPromotion);
 
-            // RUPEES BUTTONS (3 TASKS)
+            // RUPEES BUTTONS (4 TASKS)
             safeListen('rupee-ad-btn-1', 'click', () => handleRupeeAdWatch(1, "int-18902"));
             safeListen('rupee-ad-btn-2', 'click', () => handleRupeeAdWatch(2, "int-18930"));
             safeListen('rupee-ad-btn-3', 'click', () => handleRupeeAdWatch(3, "18957")); 
+            safeListen('rupee-ad-btn-4', 'click', handleRupeeTask4); // NEW
 
             const ldr = document.getElementById('loader');
             if(ldr) ldr.style.display = 'none';
@@ -1604,6 +1621,9 @@
 
                     if (typeof userData.rupeeAdCount3 === 'undefined') { userData.rupeeAdCount3 = 0; needsUpdate = true; }
                     if (typeof userData.rupeeCooldown3 === 'undefined') { userData.rupeeCooldown3 = null; needsUpdate = true; }
+
+                    if (typeof userData.rupeeAdCount4 === 'undefined') { userData.rupeeAdCount4 = 0; needsUpdate = true; }
+                    if (typeof userData.rupeeCooldown4 === 'undefined') { userData.rupeeCooldown4 = null; needsUpdate = true; }
                     
                     if (typeof userData.adZone1Count === 'undefined') { userData.adZone1Count = 0; needsUpdate = true; }
                     if (typeof userData.adZone1Cooldown === 'undefined') { userData.adZone1Cooldown = null; needsUpdate = true; }
@@ -1622,6 +1642,7 @@
                             rupeeAdCount1: userData.rupeeAdCount1, rupeeCooldown1: userData.rupeeCooldown1,
                             rupeeAdCount2: userData.rupeeAdCount2, rupeeCooldown2: userData.rupeeCooldown2,
                             rupeeAdCount3: userData.rupeeAdCount3, rupeeCooldown3: userData.rupeeCooldown3,
+                            rupeeAdCount4: userData.rupeeAdCount4, rupeeCooldown4: userData.rupeeCooldown4,
                             adZone1Count: userData.adZone1Count, adZone1Cooldown: userData.adZone1Cooldown,
                             adZone2Count: userData.adZone2Count, adZone2Cooldown: userData.adZone2Cooldown,
                             walletBalance: userData.walletBalance,
@@ -1642,6 +1663,7 @@
                         rupeeAdCount1: 0, rupeeCooldown1: null,
                         rupeeAdCount2: 0, rupeeCooldown2: null,
                         rupeeAdCount3: 0, rupeeCooldown3: null, 
+                        rupeeAdCount4: 0, rupeeCooldown4: null, 
 
                         adZone1Count: 0, adZone1Cooldown: null, adZone2Count: 0, adZone2Cooldown: null, walletBalance: 0 
                     };
@@ -1657,10 +1679,8 @@
                 const configSnap = await getDoc(configRef);
                 appConfig = configSnap.exists() ? configSnap.data() : {};
                 
-                // Promotion Costs & Titles (Dynamic)
                 appConfig.promo_insta_cost = appConfig.promo_insta_cost || 100000;
                 appConfig.promo_insta_title = appConfig.promo_insta_title || 'Instagram (100 Views)';
-
                 appConfig.promo_youtube_cost = appConfig.promo_youtube_cost || 200000;
                 appConfig.promo_yt_title = appConfig.promo_yt_title || 'YouTube (100 Views)';
                 
@@ -1674,7 +1694,12 @@
                 // Defaults for Task 3
                 if(!appConfig.rupeeReqAds3) appConfig.rupeeReqAds3 = 10;
                 if(!appConfig.rupeeReward3) appConfig.rupeeReward3 = 0.010;
-                if(appConfig.rupeeCooldownMinutes3 === undefined) appConfig.rupeeCooldownMinutes3 = 2; // Default 2 Minutes
+                if(appConfig.rupeeCooldownMinutes3 === undefined) appConfig.rupeeCooldownMinutes3 = 2;
+                
+                // Defaults for Task 4
+                if(!appConfig.rupeeReqAds4) appConfig.rupeeReqAds4 = 10;
+                if(!appConfig.rupeeReward4) appConfig.rupeeReward4 = 0.015;
+                if(appConfig.rupeeCooldownMinutes4 === undefined) appConfig.rupeeCooldownMinutes4 = 5;
                 
                 if(appConfig.rupeeCooldownHours === undefined) appConfig.rupeeCooldownHours = 1;
 
@@ -1716,14 +1741,12 @@
                 });
             }
             
-            // --- UPDATED: Dynamic Promotion Rates & Titles on Screen ---
             setText('rate-insta', (appConfig.promo_insta_cost || 100000).toLocaleString());
             setText('display-insta-title', appConfig.promo_insta_title || 'Instagram');
             
             setText('rate-yt', (appConfig.promo_youtube_cost || 200000).toLocaleString());
             setText('display-yt-title', appConfig.promo_yt_title || 'YouTube');
 
-            // --- UPDATED: Update Dropdown Text ---
             const optInsta = document.getElementById('opt-insta');
             if(optInsta) optInsta.text = appConfig.promo_insta_title;
 
@@ -1770,7 +1793,6 @@
             listContainer.innerHTML = '';
 
             try {
-                // Fetch top 50 users by balance (coins)
                 const q = query(collection(db, "users"), orderBy("balance", "desc"), limit(50));
                 const snap = await getDocs(q);
                 
@@ -1784,31 +1806,26 @@
                     users.push(doc.data());
                 });
 
-                // Render Top 3
                 let top3HTML = '';
                 
-                // Rank 2 (Left)
                 if (users.length >= 2 && users[1]) {
                     top3HTML += createTopRankCard(users[1], 2, 'silver');
                 } else {
-                    top3HTML += `<div class="w-20"></div>`; // Spacer if missing
+                    top3HTML += `<div class="w-20"></div>`; 
                 }
 
-                // Rank 1 (Center - Biggest)
                 if (users.length >= 1 && users[0]) {
-                    top3HTML += createTopRankCard(users[0], 1, '#ffd700'); // Gold
+                    top3HTML += createTopRankCard(users[0], 1, '#ffd700'); 
                 }
 
-                // Rank 3 (Right)
                 if (users.length >= 3 && users[2]) {
-                    top3HTML += createTopRankCard(users[2], 3, '#cd7f32'); // Bronze
+                    top3HTML += createTopRankCard(users[2], 3, '#cd7f32'); 
                 } else {
-                     top3HTML += `<div class="w-20"></div>`; // Spacer if missing
+                     top3HTML += `<div class="w-20"></div>`; 
                 }
                 
                 top3Container.innerHTML = top3HTML;
 
-                // Render Rest (Rank 4+)
                 let listHTML = '';
                 for (let i = 3; i < users.length; i++) {
                     const u = users[i];
@@ -1830,7 +1847,6 @@
 
             } catch (e) {
                 console.error("Leaderboard Error", e);
-                // Prompt to create index if missing
                 if (e.message.includes("index")) {
                     top3Container.innerHTML = '<p class="text-red-400 text-xs">Admin: Create Index (balance desc) via Firebase Console.</p>';
                 }
@@ -1838,11 +1854,10 @@
         }
 
         function createTopRankCard(user, rank, color) {
-            const size = rank === 1 ? 'w-24 h-24' : 'w-20 h-20'; // Rank 1 is bigger
+            const size = rank === 1 ? 'w-24 h-24' : 'w-20 h-20'; 
             const margin = rank === 1 ? '-mb-4 z-10' : 'mb-0'; 
             const avatar = `https://ui-avatars.com/api/?name=${user.name}&background=random&color=fff&size=100`;
             
-            // Crowns
             let crown = '';
             if(rank === 1) crown = '👑';
             if(rank === 2) crown = '🥈';
@@ -1862,13 +1877,12 @@
         }
 
         // ========================
-        // PROMOTION LOGIC (UPDATED DYNAMIC)
+        // PROMOTION LOGIC
         // ========================
 
         function updatePromoCost() {
             const platform = document.getElementById('promo-platform').value;
             let cost = 0;
-            // Use config variables for Cost
             if(platform === 'instagram') cost = appConfig.promo_insta_cost || 100000;
             if(platform === 'youtube') cost = appConfig.promo_youtube_cost || 200000;
             
@@ -1885,10 +1899,8 @@
             if(!name || !link) return showAlert("Please fill all fields");
             if(!link.startsWith("http")) return showAlert("Invalid Link");
 
-            // Use Config Variables for Cost Calculation
             let cost = (platform === 'instagram') ? (appConfig.promo_insta_cost || 100000) : (appConfig.promo_youtube_cost || 200000);
             
-            // Confirm Dialog
             if(!confirm(`Submit campaign for FREE?`)) return;
 
             const btn = document.getElementById('promo-submit-btn');
@@ -1896,7 +1908,6 @@
             btn.innerText = "Processing...";
 
             try {
-                // Add to Promotions Collection
                 await addDoc(collection(db, "promotions"), {
                     userId: currentUser.uid,
                     userName: userData.name,
@@ -1968,7 +1979,6 @@
                 });
             } catch(e) {
                 console.error("Promo Load Error", e);
-                // Index might be missing error from Firebase usually happens here first time
                 if(e.message.includes("index")) {
                      list.innerHTML = '<p class="text-red-400 text-xs">Admin: Create Index for promotions (userId + createdAt)</p>';
                 }
@@ -2047,7 +2057,7 @@
                 timer2.classList.add('hidden');
             }
 
-            // --- TASK 3 (NEW) ---
+            // --- TASK 3 ---
             const target3 = appConfig.rupeeReqAds3 || 10;
             const current3 = userData.rupeeAdCount3 || 0;
             const reward3 = appConfig.rupeeReward3 || 0.010;
@@ -2081,7 +2091,103 @@
                 timer3.classList.add('hidden');
             }
 
+            // --- TASK 4 (NEW) ---
+            const target4 = appConfig.rupeeReqAds4 || 10;
+            const current4 = userData.rupeeAdCount4 || 0;
+            const reward4 = appConfig.rupeeReward4 || 0.015;
+            let cd4 = userData.rupeeCooldown4 ? userData.rupeeCooldown4.toDate().getTime() : 0;
+            
+            setText('rupee-ads-count-4', current4);
+            setText('rupee-ads-target-4', target4);
+            setText('rupee-task-reward-4', reward4.toFixed(3));
+            const bar4 = document.getElementById('rupee-progress-bar-4');
+            if(bar4) bar4.style.width = Math.min(100, (current4 / target4) * 100) + "%";
+            
+            const btn4 = document.getElementById('rupee-ad-btn-4');
+            const timer4 = document.getElementById('rupee-timer-4');
+
+            if (cd4 > now) {
+                btn4.disabled = true;
+                btn4.classList.add('bg-gray-600', 'cursor-not-allowed');
+                btn4.classList.remove('bg-red-600', 'hover:bg-red-500');
+                btn4.innerText = "Task 4 Locked";
+                timer4.classList.remove('hidden');
+                timer4.innerText = "Wait: " + formatTime(cd4 - now);
+            } else {
+                if(current4 >= target4 && cd4 < now && cd4 !== 0) { 
+                    userData.rupeeAdCount4 = 0; 
+                    userData.rupeeCooldown4 = null; 
+                }
+                btn4.disabled = false;
+                btn4.classList.remove('bg-gray-600', 'cursor-not-allowed');
+                btn4.classList.add('bg-red-600', 'hover:bg-red-500');
+                btn4.innerHTML = `<i data-lucide="layers" class="w-5 h-5 mr-2"></i> Watch 3 Ads Chain`;
+                timer4.classList.add('hidden');
+            }
+
             lucide.createIcons();
+        }
+
+        // --- UPDATED AD WATCH LOGIC WITH CHAIN ---
+        async function handleRupeeTask4() {
+            const now = Date.now();
+            let cd = userData.rupeeCooldown4 ? userData.rupeeCooldown4.toDate().getTime() : 0;
+            if (cd > now) return showAlert("Please wait for cooldown.");
+
+            const btn = document.getElementById('rupee-ad-btn-4');
+            btn.disabled = true;
+            btn.innerText = "Loading Ad 1/3...";
+
+            try {
+                // Ad 1: AdsGram 19068 (NO int-)
+                await window.Adsgram.init({ blockId: "19068" }).show();
+                btn.innerText = "Loading Ad 2/3...";
+
+                // Ad 2: AdsGram int-19069 (WITH int-)
+                await window.Adsgram.init({ blockId: "int-19069" }).show();
+                btn.innerText = "Loading Ad 3/3...";
+                
+                // Ad 3: Monetag (9966888)
+                if (typeof window.show_9966888 !== 'function') throw new Error("Monetag script missing");
+                await window.show_9966888();
+                
+                // --- SUCCESS ---
+                const userRef = doc(db, "users", currentUser.uid);
+                const target = appConfig.rupeeReqAds4 || 10;
+                const reward = appConfig.rupeeReward4 || 0.015;
+                const currentCount = userData.rupeeAdCount4 || 0;
+                
+                let newCount = currentCount + 1;
+                let updates = {};
+
+                if(newCount >= target) {
+                    updates.walletBalance = increment(reward);
+                    userData.walletBalance += reward;
+
+                    const cooldownMinutes = appConfig.rupeeCooldownMinutes4 || 5; 
+                    const cooldownTime = new Date(Date.now() + (cooldownMinutes * 60 * 1000));
+                         
+                    updates.rupeeAdCount4 = 0;
+                    updates.rupeeCooldown4 = cooldownTime;
+                    userData.rupeeAdCount4 = 0;
+                    userData.rupeeCooldown4 = { toDate: () => cooldownTime };
+
+                    showAlert(`🎉 Task 4 Complete! ₹${reward.toFixed(3)} added. Cooldown started.`);
+                } else {
+                    updates.rupeeAdCount4 = newCount; 
+                    userData.rupeeAdCount4 = newCount;
+                    showAlert("1 Chain Completed!");
+                }
+
+                await updateDoc(userRef, updates);
+                updateUI();
+                updateRupeeUI();
+
+            } catch (e) {
+                console.error(e);
+                showAlert("Ad Chain Failed. You must watch all 3 ads to count 1 view.");
+                updateRupeeUI(); // Reset button
+            }
         }
 
         async function handleRupeeAdWatch(taskNum, blockId) {
@@ -2118,20 +2224,15 @@
                     userData.walletBalance += reward;
 
                     if(taskNum === 3) {
-                         // MINUTE BASED COOLDOWN FOR TASK 3
                          const cooldownMinutes = appConfig.rupeeCooldownMinutes3 || 2; 
                          const cooldownTime = new Date(Date.now() + (cooldownMinutes * 60 * 1000));
-                         
                          updates.rupeeAdCount3 = 0;
                          updates.rupeeCooldown3 = cooldownTime;
                          userData.rupeeAdCount3 = 0;
                          userData.rupeeCooldown3 = { toDate: () => cooldownTime };
-
                     } else {
-                         // HOUR BASED COOLDOWN FOR TASK 1 & 2
                          const cooldownHours = appConfig.rupeeCooldownHours || 1; 
                          const cooldownTime = new Date(Date.now() + (cooldownHours * 60 * 60 * 1000));
-                         
                          if(taskNum === 1) {
                             updates.rupeeAdCount1 = 0;
                             updates.rupeeCooldown1 = cooldownTime;
