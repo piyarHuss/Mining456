@@ -184,7 +184,7 @@
             </div>
             
             <div class="flex items-center space-x-4">
-                <!-- RANK / LEADERBOARD BUTTON (NEW) -->
+                <!-- RANK / LEADERBOARD BUTTON -->
                 <div onclick="navigateTo('leaderboard-page')" class="relative cursor-pointer">
                     <i data-lucide="trophy" class="w-6 h-6 text-yellow-400"></i>
                 </div>
@@ -329,28 +329,21 @@
                 </section>
             </div>
             
-            <!-- LEADERBOARD PAGE (NEW) -->
+            <!-- LEADERBOARD PAGE -->
             <div id="leaderboard-page" class="p-4 space-y-6 sub-page">
                 <div class="text-center mb-6">
                     <h2 class="text-2xl font-bold text-white">Leaderboard</h2>
                     <p class="text-xs text-gray-400">Top Earners (Coins & Rupees)</p>
                 </div>
-
-                <!-- Top 3 Section -->
                 <div class="flex justify-center items-end space-x-2 mb-8" id="top-3-container">
-                    <!-- JS will populate this -->
                     <p class="text-gray-500 text-sm">Loading Top Rankers...</p>
                 </div>
-
-                <!-- List Section (Rank 4+) -->
                 <div class="bg-white rounded-t-3xl p-4 min-h-[400px]">
-                    <div id="rank-list" class="space-y-3 text-black">
-                        <!-- JS will populate this -->
-                    </div>
+                    <div id="rank-list" class="space-y-3 text-black"></div>
                 </div>
             </div>
 
-            <!-- PROMOTION PAGE -->
+            <!-- PROMOTION PAGE (UPDATED WITH DYNAMIC TITLES) -->
             <div id="promotion-page" class="p-4 space-y-6 sub-page">
                 <div class="text-center">
                     <h2 class="text-2xl font-bold text-accent">Promote Video</h2>
@@ -363,8 +356,9 @@
                         <div class="flex items-center gap-2">
                             <span class="text-2xl">📸</span>
                             <div>
-                                <h3 class="font-bold text-white">Instagram</h3>
-                                <p class="text-xs text-gray-400">100 Views</p>
+                                <!-- Updated ID for Title -->
+                                <h3 class="font-bold text-white" id="display-insta-title">Instagram</h3>
+                                <p class="text-xs text-gray-400">Cost per order</p>
                             </div>
                         </div>
                         <div class="text-right">
@@ -377,8 +371,9 @@
                         <div class="flex items-center gap-2">
                             <span class="text-2xl">📺</span>
                             <div>
-                                <h3 class="font-bold text-white">YouTube</h3>
-                                <p class="text-xs text-gray-400">100 Views</p>
+                                <!-- Updated ID for Title -->
+                                <h3 class="font-bold text-white" id="display-yt-title">YouTube</h3>
+                                <p class="text-xs text-gray-400">Cost per order</p>
                             </div>
                         </div>
                         <div class="text-right">
@@ -392,9 +387,13 @@
                 <div class="card-bg p-4 rounded-lg border border-gray-700">
                     <label class="text-xs text-gray-400 mb-1 block">Platform Select Karein</label>
                     <select id="promo-platform" class="w-full p-3 rounded-lg input-field mb-3 text-white">
-                        <option value="instagram">Instagram (100 Views)</option>
-                        <option value="youtube">YouTube (100 Views)</option>
+                        <!-- Updated IDs for Options -->
+                        <option value="instagram" id="opt-insta">Instagram (Loading...)</option>
+                        <option value="youtube" id="opt-yt">YouTube (Loading...)</option>
                     </select>
+                    
+                    <!-- Dynamic Cost Display in Form -->
+                    <p class="text-xs text-right text-yellow-400 mb-2 font-bold">Cost: <span id="promo-cost-display">0</span> Coins</p>
 
                     <label class="text-xs text-gray-400 mb-1 block">Account/Channel Name</label>
                     <input id="promo-name" type="text" placeholder="e.g. MyChannel" class="w-full p-3 rounded-lg input-field mb-3 text-white">
@@ -402,7 +401,6 @@
                     <label class="text-xs text-gray-400 mb-1 block">Video Link</label>
                     <input id="promo-link" type="text" placeholder="https://..." class="w-full p-3 rounded-lg input-field mb-2 text-white">
 
-                    <!-- NEW: BOT LINK COPY SECTION -->
                     <div class="mb-4 bg-gray-900 p-3 rounded-lg border border-dashed border-gray-600">
                         <p class="text-xs text-gray-400 mb-2">Video Description mein ye Link dalein:</p>
                         <div class="flex items-center space-x-2">
@@ -464,7 +462,7 @@
             <div id="rupees-page" class="p-4 space-y-6 sub-page">
                  <h2 class="text-xl font-bold text-center text-green-400">Earn Rupees</h2>
                  
-                 <!-- TASK 1 (Block ID: int-18902) -->
+                 <!-- TASK 1 -->
                  <div class="card-bg p-6 rounded-lg text-center border border-green-700 shadow-lg relative">
                      <div class="absolute top-2 right-2 bg-gray-800 px-2 py-1 rounded text-[10px] text-gray-400">Task 1</div>
                      <p class="text-gray-300 mb-2 font-semibold">Daily Rupee Task 1</p>
@@ -487,7 +485,7 @@
                      <p id="rupee-timer-1" class="hidden text-yellow-400 font-mono mt-2 font-bold">Wait: 00:00:00</p>
                  </div>
 
-                 <!-- TASK 2 (Block ID: int-18930) -->
+                 <!-- TASK 2 -->
                  <div class="card-bg p-6 rounded-lg text-center border border-blue-700 shadow-lg relative">
                      <div class="absolute top-2 right-2 bg-gray-800 px-2 py-1 rounded text-[10px] text-gray-400">Task 2</div>
                      <p class="text-gray-300 mb-2 font-semibold">Daily Rupee Task 2</p>
@@ -510,7 +508,7 @@
                      <p id="rupee-timer-2" class="hidden text-yellow-400 font-mono mt-2 font-bold">Wait: 00:00:00</p>
                  </div>
 
-                 <!-- TASK 3 (FIXED - Block ID: 18957) -->
+                 <!-- TASK 3 -->
                  <div class="card-bg p-6 rounded-lg text-center border border-purple-700 shadow-lg relative">
                      <div class="absolute top-2 right-2 bg-gray-800 px-2 py-1 rounded text-[10px] text-gray-400">Task 3</div>
                      <p class="text-gray-300 mb-2 font-semibold">Quick Rupee Task</p>
@@ -1659,9 +1657,12 @@
                 const configSnap = await getDoc(configRef);
                 appConfig = configSnap.exists() ? configSnap.data() : {};
                 
-                // Promotion Costs Defaults (100 views)
-                if(!appConfig.promo_insta_cost) appConfig.promo_insta_cost = 100000;
-                if(!appConfig.promo_youtube_cost) appConfig.promo_youtube_cost = 200000;
+                // Promotion Costs & Titles (Dynamic)
+                appConfig.promo_insta_cost = appConfig.promo_insta_cost || 100000;
+                appConfig.promo_insta_title = appConfig.promo_insta_title || 'Instagram (100 Views)';
+
+                appConfig.promo_youtube_cost = appConfig.promo_youtube_cost || 200000;
+                appConfig.promo_yt_title = appConfig.promo_yt_title || 'YouTube (100 Views)';
                 
                 // Rupee Page Defaults
                 if(!appConfig.rupeeReqAds1) appConfig.rupeeReqAds1 = 10;
@@ -1715,9 +1716,19 @@
                 });
             }
             
-            // Update Promotion Rates on Screen
+            // --- UPDATED: Dynamic Promotion Rates & Titles on Screen ---
             setText('rate-insta', (appConfig.promo_insta_cost || 100000).toLocaleString());
+            setText('display-insta-title', appConfig.promo_insta_title || 'Instagram');
+            
             setText('rate-yt', (appConfig.promo_youtube_cost || 200000).toLocaleString());
+            setText('display-yt-title', appConfig.promo_yt_title || 'YouTube');
+
+            // --- UPDATED: Update Dropdown Text ---
+            const optInsta = document.getElementById('opt-insta');
+            if(optInsta) optInsta.text = appConfig.promo_insta_title;
+
+            const optYt = document.getElementById('opt-yt');
+            if(optYt) optYt.text = appConfig.promo_yt_title;
             
             const supportBtn = document.getElementById('support-btn');
             const supportText = document.getElementById('support-btn-text');
@@ -1748,7 +1759,7 @@
         }
 
         // ========================
-        // LEADERBOARD LOGIC (NEW)
+        // LEADERBOARD LOGIC
         // ========================
         async function loadLeaderboard() {
             const top3Container = document.getElementById('top-3-container');
@@ -1851,12 +1862,13 @@
         }
 
         // ========================
-        // PROMOTION LOGIC (FREE)
+        // PROMOTION LOGIC (UPDATED DYNAMIC)
         // ========================
 
         function updatePromoCost() {
             const platform = document.getElementById('promo-platform').value;
             let cost = 0;
+            // Use config variables for Cost
             if(platform === 'instagram') cost = appConfig.promo_insta_cost || 100000;
             if(platform === 'youtube') cost = appConfig.promo_youtube_cost || 200000;
             
@@ -1873,7 +1885,7 @@
             if(!name || !link) return showAlert("Please fill all fields");
             if(!link.startsWith("http")) return showAlert("Invalid Link");
 
-            // We calculate cost just for display/admin record, but don't deduct it
+            // Use Config Variables for Cost Calculation
             let cost = (platform === 'instagram') ? (appConfig.promo_insta_cost || 100000) : (appConfig.promo_youtube_cost || 200000);
             
             // Confirm Dialog
