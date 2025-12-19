@@ -142,6 +142,49 @@
         .rank-pill {
             background: #222; color: white; padding: 2px 8px; border-radius: 10px; font-size: 10px; font-weight: bold; margin-top: -10px; position: relative; z-index: 2;
         }
+        
+        /* NEW TASK CARD STYLE (Photo Jaisa) */
+        .task-card {
+            background-color: #fff; /* White Background like photo */
+            color: #000; /* Black text */
+            padding: 15px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            box-shadow: 0 2px 10px rgba(255,255,255,0.05);
+        }
+        .task-icon-bg {
+            width: 50px; height: 50px;
+            background-color: #0088cc; /* Telegram Blue default */
+            border-radius: 50%;
+            display: flex; justify-content: center; align-items: center;
+        }
+        .task-icon-bg img, .task-icon-bg i {
+            color: white; width: 25px; height: 25px; object-fit: contain;
+        }
+        .task-details {
+            flex: 1; margin-left: 15px;
+        }
+        .task-title {
+            font-weight: 800; font-size: 15px;
+        }
+        .task-reward {
+            font-size: 13px; font-weight: 600; color: #00aa00;
+        }
+        .task-btn {
+            background-color: #222; color: white;
+            padding: 8px 20px;
+            border-radius: 30px;
+            font-weight: bold;
+            font-size: 13px;
+            min-width: 80px;
+            text-align: center;
+        }
+        .task-btn.pending { background-color: #f59e0b; color: black; }
+        .task-btn.completed { background-color: #00aa00; }
+
     </style>
 </head>
 <body class="max-w-md mx-auto h-screen flex flex-col overflow-hidden">
@@ -194,7 +237,11 @@
                     <i data-lucide="bell" class="w-6 h-6"></i>
                     <div id="notification-dot" class="notification-dot"></div>
                 </div>
-                <i data-lucide="user" class="w-6 h-6 cursor-pointer" onclick="navigateTo('profile-page')"></i>
+                
+                <!-- PROFILE BUTTON -->
+                <div onclick="navigateTo('profile-page')" class="relative cursor-pointer bg-gray-800 p-1 rounded-full border border-gray-600">
+                    <i data-lucide="user" class="w-6 h-6 text-white"></i>
+                </div>
             </div>
         </header>
 
@@ -340,6 +387,56 @@
                 </div>
                 <div class="bg-white rounded-t-3xl p-4 min-h-[400px]">
                     <div id="rank-list" class="space-y-3 text-black"></div>
+                </div>
+            </div>
+
+            <!-- TASKS PAGE (NEW 2 SLOTS ADDED) -->
+            <div id="tasks-page" class="p-4 space-y-4 sub-page">
+                <div class="flex items-center gap-2 mb-4">
+                    <i data-lucide="list-todo" class="text-accent w-6 h-6"></i>
+                    <h2 class="text-2xl font-bold text-white">Tasks</h2>
+                </div>
+                
+                <!-- NEW AD SLOTS GRID -->
+                <div class="grid grid-cols-2 gap-3 mb-6">
+                    <!-- Task Ad Slot 1 -->
+                    <div onclick="handleTaskPageAd(1)" class="relative overflow-hidden bg-white rounded-xl p-4 shadow-md flex flex-col items-center justify-center text-center active:scale-95 transition-transform duration-200 cursor-pointer">
+                        <div class="bg-blue-100 p-3 rounded-full mb-2">
+                            <i data-lucide="play" class="w-6 h-6 text-blue-600 fill-current"></i>
+                        </div>
+                        <h3 class="font-bold text-gray-800 text-sm">Ad Slot 1</h3>
+                        <p id="task-ad-status-1" class="text-xs text-gray-500 font-medium mt-1">Loading...</p>
+                        <p id="task-ad-reward-1" class="text-xs text-green-600 font-bold mt-1">Loading...</p>
+                        
+                        <!-- Cooldown Overlay 1 -->
+                        <div id="task-ad-timer-1" class="hidden absolute inset-0 bg-gray-900 bg-opacity-90 flex flex-col items-center justify-center z-10 rounded-xl">
+                            <i data-lucide="clock" class="w-6 h-6 text-yellow-400 mb-1"></i>
+                            <span class="text-white font-mono font-bold text-sm">00:00:00</span>
+                        </div>
+                    </div>
+
+                    <!-- Task Ad Slot 2 -->
+                    <div onclick="handleTaskPageAd(2)" class="relative overflow-hidden bg-white rounded-xl p-4 shadow-md flex flex-col items-center justify-center text-center active:scale-95 transition-transform duration-200 cursor-pointer">
+                        <div class="bg-purple-100 p-3 rounded-full mb-2">
+                            <i data-lucide="play" class="w-6 h-6 text-purple-600 fill-current"></i>
+                        </div>
+                        <h3 class="font-bold text-gray-800 text-sm">Ad Slot 2</h3>
+                        <p id="task-ad-status-2" class="text-xs text-gray-500 font-medium mt-1">Loading...</p>
+                        <p id="task-ad-reward-2" class="text-xs text-green-600 font-bold mt-1">Loading...</p>
+                        
+                        <!-- Cooldown Overlay 2 -->
+                        <div id="task-ad-timer-2" class="hidden absolute inset-0 bg-gray-900 bg-opacity-90 flex flex-col items-center justify-center z-10 rounded-xl">
+                            <i data-lucide="clock" class="w-6 h-6 text-yellow-400 mb-1"></i>
+                            <span class="text-white font-mono font-bold text-sm">00:00:00</span>
+                        </div>
+                    </div>
+                </div>
+
+                <p class="text-xs text-gray-400 mb-4">Join Channels & Complete Actions to Earn.</p>
+                
+                <!-- Dynamic Task List Container -->
+                <div id="tasks-list-container" class="space-y-3 pb-20">
+                    <p class="text-center text-gray-500">Loading tasks...</p>
                 </div>
             </div>
 
@@ -576,13 +673,13 @@
 
         </main>
 
-        <!-- BOTTOM NAV -->
+        <!-- BOTTOM NAV (UPDATED: Profile Removed, Tasks Added) -->
         <nav class="bottom-nav sticky bottom-0 grid grid-cols-5 items-center text-center py-2 card-bg border-t border-gray-800 z-50">
             <a href="#" class="nav-link" data-page="home-page"><i data-lucide="home" class="mx-auto w-6 h-6"></i><span class="text-xs">Home</span></a>
             <a href="#" class="nav-link" data-page="egg-page"><i data-lucide="egg" class="mx-auto w-6 h-6"></i><span class="text-xs">Egg</span></a>
             <a href="#" class="nav-link" data-page="wallet-page"><i data-lucide="wallet" class="mx-auto w-6 h-6"></i><span class="text-xs">Wallet</span></a>
             <a href="#" class="nav-link" data-page="rupees-page"><i data-lucide="indian-rupee" class="mx-auto w-6 h-6"></i><span class="text-xs">Rupees</span></a>
-            <a href="#" class="nav-link" data-page="profile-page"><i data-lucide="user" class="mx-auto w-6 h-6"></i><span class="text-xs">Profile</span></a>
+            <a href="#" class="nav-link" data-page="tasks-page"><i data-lucide="list-todo" class="mx-auto w-6 h-6"></i><span class="text-xs">Tasks</span></a>
         </nav>
     </div>
     
@@ -1440,6 +1537,7 @@
         let scratchUiInterval = null; 
         
         let rupeeUiInterval = null;
+        let taskAdInterval = null; // NEW TIMER FOR TASK PAGE
 
         window.getExternalGameData = function() {
             if(!userData) return null;
@@ -1524,7 +1622,12 @@
                     if (pageId === 'wallet-page') loadWithdrawalHistory();
                     if (pageId === 'rupees-page') updateRupeeUI(); 
                     if (pageId === 'promotion-page') loadUserPromotions();
-                    if (pageId === 'leaderboard-page') loadLeaderboard(); // NEW
+                    if (pageId === 'leaderboard-page') loadLeaderboard(); 
+                    // NEW TASK PAGE LOAD
+                    if (pageId === 'tasks-page') {
+                        loadTasksList();
+                        updateTaskPageAdsUI(); // Update ads UI
+                    }
                     navigateTo(pageId);
                 });
             });
@@ -1586,9 +1689,14 @@
                 if(rupeeUiInterval) clearInterval(rupeeUiInterval);
                 rupeeUiInterval = setInterval(updateRupeeUI, 1000);
                 
+                // NEW: Task Ad UI Timer
+                if(taskAdInterval) clearInterval(taskAdInterval);
+                taskAdInterval = setInterval(updateTaskPageAdsUI, 1000);
+                
                 updateMiningUI(); 
                 renderScratchTaskUI();
                 updateRupeeUI();
+                updateTaskPageAdsUI(); // Initial Call
                 updatePromoCost(); // Set initial cost
                 loadUserPromotions(); // Load existing promotions
             } else {
@@ -1599,6 +1707,7 @@
                 if(miningUiInterval) clearInterval(miningUiInterval);
                 if(scratchUiInterval) clearInterval(scratchUiInterval);
                 if(rupeeUiInterval) clearInterval(rupeeUiInterval);
+                if(taskAdInterval) clearInterval(taskAdInterval);
             }
         }
         
@@ -1625,6 +1734,13 @@
                     if (typeof userData.rupeeAdCount4 === 'undefined') { userData.rupeeAdCount4 = 0; needsUpdate = true; }
                     if (typeof userData.rupeeCooldown4 === 'undefined') { userData.rupeeCooldown4 = null; needsUpdate = true; }
                     
+                    // NEW TASK AD FIELDS
+                    if (typeof userData.taskAd1_Count === 'undefined') { userData.taskAd1_Count = 0; needsUpdate = true; }
+                    if (typeof userData.taskAd1_Cooldown === 'undefined') { userData.taskAd1_Cooldown = null; needsUpdate = true; }
+                    
+                    if (typeof userData.taskAd2_Count === 'undefined') { userData.taskAd2_Count = 0; needsUpdate = true; }
+                    if (typeof userData.taskAd2_Cooldown === 'undefined') { userData.taskAd2_Cooldown = null; needsUpdate = true; }
+                    
                     if (typeof userData.adZone1Count === 'undefined') { userData.adZone1Count = 0; needsUpdate = true; }
                     if (typeof userData.adZone1Cooldown === 'undefined') { userData.adZone1Cooldown = null; needsUpdate = true; }
                     if (typeof userData.adZone2Count === 'undefined') { userData.adZone2Count = 0; needsUpdate = true; }
@@ -1643,6 +1759,8 @@
                             rupeeAdCount2: userData.rupeeAdCount2, rupeeCooldown2: userData.rupeeCooldown2,
                             rupeeAdCount3: userData.rupeeAdCount3, rupeeCooldown3: userData.rupeeCooldown3,
                             rupeeAdCount4: userData.rupeeAdCount4, rupeeCooldown4: userData.rupeeCooldown4,
+                            taskAd1_Count: userData.taskAd1_Count, taskAd1_Cooldown: userData.taskAd1_Cooldown,
+                            taskAd2_Count: userData.taskAd2_Count, taskAd2_Cooldown: userData.taskAd2_Cooldown,
                             adZone1Count: userData.adZone1Count, adZone1Cooldown: userData.adZone1Cooldown,
                             adZone2Count: userData.adZone2Count, adZone2Cooldown: userData.adZone2Cooldown,
                             walletBalance: userData.walletBalance,
@@ -1663,7 +1781,10 @@
                         rupeeAdCount1: 0, rupeeCooldown1: null,
                         rupeeAdCount2: 0, rupeeCooldown2: null,
                         rupeeAdCount3: 0, rupeeCooldown3: null, 
-                        rupeeAdCount4: 0, rupeeCooldown4: null, 
+                        rupeeAdCount4: 0, rupeeCooldown4: null,
+                        
+                        taskAd1_Count: 0, taskAd1_Cooldown: null,
+                        taskAd2_Count: 0, taskAd2_Cooldown: null,
 
                         adZone1Count: 0, adZone1Cooldown: null, adZone2Count: 0, adZone2Cooldown: null, walletBalance: 0 
                     };
@@ -1700,6 +1821,15 @@
                 if(!appConfig.rupeeReqAds4) appConfig.rupeeReqAds4 = 10;
                 if(!appConfig.rupeeReward4) appConfig.rupeeReward4 = 0.015;
                 if(appConfig.rupeeCooldownMinutes4 === undefined) appConfig.rupeeCooldownMinutes4 = 5;
+                
+                // NEW TASK AD DEFAULTS
+                if(!appConfig.taskAd1_Target) appConfig.taskAd1_Target = 5;
+                if(!appConfig.taskAd1_Reward) appConfig.taskAd1_Reward = 50;
+                if(!appConfig.taskAd1_CooldownHours) appConfig.taskAd1_CooldownHours = 1;
+
+                if(!appConfig.taskAd2_Target) appConfig.taskAd2_Target = 10;
+                if(!appConfig.taskAd2_Reward) appConfig.taskAd2_Reward = 100;
+                if(!appConfig.taskAd2_CooldownHours) appConfig.taskAd2_CooldownHours = 2;
                 
                 if(appConfig.rupeeCooldownHours === undefined) appConfig.rupeeCooldownHours = 1;
 
@@ -1778,7 +1908,7 @@
             document.getElementById('scratch-req-text').innerText = req;
             document.getElementById('scratch-cd-text').innerText = cd + "H";
 
-            updateDynamicPaymentFields(); updateAdsLeftCount(); updateZoneButtons(); updateRupeeUI(); updatePromoCost();
+            updateDynamicPaymentFields(); updateAdsLeftCount(); updateZoneButtons(); updateRupeeUI(); updatePromoCost(); updateTaskPageAdsUI();
         }
 
         // ========================
@@ -2562,7 +2692,8 @@
             if (pageId === 'wallet-page') loadWithdrawalHistory();
             if (pageId === 'rupees-page') updateRupeeUI(); 
             if (pageId === 'promotion-page') loadUserPromotions();
-            if (pageId === 'leaderboard-page') loadLeaderboard(); // <--- FIX ADDED HERE
+            if (pageId === 'leaderboard-page') loadLeaderboard(); 
+            if (pageId === 'tasks-page') loadTasksList();
         }
         window.navigateTo = navigateTo;
         
@@ -2577,7 +2708,9 @@
                     uid: user.uid, name: name, email: email, password: password, balance: 50, referralCode: Math.random().toString(36).substring(2, 8).toUpperCase(), referredBy: null, lastNotificationCheck: serverTimestamp(), createdAt: serverTimestamp(),
                     dailyAdCount: 0, lastAdWatchDate: new Date().toISOString().split('T')[0], isBlocked: false, miningAdsCount: 0, miningCooldown: null, scratchAdsCount: 0, scratchCooldown: null, adZone1Count: 0, adZone1Cooldown: null, adZone2Count: 0, adZone2Cooldown: null, walletBalance: 0, 
                     rupeeAdCount1: 0, rupeeCooldown1: null,
-                    rupeeAdCount2: 0, rupeeCooldown2: null
+                    rupeeAdCount2: 0, rupeeCooldown2: null,
+                    taskAd1_Count: 0, taskAd1_Cooldown: null,
+                    taskAd2_Count: 0, taskAd2_Cooldown: null
                 });
             } catch (error) { showAlert(error.message); } finally { if(ldr) ldr.style.display = 'none'; }
         }
@@ -2713,9 +2846,202 @@
             }).catch(e => { console.error(e); showAlert("Ad failed to load or closed early."); updateMiningUI(); });
         }
 
+        // =============================
+        // NEW TASK PAGE AD SLOTS LOGIC
+        // =============================
+        function updateTaskPageAdsUI() {
+            if(!userData || !appConfig) return;
+            const now = Date.now();
+
+            // --- Slot 1 UI ---
+            const target1 = appConfig.taskAd1_Target || 5;
+            const reward1 = appConfig.taskAd1_Reward || 50;
+            const current1 = userData.taskAd1_Count || 0;
+            let cd1 = userData.taskAd1_Cooldown ? userData.taskAd1_Cooldown.toDate().getTime() : 0;
+
+            setText('task-ad-reward-1', `+${reward1} Coins`);
+            
+            if(cd1 > now) {
+                document.getElementById('task-ad-timer-1').classList.remove('hidden');
+                document.getElementById('task-ad-timer-1').querySelector('span').innerText = formatTime(cd1 - now);
+                setText('task-ad-status-1', "Cooldown Active");
+            } else {
+                document.getElementById('task-ad-timer-1').classList.add('hidden');
+                if(current1 >= target1 && cd1 !== 0) setText('task-ad-status-1', `0 / ${target1} Watched`);
+                else setText('task-ad-status-1', `${current1} / ${target1} Watched`);
+            }
+
+            // --- Slot 2 UI ---
+            const target2 = appConfig.taskAd2_Target || 10;
+            const reward2 = appConfig.taskAd2_Reward || 100;
+            const current2 = userData.taskAd2_Count || 0;
+            let cd2 = userData.taskAd2_Cooldown ? userData.taskAd2_Cooldown.toDate().getTime() : 0;
+
+            setText('task-ad-reward-2', `+${reward2} Coins`);
+
+            if(cd2 > now) {
+                document.getElementById('task-ad-timer-2').classList.remove('hidden');
+                document.getElementById('task-ad-timer-2').querySelector('span').innerText = formatTime(cd2 - now);
+                setText('task-ad-status-2', "Cooldown Active");
+            } else {
+                document.getElementById('task-ad-timer-2').classList.add('hidden');
+                if(current2 >= target2 && cd2 !== 0) setText('task-ad-status-2', `0 / ${target2} Watched`);
+                else setText('task-ad-status-2', `${current2} / ${target2} Watched`);
+            }
+        }
+
+        window.handleTaskPageAd = async function(slotId) {
+            if(!userData) return;
+            const now = Date.now();
+            let target = slotId === 1 ? (appConfig.taskAd1_Target || 5) : (appConfig.taskAd2_Target || 10);
+            let reward = slotId === 1 ? (appConfig.taskAd1_Reward || 50) : (appConfig.taskAd2_Reward || 100);
+            let cooldownHours = slotId === 1 ? (appConfig.taskAd1_CooldownHours || 1) : (appConfig.taskAd2_CooldownHours || 2);
+            let currentCount = slotId === 1 ? (userData.taskAd1_Count || 0) : (userData.taskAd2_Count || 0);
+            let cdTime = slotId === 1 ? (userData.taskAd1_Cooldown ? userData.taskAd1_Cooldown.toDate().getTime() : 0) : (userData.taskAd2_Cooldown ? userData.taskAd2_Cooldown.toDate().getTime() : 0);
+
+            if(cdTime > now) return showAlert("Cooldown active! Please wait.");
+            
+            // Reset if cooldown expired
+            if(cdTime > 0 && now > cdTime && currentCount >= target) {
+                const userRef = doc(db, "users", currentUser.uid);
+                let resetUpdate = {};
+                if(slotId === 1) { resetUpdate.taskAd1_Count = 0; resetUpdate.taskAd1_Cooldown = null; userData.taskAd1_Count = 0; userData.taskAd1_Cooldown = null; }
+                else { resetUpdate.taskAd2_Count = 0; resetUpdate.taskAd2_Cooldown = null; userData.taskAd2_Count = 0; userData.taskAd2_Cooldown = null; }
+                await updateDoc(userRef, resetUpdate); currentCount = 0;
+            }
+
+            try {
+                if(slotId === 1) {
+                     if (typeof window.show_9966888 !== 'function') throw new Error("Ad Script Missing");
+                     await window.show_9966888(); 
+                } else {
+                     if (typeof window.show_9966767 !== 'function') throw new Error("Ad Script Missing");
+                     await window.show_9966767();
+                }
+
+                const userRef = doc(db, "users", currentUser.uid);
+                let newCount = currentCount + 1;
+                let updates = {};
+
+                if(newCount >= target) {
+                    const newCooldown = new Date(Date.now() + (cooldownHours * 60 * 60 * 1000));
+                    updates.balance = increment(reward);
+                    if(slotId === 1) {
+                        updates.taskAd1_Count = newCount; updates.taskAd1_Cooldown = newCooldown;
+                        userData.taskAd1_Cooldown = { toDate: () => newCooldown }; userData.taskAd1_Count = newCount;
+                    } else {
+                        updates.taskAd2_Count = newCount; updates.taskAd2_Cooldown = newCooldown;
+                        userData.taskAd2_Cooldown = { toDate: () => newCooldown }; userData.taskAd2_Count = newCount;
+                    }
+                    userData.balance += reward; showAlert(`🎉 Task Completed! +${reward} Coins.`);
+                } else {
+                    if(slotId === 1) { updates.taskAd1_Count = newCount; userData.taskAd1_Count = newCount; }
+                    else { updates.taskAd2_Count = newCount; userData.taskAd2_Count = newCount; }
+                    showAlert(`Ad Watched! (${newCount}/${target})`);
+                }
+                await updateDoc(userRef, updates); updateUI(); updateTaskPageAdsUI();
+            } catch(e) { console.error(e); showAlert("Ad failed to load. Check internet."); }
+        };
+        
+        // ==========================
+        // NEW TASK SYSTEM FUNCTIONS
+        // ==========================
+        async function loadTasksList() {
+            const container = document.getElementById('tasks-list-container');
+            container.innerHTML = '<p class="text-center text-gray-500">Loading tasks...</p>';
+            
+            try {
+                // Get Tasks from Admin Collection
+                const qTasks = query(collection(db, "admin_tasks"), where("active", "==", true));
+                const snapTasks = await getDocs(qTasks);
+                
+                // Get My Submissions to check status
+                const qSubs = query(collection(db, "task_submissions"), where("userId", "==", currentUser.uid));
+                const snapSubs = await getDocs(qSubs);
+                let mySubs = {};
+                snapSubs.forEach(doc => {
+                    mySubs[doc.data().taskId] = doc.data().status; 
+                });
+
+                if(snapTasks.empty) {
+                    container.innerHTML = '<p class="text-center text-gray-500">No tasks available right now.</p>';
+                    return;
+                }
+
+                container.innerHTML = '';
+                snapTasks.forEach(doc => {
+                    const task = doc.data();
+                    const taskId = doc.id;
+                    const status = mySubs[taskId]; 
+                    
+                    let btnHtml = '';
+                    if(status === 'approved') {
+                        btnHtml = `<button class="task-btn completed" disabled>Completed</button>`;
+                    } else if(status === 'pending') {
+                        btnHtml = `<button class="task-btn pending" disabled>Checking...</button>`;
+                    } else {
+                        btnHtml = `<button class="task-btn" onclick="window.handleTaskClick('${taskId}', '${task.link}')">Start</button>`;
+                    }
+
+                    const rewardLabel = task.rewardType === 'rupees' ? `₹${task.reward}` : `${task.reward} Coins`;
+                    const icon = task.logo || 'https://cdn-icons-png.flaticon.com/512/2111/2111646.png'; // Default Telegram Icon
+
+                    container.innerHTML += `
+                    <div class="task-card">
+                        <div class="task-icon-bg">
+                            <img src="${icon}">
+                        </div>
+                        <div class="task-details">
+                            <div class="task-title">${task.title}</div>
+                            <div class="task-reward">+${rewardLabel}</div>
+                        </div>
+                        <div id="task-action-${taskId}">
+                            ${btnHtml}
+                        </div>
+                    </div>
+                    `;
+                });
+
+            } catch(e) {
+                console.error(e);
+                container.innerHTML = '<p class="text-red-500 text-center">Error loading tasks</p>';
+            }
+        }
+
+        window.handleTaskClick = async (taskId, link) => {
+            window.open(link, '_blank');
+            const container = document.getElementById(`task-action-${taskId}`);
+            // Change button to Submit
+            container.innerHTML = `<button class="task-btn" style="background:#007bff;" onclick="window.submitTask('${taskId}')">Submit</button>`;
+        };
+
+        window.submitTask = async (taskId) => {
+             if(!confirm("Did you join/complete the task? Admin will verify.")) return;
+             
+             const btnContainer = document.getElementById(`task-action-${taskId}`);
+             btnContainer.innerHTML = `<button class="task-btn pending" disabled>Sending...</button>`;
+
+             try {
+                 await addDoc(collection(db, "task_submissions"), {
+                     userId: currentUser.uid,
+                     userName: userData.name,
+                     taskId: taskId,
+                     status: 'pending',
+                     submittedAt: serverTimestamp()
+                 });
+                 
+                 btnContainer.innerHTML = `<button class="task-btn pending" disabled>Checking...</button>`;
+                 showAlert("Task Submitted! Admin will verify soon.");
+             } catch(e) {
+                 console.error(e);
+                 showAlert("Error submitting.");
+                 btnContainer.innerHTML = `<button class="task-btn" onclick="window.loadTasksList()">Retry</button>`;
+             }
+        };
+
         function showAlert(message) { document.getElementById('alert-message').textContent = message; document.getElementById('custom-alert').classList.remove('hidden'); document.getElementById('alert-ok-btn').onclick = () => { document.getElementById('custom-alert').classList.add('hidden'); }; }
         window.showAlert = showAlert;
 
     </script>
 </body>
-    </html>
+</html>
