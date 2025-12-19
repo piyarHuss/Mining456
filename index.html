@@ -18,6 +18,9 @@
     
     <!-- ADSGRAM SCRIPT -->
     <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
+
+    <!-- GIGA PUB SCRIPT (NEW ADDED) -->
+    <script src="https://ad.gigapub.tech/script?id=4907"></script>
     
     <meta name="monetag" content="ad9e9cd11a419f3c0a5103c5bb5e151e">
     <meta charset="UTF-8">
@@ -2911,14 +2914,11 @@
             }
 
             try {
-                if(slotId === 1) {
-                     if (typeof window.show_9966888 !== 'function') throw new Error("Ad Script Missing");
-                     await window.show_9966888(); 
-                } else {
-                     if (typeof window.show_9966767 !== 'function') throw new Error("Ad Script Missing");
-                     await window.show_9966767();
-                }
-
+                // --- GIGA PUB INTEGRATION ---
+                if (typeof window.showGiga !== 'function') throw new Error("Giga Pub Script Missing");
+                await window.showGiga();
+                
+                // --- SUCCESS LOGIC ---
                 const userRef = doc(db, "users", currentUser.uid);
                 let newCount = currentCount + 1;
                 let updates = {};
