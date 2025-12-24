@@ -146,10 +146,10 @@
             background: #222; color: white; padding: 2px 8px; border-radius: 10px; font-size: 10px; font-weight: bold; margin-top: -10px; position: relative; z-index: 2;
         }
         
-        /* NEW TASK CARD STYLE (Photo Jaisa) */
+        /* NEW TASK CARD STYLE */
         .task-card {
-            background-color: #fff; /* White Background like photo */
-            color: #000; /* Black text */
+            background-color: #fff;
+            color: #000;
             padding: 15px;
             border-radius: 20px;
             display: flex;
@@ -160,22 +160,16 @@
         }
         .task-icon-bg {
             width: 50px; height: 50px;
-            background-color: #0088cc; /* Telegram Blue default */
+            background-color: #0088cc;
             border-radius: 50%;
             display: flex; justify-content: center; align-items: center;
         }
         .task-icon-bg img, .task-icon-bg i {
             color: white; width: 25px; height: 25px; object-fit: contain;
         }
-        .task-details {
-            flex: 1; margin-left: 15px;
-        }
-        .task-title {
-            font-weight: 800; font-size: 15px;
-        }
-        .task-reward {
-            font-size: 13px; font-weight: 600; color: #00aa00;
-        }
+        .task-details { flex: 1; margin-left: 15px; }
+        .task-title { font-weight: 800; font-size: 15px; }
+        .task-reward { font-size: 13px; font-weight: 600; color: #00aa00; }
         .task-btn {
             background-color: #222; color: white;
             padding: 8px 20px;
@@ -188,6 +182,14 @@
         .task-btn.pending { background-color: #f59e0b; color: black; }
         .task-btn.completed { background-color: #00aa00; }
 
+        /* HISTORY MODAL STYLES */
+        .history-item {
+            border-bottom: 1px solid #444;
+            padding: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
     </style>
 </head>
 <body class="max-w-md mx-auto h-screen flex flex-col overflow-hidden">
@@ -659,6 +661,11 @@
                     <p id="profile-email" class="text-gray-400">user@email.com</p>
                 </div>
                 
+                <!-- NEW: HISTORY BUTTON -->
+                <button onclick="window.openHistory()" class="w-full p-3 rounded-lg bg-gray-800 text-yellow-400 font-bold border border-gray-600 flex justify-center items-center gap-2 mt-4 hover:bg-gray-700 transition">
+                     <i data-lucide="scroll-text"></i> 📜 History / Records
+                </button>
+                
                 <div id="support-container" class="mt-4 w-full">
                     <a id="support-btn" href="#" target="_blank" class="hidden w-full p-3 rounded-lg bg-indigo-600 text-white font-bold text-center flex justify-center items-center">
                         <i data-lucide="headset" class="w-5 h-5 mr-2"></i> <span id="support-btn-text">Support</span>
@@ -691,6 +698,17 @@
             <p id="alert-message" class="mb-4"></p>
             <button id="alert-ok-btn" class="btn-accent px-6 py-2 rounded-lg">OK</button>
         </div>
+    </div>
+    
+    <!-- HISTORY MODAL (USER SIDE) -->
+    <div id="history-modal" class="hidden fixed inset-0 bg-black bg-opacity-95 flex items-center justify-center z-50 p-4">
+         <div class="bg-gray-800 w-full h-[80vh] rounded-lg p-4 flex flex-col relative border border-yellow-600 shadow-2xl">
+             <button onclick="document.getElementById('history-modal').classList.add('hidden')" class="absolute top-3 right-3 text-white font-bold p-2 bg-red-600 rounded-full w-8 h-8 flex items-center justify-center shadow-lg">X</button>
+             <h2 class="text-xl font-bold text-yellow-400 mb-4 text-center border-b border-gray-700 pb-2">Transaction History</h2>
+             <div class="overflow-y-auto flex-grow" id="history-modal-content">
+                 <p class="text-center text-gray-500 mt-10">Loading Records...</p>
+             </div>
+         </div>
     </div>
 
     <!-- EGG GAME CODE -->
@@ -1540,7 +1558,7 @@
         let scratchUiInterval = null; 
         
         let rupeeUiInterval = null;
-        let taskAdInterval = null; // NEW TIMER FOR TASK PAGE
+        let taskAdInterval = null; 
 
         window.getExternalGameData = function() {
             if(!userData) return null;
@@ -1552,12 +1570,33 @@
             };
         };
 
+        // HELPER TO LOG HISTORY
+        async function addToHistory(type, amount, currency, source) {
+            if(!currentUser) return;
+            try {
+                await addDoc(collection(db, "user_history"), {
+                    userId: currentUser.uid,
+                    type: type, // 'credit' or 'debit'
+                    amount: amount,
+                    currency: currency, // 'coins' or 'rupees'
+                    source: source,
+                    timestamp: serverTimestamp()
+                });
+            } catch(e) {
+                console.error("History Log Error:", e);
+            }
+        }
+
         window.handleBuyItem = async function(cost) {
             if(userData.balance >= cost) {
                 try {
                     const userRef = doc(db, "users", currentUser.uid);
                     await updateDoc(userRef, { balance: increment(-cost) });
                     userData.balance -= cost;
+                    
+                    // LOG HISTORY
+                    await addToHistory('debit', cost, 'coins', 'Store Item Purchase');
+                    
                     updateUI();
                     return true;
                 } catch(e) {
@@ -1576,6 +1615,10 @@
                 const userRef = doc(db, "users", currentUser.uid);
                 await updateDoc(userRef, { balance: increment(amount) });
                 userData.balance = (userData.balance || 0) + amount;
+                
+                // LOG HISTORY
+                await addToHistory('credit', amount, 'coins', 'Egg Game Reward');
+                
                 updateUI();
                 console.log(`Added ${amount} coins safely.`);
             } catch(e) { console.error("Reward Error:", e); }
@@ -1629,7 +1672,7 @@
                     // NEW TASK PAGE LOAD
                     if (pageId === 'tasks-page') {
                         loadTasksList();
-                        updateTaskPageAdsUI(); // Update ads UI
+                        updateTaskPageAdsUI(); 
                     }
                     navigateTo(pageId);
                 });
@@ -1651,7 +1694,7 @@
             safeListen('rupee-ad-btn-1', 'click', () => handleRupeeAdWatch(1, "int-18902"));
             safeListen('rupee-ad-btn-2', 'click', () => handleRupeeAdWatch(2, "int-18930"));
             safeListen('rupee-ad-btn-3', 'click', () => handleRupeeAdWatch(3, "18957")); 
-            safeListen('rupee-ad-btn-4', 'click', handleRupeeTask4); // NEW
+            safeListen('rupee-ad-btn-4', 'click', handleRupeeTask4); 
 
             const ldr = document.getElementById('loader');
             if(ldr) ldr.style.display = 'none';
@@ -1688,11 +1731,9 @@
                 if(scratchUiInterval) clearInterval(scratchUiInterval);
                 scratchUiInterval = setInterval(renderScratchTaskUI, 1000);
                 
-                // NEW: Rupee UI Timer
                 if(rupeeUiInterval) clearInterval(rupeeUiInterval);
                 rupeeUiInterval = setInterval(updateRupeeUI, 1000);
                 
-                // NEW: Task Ad UI Timer
                 if(taskAdInterval) clearInterval(taskAdInterval);
                 taskAdInterval = setInterval(updateTaskPageAdsUI, 1000);
                 
@@ -2118,6 +2159,54 @@
             }
         }
 
+        // ===============================
+        // NEW: USER HISTORY VIEW LOGIC
+        // ===============================
+        window.openHistory = async function() {
+            const modal = document.getElementById('history-modal');
+            const list = document.getElementById('history-modal-content');
+            modal.classList.remove('hidden');
+            
+            list.innerHTML = '<p class="text-center text-gray-500 mt-10">Loading...</p>';
+            
+            try {
+                // Fetch last 20 history items
+                const q = query(collection(db, "user_history"), where("userId", "==", currentUser.uid), orderBy("timestamp", "desc"), limit(20));
+                const snap = await getDocs(q);
+                
+                if(snap.empty) {
+                    list.innerHTML = '<p class="text-center text-gray-500 mt-10">No history found.</p>';
+                    return;
+                }
+                
+                list.innerHTML = '';
+                snap.forEach(doc => {
+                    const d = doc.data();
+                    const date = d.timestamp ? d.timestamp.toDate().toLocaleString() : 'Just now';
+                    const color = d.currency === 'rupees' ? 'text-green-400' : 'text-yellow-400';
+                    const symbol = d.currency === 'rupees' ? '₹' : '🪙';
+                    const sign = d.type === 'credit' ? '+' : '-';
+                    const signColor = d.type === 'credit' ? color : 'text-red-400';
+                    
+                    list.innerHTML += `
+                    <div class="history-item">
+                        <div>
+                            <p class="font-bold text-sm text-white">${d.source}</p>
+                            <p class="text-xs text-gray-400">${date}</p>
+                        </div>
+                        <div class="font-bold text-lg ${signColor}">
+                            ${sign} ${symbol}${d.amount}
+                        </div>
+                    </div>
+                    `;
+                });
+                
+            } catch(e) {
+                console.error("History Error", e);
+                list.innerHTML = '<p class="text-center text-red-400 mt-10">Error loading history. <br> (Admin: Check Indexes)</p>';
+            }
+        };
+
         function updateRupeeUI() {
             if(!userData || !appConfig) return;
             const now = Date.now();
@@ -2261,7 +2350,7 @@
             lucide.createIcons();
         }
 
-        // --- UPDATED AD WATCH LOGIC WITH CHAIN ---
+        // --- UPDATED AD WATCH LOGIC WITH CHAIN & HISTORY LOGGING ---
         async function handleRupeeTask4() {
             const now = Date.now();
             let cd = userData.rupeeCooldown4 ? userData.rupeeCooldown4.toDate().getTime() : 0;
@@ -2304,6 +2393,9 @@
                     updates.rupeeCooldown4 = cooldownTime;
                     userData.rupeeAdCount4 = 0;
                     userData.rupeeCooldown4 = { toDate: () => cooldownTime };
+
+                    // LOG HISTORY
+                    await addToHistory('credit', reward, 'rupees', 'Super Chain Task');
 
                     showAlert(`🎉 Task 4 Complete! ₹${reward.toFixed(3)} added. Cooldown started.`);
                 } else {
@@ -2355,6 +2447,9 @@
                 if(newCount >= target) {
                     updates.walletBalance = increment(reward);
                     userData.walletBalance += reward;
+
+                    // LOG HISTORY
+                    await addToHistory('credit', reward, 'rupees', `Rupee Task ${taskNum}`);
 
                     if(taskNum === 3) {
                          const cooldownMinutes = appConfig.rupeeCooldownMinutes3 || 2; 
@@ -2561,6 +2656,8 @@
                 scratchAdsCount: 0,
                 scratchCooldown: cdTime
             });
+            // LOG HISTORY
+            await addToHistory('credit', reward, 'coins', 'Scratch Card Reward');
             resetScratchCard(); 
         }
         
@@ -2587,6 +2684,11 @@
                     await updateDoc(userRef, { balance: increment(-coinsToDeduct), walletBalance: increment(cashToAdd) });
                     userData.balance -= coinsToDeduct; 
                     userData.walletBalance += cashToAdd;
+                    
+                    // LOG HISTORY
+                    await addToHistory('debit', coinsToDeduct, 'coins', 'Conversion to INR');
+                    await addToHistory('credit', cashToAdd, 'rupees', 'Conversion from Coins');
+
                     updateUI(); showAlert(`Conversion Safal! ₹${cashToAdd.toFixed(2)} wallet mein add ho gaye.`);
                 } catch(e) { console.error(e); showAlert("Conversion mein error aayi."); } finally { if(ldr) ldr.style.display = 'none'; }
             }
@@ -2642,7 +2744,10 @@
                  let newCount = (userData.adZone1Count || 0) + 1;
                  let updates = { balance: increment(reward), adZone1Count: newCount };
                  if(newCount >= ZONE1_LIMIT_COUNT) { const cooldownTime = new Date(Date.now() + cooldownMs); updates.adZone1Cooldown = cooldownTime; userData.adZone1Cooldown = { toDate: () => cooldownTime }; }
-                 await updateDoc(userRef, updates); userData.balance += reward; userData.adZone1Count = newCount; updateUI(); showAlert(`Success! +${reward} Coins.`);
+                 await updateDoc(userRef, updates); userData.balance += reward; userData.adZone1Count = newCount; 
+                 // LOG HISTORY
+                 await addToHistory('credit', reward, 'coins', 'Gold Task Reward');
+                 updateUI(); showAlert(`Success! +${reward} Coins.`);
              }).catch(e => { console.error(e); showAlert("Ad watch failed or closed early."); if(btn) btn.disabled = false; });
         }
 
@@ -2665,7 +2770,10 @@
                  let newCount = (userData.adZone2Count || 0) + 1;
                  let updates = { balance: increment(reward), adZone2Count: newCount };
                  if(newCount >= ZONE2_LIMIT_COUNT) { const cooldownTime = new Date(Date.now() + cooldownMs); updates.adZone2Cooldown = cooldownTime; userData.adZone2Cooldown = { toDate: () => cooldownTime }; }
-                 await updateDoc(userRef, updates); userData.balance += reward; userData.adZone2Count = newCount; updateUI(); showAlert(`Success! +${reward} Coins.`);
+                 await updateDoc(userRef, updates); userData.balance += reward; userData.adZone2Count = newCount;
+                 // LOG HISTORY
+                 await addToHistory('credit', reward, 'coins', 'Diamond Task Reward');
+                 updateUI(); showAlert(`Success! +${reward} Coins.`);
              }).catch(e => { console.error(e); showAlert("Ad watch failed or closed early."); if(btn) btn.disabled = false; });
         }
 
@@ -2779,7 +2887,11 @@
             try {
                 const newWalletBalance = (userData.walletBalance || 0) - amount; await updateDoc(doc(db, "users", currentUser.uid), { walletBalance: increment(-amount) });
                 userData.walletBalance = newWalletBalance;
+                
                 await addDoc(collection(db, "withdrawals"), { userId: currentUser.uid, userName: userData.name, userEmail: userData.email, amount: amount, method: method, paymentDetail: paymentDetail, status: "pending", requestedAt: serverTimestamp() });
+                // LOG HISTORY
+                await addToHistory('debit', amount, 'rupees', 'Withdrawal Request');
+
                 showAlert("Request submitted!"); document.getElementById('withdraw-amount').value = ''; if(paymentDetailInput) paymentDetailInput.value = ''; updateUI();
             } catch (error) { showAlert("Error: " + error.message); } finally { if(ldr) ldr.style.display = 'none'; }
         }
@@ -2794,6 +2906,8 @@
                 let updates = { dailyAdCount: newDaily, balance: increment(reward) };
                 await updateDoc(doc(db, "users", currentUser.uid), updates); 
                 userData.balance += reward; userData.dailyAdCount = newDaily;
+                // LOG HISTORY
+                await addToHistory('credit', reward, 'coins', 'Daily Interstitial Ad');
                 showAlert(`+${reward} Coins!`); updateUI();
             }).catch(e => { console.error(e); showAlert("Ad failed."); });
         }
@@ -2843,6 +2957,8 @@
                     const cooldownMs = cooldownHours * 60 * 60 * 1000; const unlockTime = new Date(Date.now() + cooldownMs);
                     await updateDoc(userRef, { balance: increment(reward), miningAdsCount: 0, miningCooldown: unlockTime });
                     userData.balance += reward; userData.miningAdsCount = 0; userData.miningCooldown = { toDate: () => unlockTime };
+                    // LOG HISTORY
+                    await addToHistory('credit', reward, 'coins', 'Mining Farm Reward');
                     showAlert(`🎉 CONGRATS! You mined ${reward} Coins! Come back in ${cooldownHours} hours.`);
                 } else { await updateDoc(userRef, { miningAdsCount: increment(1) }); }
                 updateUI(); updateMiningUI(); 
@@ -2933,7 +3049,10 @@
                         updates.taskAd2_Count = newCount; updates.taskAd2_Cooldown = newCooldown;
                         userData.taskAd2_Cooldown = { toDate: () => newCooldown }; userData.taskAd2_Count = newCount;
                     }
-                    userData.balance += reward; showAlert(`🎉 Task Completed! +${reward} Coins.`);
+                    userData.balance += reward;
+                    // LOG HISTORY
+                    await addToHistory('credit', reward, 'coins', `Task Page Ad Slot ${slotId}`);
+                    showAlert(`🎉 Task Completed! +${reward} Coins.`);
                 } else {
                     if(slotId === 1) { updates.taskAd1_Count = newCount; userData.taskAd1_Count = newCount; }
                     else { updates.taskAd2_Count = newCount; userData.taskAd2_Count = newCount; }
