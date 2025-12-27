@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 
-<!-- TELEGRAM WEB APP SCRIPT (REQUIRED) - Ye Line Missing Thi -->
+<!-- TELEGRAM WEB APP SCRIPT (REQUIRED) -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
 
@@ -24,7 +24,7 @@
     <!-- ADSGRAM SCRIPT -->
     <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
 
-    <!-- GIGA PUB SCRIPT (NEW ADDED) -->
+    <!-- GIGA PUB SCRIPT -->
     <script src="https://ad.gigapub.tech/script?id=4907"></script>
 
     <!-- RICHADS AUTO ADS (NEW ADDED) -->
@@ -568,7 +568,7 @@
                 </div>
             </div>
 
-            <!-- RUPEES PAGE (4 TASKS) -->
+            <!-- RUPEES PAGE (5 TASKS) -->
             <div id="rupees-page" class="p-4 space-y-6 sub-page">
                  <h2 class="text-xl font-bold text-center text-green-400">Earn Rupees</h2>
                  
@@ -641,7 +641,7 @@
                      <p id="rupee-timer-3" class="hidden text-yellow-400 font-mono mt-2 font-bold">Wait: 00:00:00</p>
                  </div>
                  
-                 <!-- TASK 4 (NEW SUPER CHAIN) -->
+                 <!-- TASK 4 (Super Chain) -->
                  <div class="card-bg p-6 rounded-lg text-center border border-red-700 shadow-lg relative">
                      <div class="absolute top-2 right-2 bg-gray-800 px-2 py-1 rounded text-[10px] text-gray-400">Task 4</div>
                      <p class="text-gray-300 mb-2 font-semibold">Super Chain Task</p>
@@ -663,8 +663,31 @@
                      </button>
                      <p id="rupee-timer-4" class="hidden text-yellow-400 font-mono mt-2 font-bold">Wait: 00:00:00</p>
                  </div>
+
+                 <!-- TASK 5 (NEW RICHADS TASK) -->
+                 <div class="card-bg p-6 rounded-lg text-center border border-pink-700 shadow-lg relative mt-4">
+                     <div class="absolute top-2 right-2 bg-gray-800 px-2 py-1 rounded text-[10px] text-gray-400">Task 5</div>
+                     <p class="text-gray-300 mb-2 font-semibold">RichAds Mega Chain</p>
+                     <div class="mb-4">
+                        <p class="text-4xl mb-2">🚀</p>
+                        <h3 class="text-2xl font-bold text-white">₹ <span id="rupee-task-reward-5">0.010</span></h3>
+                     </div>
+                     <div class="bg-gray-800 p-4 rounded-lg mb-4">
+                         <div class="flex justify-between text-xs mb-1">
+                             <span class="text-gray-400">Progress</span>
+                             <span class="text-pink-400 font-bold"><span id="rupee-ads-count-5">0</span> / <span id="rupee-ads-target-5">15</span> Ads</span>
+                         </div>
+                         <div class="w-full bg-gray-700 rounded-full h-2">
+                             <div id="rupee-progress-bar-5" class="bg-pink-500 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+                         </div>
+                     </div>
+                     <button id="rupee-ad-btn-5" class="w-full p-3 rounded-lg bg-pink-600 hover:bg-pink-500 text-white font-bold transition-all shadow-md flex items-center justify-center">
+                         <i data-lucide="video" class="w-5 h-5 mr-2"></i> Watch 2 Ads Chain
+                     </button>
+                     <p id="rupee-timer-5" class="hidden text-yellow-400 font-mono mt-2 font-bold">Wait: 00:00:00</p>
+                 </div>
                  
-                 <p class="text-xs text-center text-gray-500 mt-4">Powered by AdsGram</p>
+                 <p class="text-xs text-center text-gray-500 mt-4">Powered by AdsGram & RichAds</p>
             </div>
 
             <!-- Profile Page -->
@@ -726,7 +749,7 @@
          </div>
     </div>
 
-    <!-- EGG GAME CODE -->
+    <!-- EGG GAME CODE (UNCHANGED) -->
     <script>
         const eggGameCode = `
 <!DOCTYPE html>
@@ -1705,11 +1728,12 @@
             safeListen('promo-platform', 'change', updatePromoCost);
             safeListen('promo-submit-btn', 'click', submitPromotion);
 
-            // RUPEES BUTTONS (4 TASKS)
+            // RUPEES BUTTONS (5 TASKS NOW)
             safeListen('rupee-ad-btn-1', 'click', () => handleRupeeAdWatch(1, "int-18902"));
             safeListen('rupee-ad-btn-2', 'click', () => handleRupeeAdWatch(2, "int-18930"));
             safeListen('rupee-ad-btn-3', 'click', () => handleRupeeAdWatch(3, "18957")); 
             safeListen('rupee-ad-btn-4', 'click', handleRupeeTask4); 
+            safeListen('rupee-ad-btn-5', 'click', handleRupeeTask5); 
 
             const ldr = document.getElementById('loader');
             if(ldr) ldr.style.display = 'none';
@@ -1792,6 +1816,10 @@
 
                     if (typeof userData.rupeeAdCount4 === 'undefined') { userData.rupeeAdCount4 = 0; needsUpdate = true; }
                     if (typeof userData.rupeeCooldown4 === 'undefined') { userData.rupeeCooldown4 = null; needsUpdate = true; }
+
+                    // NEW RICHADS TASK FIELDS (TASK 5)
+                    if (typeof userData.rupeeAdCount5 === 'undefined') { userData.rupeeAdCount5 = 0; needsUpdate = true; }
+                    if (typeof userData.rupeeCooldown5 === 'undefined') { userData.rupeeCooldown5 = null; needsUpdate = true; }
                     
                     // NEW TASK AD FIELDS
                     if (typeof userData.taskAd1_Count === 'undefined') { userData.taskAd1_Count = 0; needsUpdate = true; }
@@ -1818,6 +1846,7 @@
                             rupeeAdCount2: userData.rupeeAdCount2, rupeeCooldown2: userData.rupeeCooldown2,
                             rupeeAdCount3: userData.rupeeAdCount3, rupeeCooldown3: userData.rupeeCooldown3,
                             rupeeAdCount4: userData.rupeeAdCount4, rupeeCooldown4: userData.rupeeCooldown4,
+                            rupeeAdCount5: userData.rupeeAdCount5, rupeeCooldown5: userData.rupeeCooldown5, // Added Task 5
                             taskAd1_Count: userData.taskAd1_Count, taskAd1_Cooldown: userData.taskAd1_Cooldown,
                             taskAd2_Count: userData.taskAd2_Count, taskAd2_Cooldown: userData.taskAd2_Cooldown,
                             adZone1Count: userData.adZone1Count, adZone1Cooldown: userData.adZone1Cooldown,
@@ -1841,6 +1870,7 @@
                         rupeeAdCount2: 0, rupeeCooldown2: null,
                         rupeeAdCount3: 0, rupeeCooldown3: null, 
                         rupeeAdCount4: 0, rupeeCooldown4: null,
+                        rupeeAdCount5: 0, rupeeCooldown5: null, // Task 5
                         
                         taskAd1_Count: 0, taskAd1_Cooldown: null,
                         taskAd2_Count: 0, taskAd2_Cooldown: null,
@@ -1880,6 +1910,11 @@
                 if(!appConfig.rupeeReqAds4) appConfig.rupeeReqAds4 = 10;
                 if(!appConfig.rupeeReward4) appConfig.rupeeReward4 = 0.015;
                 if(appConfig.rupeeCooldownMinutes4 === undefined) appConfig.rupeeCooldownMinutes4 = 5;
+
+                // DEFAULTS FOR TASK 5 (RICHADS)
+                if(!appConfig.rupeeReqAds5) appConfig.rupeeReqAds5 = 15;
+                if(!appConfig.rupeeReward5) appConfig.rupeeReward5 = 0.010;
+                if(!appConfig.rupeeCooldownHours5) appConfig.rupeeCooldownHours5 = 6;
                 
                 // NEW TASK AD DEFAULTS
                 if(!appConfig.taskAd1_Target) appConfig.taskAd1_Target = 5;
@@ -2226,140 +2261,73 @@
             if(!userData || !appConfig) return;
             const now = Date.now();
             
-            // --- TASK 1 ---
-            const target1 = appConfig.rupeeReqAds1 || 10;
-            const current1 = userData.rupeeAdCount1 || 0;
-            const reward1 = appConfig.rupeeReward1 || 0.010;
-            let cd1 = userData.rupeeCooldown1 ? userData.rupeeCooldown1.toDate().getTime() : 0;
-            
-            setText('rupee-ads-count-1', current1);
-            setText('rupee-ads-target-1', target1);
-            setText('rupee-task-reward-1', reward1.toFixed(3));
-            const bar1 = document.getElementById('rupee-progress-bar-1');
-            if(bar1) bar1.style.width = Math.min(100, (current1 / target1) * 100) + "%";
+            // Loop for Task 1-4
+            const tasks = [1, 2, 3, 4];
+            tasks.forEach(num => {
+                const target = appConfig[`rupeeReqAds${num}`] || 10;
+                const current = userData[`rupeeAdCount${num}`] || 0;
+                const reward = appConfig[`rupeeReward${num}`] || 0.010;
+                let cd = userData[`rupeeCooldown${num}`] ? userData[`rupeeCooldown${num}`].toDate().getTime() : 0;
+                
+                setText(`rupee-ads-count-${num}`, current);
+                setText(`rupee-ads-target-${num}`, target);
+                setText(`rupee-task-reward-${num}`, reward.toFixed(3));
+                const bar = document.getElementById(`rupee-progress-bar-${num}`);
+                if(bar) bar.style.width = Math.min(100, (current / target) * 100) + "%";
 
-            const btn1 = document.getElementById('rupee-ad-btn-1');
-            const timer1 = document.getElementById('rupee-timer-1');
-
-            if (cd1 > now) {
-                btn1.disabled = true;
-                btn1.classList.add('bg-gray-600', 'cursor-not-allowed');
-                btn1.classList.remove('bg-green-600', 'hover:bg-green-500');
-                btn1.innerText = "Task 1 Locked";
-                timer1.classList.remove('hidden');
-                timer1.innerText = "Wait: " + formatTime(cd1 - now);
-            } else {
-                if(current1 >= target1 && cd1 < now && cd1 !== 0) { 
-                    userData.rupeeAdCount1 = 0; 
-                    userData.rupeeCooldown1 = null; 
+                const btn = document.getElementById(`rupee-ad-btn-${num}`);
+                const timer = document.getElementById(`rupee-timer-${num}`);
+                
+                if(btn && timer) {
+                    if (cd > now) {
+                        btn.disabled = true;
+                        btn.className = "w-full p-3 rounded-lg bg-gray-600 cursor-not-allowed text-white font-bold";
+                        btn.innerText = `Task ${num} Locked`;
+                        timer.classList.remove('hidden');
+                        timer.innerText = "Wait: " + formatTime(cd - now);
+                    } else {
+                        if(current >= target && cd < now && cd !== 0) { 
+                            userData[`rupeeAdCount${num}`] = 0; 
+                            userData[`rupeeCooldown${num}`] = null; 
+                        }
+                        btn.disabled = false;
+                        btn.className = `w-full p-3 rounded-lg text-white font-bold transition-all shadow-md flex items-center justify-center ${num===4?'bg-red-600 hover:bg-red-500':'bg-blue-600 hover:bg-blue-500'}`;
+                        btn.innerHTML = `<i data-lucide="play-circle" class="w-5 h-5 mr-2"></i> Watch Ad`;
+                        timer.classList.add('hidden');
+                    }
                 }
-                btn1.disabled = false;
-                btn1.classList.remove('bg-gray-600', 'cursor-not-allowed');
-                btn1.classList.add('bg-green-600', 'hover:bg-green-500');
-                btn1.innerHTML = `<i data-lucide="play-circle" class="w-5 h-5 mr-2"></i> Watch Ad`;
-                timer1.classList.add('hidden');
-            }
+            });
 
-            // --- TASK 2 ---
-            const target2 = appConfig.rupeeReqAds2 || 10;
-            const current2 = userData.rupeeAdCount2 || 0;
-            const reward2 = appConfig.rupeeReward2 || 0.010;
-            let cd2 = userData.rupeeCooldown2 ? userData.rupeeCooldown2.toDate().getTime() : 0;
-            
-            setText('rupee-ads-count-2', current2);
-            setText('rupee-ads-target-2', target2);
-            setText('rupee-task-reward-2', reward2.toFixed(3));
-            const bar2 = document.getElementById('rupee-progress-bar-2');
-            if(bar2) bar2.style.width = Math.min(100, (current2 / target2) * 100) + "%";
-            
-            const btn2 = document.getElementById('rupee-ad-btn-2');
-            const timer2 = document.getElementById('rupee-timer-2');
+            // --- TASK 5 (RICHADS) UI ---
+            const target5 = appConfig.rupeeReqAds5 || 15;
+            const current5 = userData.rupeeAdCount5 || 0;
+            const reward5 = appConfig.rupeeReward5 || 0.010;
+            let cd5 = userData.rupeeCooldown5 ? userData.rupeeCooldown5.toDate().getTime() : 0;
 
-            if (cd2 > now) {
-                btn2.disabled = true;
-                btn2.classList.add('bg-gray-600', 'cursor-not-allowed');
-                btn2.classList.remove('bg-blue-600', 'hover:bg-blue-500');
-                btn2.innerText = "Task 2 Locked";
-                timer2.classList.remove('hidden');
-                timer2.innerText = "Wait: " + formatTime(cd2 - now);
+            setText('rupee-ads-count-5', current5);
+            setText('rupee-ads-target-5', target5);
+            setText('rupee-task-reward-5', reward5.toFixed(3));
+            const bar5 = document.getElementById('rupee-progress-bar-5');
+            if(bar5) bar5.style.width = Math.min(100, (current5 / target5) * 100) + "%";
+
+            const btn5 = document.getElementById('rupee-ad-btn-5');
+            const timer5 = document.getElementById('rupee-timer-5');
+
+            if (cd5 > now) {
+                btn5.disabled = true;
+                btn5.className = "w-full p-3 rounded-lg bg-gray-600 cursor-not-allowed text-white font-bold";
+                btn5.innerText = "Task 5 Locked";
+                timer5.classList.remove('hidden');
+                timer5.innerText = "Wait: " + formatTime(cd5 - now);
             } else {
-                if(current2 >= target2 && cd2 < now && cd2 !== 0) { 
-                    userData.rupeeAdCount2 = 0; 
-                    userData.rupeeCooldown2 = null; 
+                if(current5 >= target5 && cd5 < now && cd5 !== 0) { 
+                    userData.rupeeAdCount5 = 0; 
+                    userData.rupeeCooldown5 = null; 
                 }
-                btn2.disabled = false;
-                btn2.classList.remove('bg-gray-600', 'cursor-not-allowed');
-                btn2.classList.add('bg-blue-600', 'hover:bg-blue-500');
-                btn2.innerHTML = `<i data-lucide="play-circle" class="w-5 h-5 mr-2"></i> Watch Ad`;
-                timer2.classList.add('hidden');
-            }
-
-            // --- TASK 3 ---
-            const target3 = appConfig.rupeeReqAds3 || 10;
-            const current3 = userData.rupeeAdCount3 || 0;
-            const reward3 = appConfig.rupeeReward3 || 0.010;
-            let cd3 = userData.rupeeCooldown3 ? userData.rupeeCooldown3.toDate().getTime() : 0;
-            
-            setText('rupee-ads-count-3', current3);
-            setText('rupee-ads-target-3', target3);
-            setText('rupee-task-reward-3', reward3.toFixed(3));
-            const bar3 = document.getElementById('rupee-progress-bar-3');
-            if(bar3) bar3.style.width = Math.min(100, (current3 / target3) * 100) + "%";
-            
-            const btn3 = document.getElementById('rupee-ad-btn-3');
-            const timer3 = document.getElementById('rupee-timer-3');
-
-            if (cd3 > now) {
-                btn3.disabled = true;
-                btn3.classList.add('bg-gray-600', 'cursor-not-allowed');
-                btn3.classList.remove('bg-purple-600', 'hover:bg-purple-500');
-                btn3.innerText = "Task 3 Locked";
-                timer3.classList.remove('hidden');
-                timer3.innerText = "Wait: " + formatTime(cd3 - now);
-            } else {
-                if(current3 >= target3 && cd3 < now && cd3 !== 0) { 
-                    userData.rupeeAdCount3 = 0; 
-                    userData.rupeeCooldown3 = null; 
-                }
-                btn3.disabled = false;
-                btn3.classList.remove('bg-gray-600', 'cursor-not-allowed');
-                btn3.classList.add('bg-purple-600', 'hover:bg-purple-500');
-                btn3.innerHTML = `<i data-lucide="play-circle" class="w-5 h-5 mr-2"></i> Watch Ad`;
-                timer3.classList.add('hidden');
-            }
-
-            // --- TASK 4 (NEW) ---
-            const target4 = appConfig.rupeeReqAds4 || 10;
-            const current4 = userData.rupeeAdCount4 || 0;
-            const reward4 = appConfig.rupeeReward4 || 0.015;
-            let cd4 = userData.rupeeCooldown4 ? userData.rupeeCooldown4.toDate().getTime() : 0;
-            
-            setText('rupee-ads-count-4', current4);
-            setText('rupee-ads-target-4', target4);
-            setText('rupee-task-reward-4', reward4.toFixed(3));
-            const bar4 = document.getElementById('rupee-progress-bar-4');
-            if(bar4) bar4.style.width = Math.min(100, (current4 / target4) * 100) + "%";
-            
-            const btn4 = document.getElementById('rupee-ad-btn-4');
-            const timer4 = document.getElementById('rupee-timer-4');
-
-            if (cd4 > now) {
-                btn4.disabled = true;
-                btn4.classList.add('bg-gray-600', 'cursor-not-allowed');
-                btn4.classList.remove('bg-red-600', 'hover:bg-red-500');
-                btn4.innerText = "Task 4 Locked";
-                timer4.classList.remove('hidden');
-                timer4.innerText = "Wait: " + formatTime(cd4 - now);
-            } else {
-                if(current4 >= target4 && cd4 < now && cd4 !== 0) { 
-                    userData.rupeeAdCount4 = 0; 
-                    userData.rupeeCooldown4 = null; 
-                }
-                btn4.disabled = false;
-                btn4.classList.remove('bg-gray-600', 'cursor-not-allowed');
-                btn4.classList.add('bg-red-600', 'hover:bg-red-500');
-                btn4.innerHTML = `<i data-lucide="layers" class="w-5 h-5 mr-2"></i> Watch 3 Ads Chain`;
-                timer4.classList.add('hidden');
+                btn5.disabled = false;
+                btn5.className = "w-full p-3 rounded-lg bg-pink-600 hover:bg-pink-500 text-white font-bold transition-all shadow-md flex items-center justify-center";
+                btn5.innerHTML = `<i data-lucide="video" class="w-5 h-5 mr-2"></i> Watch 2 Ads Chain`;
+                timer5.classList.add('hidden');
             }
 
             lucide.createIcons();
@@ -2427,6 +2395,69 @@
                 console.error(e);
                 showAlert("Ad Chain Failed. You must watch all 3 ads to count 1 view.");
                 updateRupeeUI(); // Reset button
+            }
+        }
+
+        // ========================
+        // TASK 5 HANDLER (RICHADS)
+        // ========================
+        async function handleRupeeTask5() {
+            const now = Date.now();
+            let cd = userData.rupeeCooldown5 ? userData.rupeeCooldown5.toDate().getTime() : 0;
+            if (cd > now) return showAlert("Please wait for cooldown.");
+
+            const btn = document.getElementById('rupee-ad-btn-5');
+            btn.disabled = true;
+            btn.innerText = "Loading Video Ad (1/2)...";
+
+            try {
+                if (!window.TelegramAdsController) throw new Error("RichAds Script missing");
+
+                // Show Video Ad
+                await window.TelegramAdsController.show();
+                
+                btn.innerText = "Loading Playable Ad (2/2)...";
+                await new Promise(r => setTimeout(r, 1500)); // Small delay
+
+                // Show Playable Ad
+                await window.TelegramAdsController.show();
+
+                // Success
+                const userRef = doc(db, "users", currentUser.uid);
+                const target = appConfig.rupeeReqAds5 || 15;
+                const reward = appConfig.rupeeReward5 || 0.010;
+                const currentCount = userData.rupeeAdCount5 || 0;
+                
+                let newCount = currentCount + 1;
+                let updates = {};
+
+                if(newCount >= target) {
+                    updates.walletBalance = increment(reward);
+                    userData.walletBalance += reward;
+
+                    const cooldownHours = appConfig.rupeeCooldownHours5 || 6; 
+                    const cooldownTime = new Date(Date.now() + (cooldownHours * 60 * 60 * 1000));
+                         
+                    updates.rupeeAdCount5 = 0;
+                    updates.rupeeCooldown5 = cooldownTime;
+                    userData.rupeeAdCount5 = 0;
+                    userData.rupeeCooldown5 = { toDate: () => cooldownTime };
+
+                    await addToHistory('credit', reward, 'rupees', 'RichAds Mega Task');
+                    showAlert(`🎉 Task 5 Complete! ₹${reward.toFixed(3)} added.`);
+                } else {
+                    updates.rupeeAdCount5 = newCount; 
+                    userData.rupeeAdCount5 = newCount;
+                    showAlert(`Ad Chain Complete! (${newCount}/${target})`);
+                }
+
+                await updateDoc(userRef, updates);
+                updateRupeeUI();
+
+            } catch (e) {
+                console.error(e);
+                showAlert("Ad Chain Failed.");
+                updateRupeeUI();
             }
         }
 
