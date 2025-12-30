@@ -209,8 +209,9 @@
 </head>
 <body class="max-w-md mx-auto h-screen flex flex-col overflow-hidden">
 
-    <div id="loader" class="hidden fixed inset-0 dark-bg bg-opacity-75 flex items-center justify-center z-50">
-        <div class="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-accent"></div>
+    <div id="loader" class="hidden fixed inset-0 dark-bg bg-opacity-75 flex flex-col items-center justify-center z-50">
+        <div class="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-accent mb-4"></div>
+        <p class="text-white font-bold animate-pulse" id="loader-msg">Verifying Ad...</p>
     </div>
 
     <!-- Authentication Section -->
@@ -1193,7 +1194,8 @@
                      return;
                  }
                  btn.innerText = \`Loading Ad (\${birdAdProgress + 1}/\${target})\`;
-                 const adPromise = window.parent.show_10284251 ? window.parent.show_10284251() : window.show_10284251();
+                 // Use Parent Play Function which handles timer
+                 const adPromise = window.parent.playAdByZoneIndex ? window.parent.playAdByZoneIndex(2) : window.show_10284251();
                  adPromise.then(() => {
                      birdAdProgress++;
                      watchNextAd(); 
@@ -1446,7 +1448,8 @@
                 btn.disabled = true;
                 btn.innerText = \`Loading Ad (\${dailyAdProgress + 1}/\${requiredAds})\`;
                 
-                const adPromise = window.parent.show_10284251 ? window.parent.show_10284251() : window.show_10284251();
+                // USE PARENT AD PLAYER TO FORCE TIMER IF NEEDED
+                const adPromise = window.parent.playAdByZoneIndex ? window.parent.playAdByZoneIndex(2) : window.show_10284251();
                 
                 adPromise.then(() => {
                     dailyAdProgress++;
@@ -1662,27 +1665,55 @@
             } catch(e) { console.error("Reward Error:", e); }
         };
 
+        // ======================================
+        // UPDATED AD LOGIC (7 SECOND TIMER FIX)
+        // ======================================
         window.playAdByZoneIndex = function(index) {
             const codeIndex = index % 5; 
             return new Promise((resolve, reject) => {
+                
+                // Loader Logic to enforce watch time
+                const waitForAd = (adPromise) => {
+                    const ldr = document.getElementById('loader');
+                    if(ldr) {
+                        ldr.style.display = 'flex';
+                        const msg = document.getElementById('loader-msg');
+                        if(msg) msg.innerText = "Verifying Ad... Please Wait 7s";
+                    }
+
+                    adPromise.then(() => {
+                        console.log("Ad opened/closed. Waiting for timer...");
+                    }).catch(e => console.error("Ad trigger error", e));
+
+                    // 7 SECOND TIMER
+                    setTimeout(() => {
+                        if(ldr) ldr.style.display = 'none';
+                        resolve(); 
+                    }, 7000); 
+                };
+
                 try {
                     if (codeIndex === 0) {
                         if(typeof window.show_9966888 !== 'function') reject("Script 9966888 Missing");
-                        window.show_9966888().then(() => { alert('You have seen an ad!'); resolve(); }).catch(reject);
+                        waitForAd(window.show_9966888());
                     } else if (codeIndex === 1) {
                          if(typeof window.show_9966767 !== 'function') reject("Script 9966767 Missing");
-                         window.show_9966767().then(() => { alert('You have seen an ad!'); resolve(); }).catch(reject);
+                         waitForAd(window.show_9966767());
                     } else if (codeIndex === 2) {
                         if(typeof window.show_10284251 !== 'function') reject("Script 10284251 Missing");
-                        window.show_10284251().then(() => { alert('You have seen an ad!'); resolve(); }).catch(reject);
+                        waitForAd(window.show_10284251());
                     } else if (codeIndex === 3) {
                         if(typeof window.show_10283653 !== 'function') reject("Script 10283653 Missing");
-                        window.show_10283653().then(() => { alert('You have seen an ad!'); resolve(); }).catch(reject);
+                        waitForAd(window.show_10283653());
                     } else {
                         if(typeof window.show_9972147 !== 'function') reject("Script 9972147 Missing");
-                        window.show_9972147().then(() => { alert('You have seen an ad!'); resolve(); }).catch(reject);
+                        waitForAd(window.show_9972147());
                     }
-                } catch(e) { reject(e); }
+                } catch(e) { 
+                    reject(e);
+                    const ldr = document.getElementById('loader');
+                    if(ldr) ldr.style.display = 'none';
+                }
             });
         };
 
@@ -2345,16 +2376,19 @@
 
             try {
                 // Ad 1: AdsGram 19068 (NO int-)
-                await window.Adsgram.init({ blockId: "19068" }).show();
+                const res1 = await window.Adsgram.init({ blockId: "19068" }).show();
+                if(!res1.done) throw new Error("Skipped");
+                
                 btn.innerText = "Loading Ad 2/3...";
 
                 // Ad 2: AdsGram int-19069 (WITH int-)
-                await window.Adsgram.init({ blockId: "int-19069" }).show();
+                const res2 = await window.Adsgram.init({ blockId: "int-19069" }).show();
+                if(!res2.done) throw new Error("Skipped");
+                
                 btn.innerText = "Loading Ad 3/3...";
                 
-                // Ad 3: Monetag (9966888)
-                if (typeof window.show_9966888 !== 'function') throw new Error("Monetag script missing");
-                await window.show_9966888();
+                // Ad 3: Monetag (9966888) WITH TIMER
+                await window.playAdByZoneIndex(0); // This calls the 7s timer function
                 
                 // --- SUCCESS ---
                 const userRef = doc(db, "users", currentUser.uid);
@@ -2393,7 +2427,7 @@
 
             } catch (e) {
                 console.error(e);
-                showAlert("Ad Chain Failed. You must watch all 3 ads to count 1 view.");
+                showAlert(e.message === "Skipped" ? "Ad Skipped! No Reward." : "Ad Chain Failed.");
                 updateRupeeUI(); // Reset button
             }
         }
@@ -2417,7 +2451,7 @@
                 await window.TelegramAdsController.show();
                 
                 btn.innerText = "Loading Playable Ad (2/2)...";
-                await new Promise(r => setTimeout(r, 1500)); // Small delay
+                await new Promise(r => setTimeout(r, 2000)); // Small delay
 
                 // Show Playable Ad
                 await window.TelegramAdsController.show();
@@ -2461,10 +2495,12 @@
             }
         }
 
+        // ================================
+        // UPDATED ADSGRAM CHECK LOGIC
+        // ================================
         async function handleRupeeAdWatch(taskNum, blockId) {
             const btn = document.getElementById(`rupee-ad-btn-${taskNum}`);
             
-            // Check Cooldown again
             const now = Date.now();
             let cd = 0;
             if(taskNum === 1) cd = userData.rupeeCooldown1?.toDate().getTime() || 0;
@@ -2479,60 +2515,67 @@
             btn.innerHTML = "Loading...";
 
             AdController.show().then(async (result) => {
-                const userRef = doc(db, "users", currentUser.uid);
-                
-                let target = 10, reward = 0.010, currentCount = 0;
-                
-                if(taskNum === 1) { target = appConfig.rupeeReqAds1 || 10; reward = appConfig.rupeeReward1 || 0.010; currentCount = userData.rupeeAdCount1 || 0; }
-                if(taskNum === 2) { target = appConfig.rupeeReqAds2 || 10; reward = appConfig.rupeeReward2 || 0.010; currentCount = userData.rupeeAdCount2 || 0; }
-                if(taskNum === 3) { target = appConfig.rupeeReqAds3 || 10; reward = appConfig.rupeeReward3 || 0.010; currentCount = userData.rupeeAdCount3 || 0; }
-                
-                let newCount = currentCount + 1;
-                let updates = {};
-
-                if(newCount >= target) {
-                    updates.walletBalance = increment(reward);
-                    userData.walletBalance += reward;
-
-                    // LOG HISTORY
-                    await addToHistory('credit', reward, 'rupees', `Rupee Task ${taskNum}`);
-
-                    if(taskNum === 3) {
-                         const cooldownMinutes = appConfig.rupeeCooldownMinutes3 || 2; 
-                         const cooldownTime = new Date(Date.now() + (cooldownMinutes * 60 * 1000));
-                         updates.rupeeAdCount3 = 0;
-                         updates.rupeeCooldown3 = cooldownTime;
-                         userData.rupeeAdCount3 = 0;
-                         userData.rupeeCooldown3 = { toDate: () => cooldownTime };
-                    } else {
-                         const cooldownHours = appConfig.rupeeCooldownHours || 1; 
-                         const cooldownTime = new Date(Date.now() + (cooldownHours * 60 * 60 * 1000));
-                         if(taskNum === 1) {
-                            updates.rupeeAdCount1 = 0;
-                            updates.rupeeCooldown1 = cooldownTime;
-                            userData.rupeeAdCount1 = 0;
-                            userData.rupeeCooldown1 = { toDate: () => cooldownTime };
-                         } else {
-                            updates.rupeeAdCount2 = 0;
-                            updates.rupeeCooldown2 = cooldownTime;
-                            userData.rupeeAdCount2 = 0;
-                            userData.rupeeCooldown2 = { toDate: () => cooldownTime };
-                         }
-                    }
+                // *** CRITICAL CHANGE: CHECK IF DONE ***
+                if(result.done) {
+                    const userRef = doc(db, "users", currentUser.uid);
                     
-                    showAlert(`🎉 Task ${taskNum} Complete! ₹${reward.toFixed(3)} added. Cooldown started.`);
-                } else {
-                    if(taskNum === 1) { updates.rupeeAdCount1 = newCount; userData.rupeeAdCount1 = newCount; }
-                    if(taskNum === 2) { updates.rupeeAdCount2 = newCount; userData.rupeeAdCount2 = newCount; }
-                    if(taskNum === 3) { updates.rupeeAdCount3 = newCount; userData.rupeeAdCount3 = newCount; }
-                }
+                    let target = 10, reward = 0.010, currentCount = 0;
+                    
+                    if(taskNum === 1) { target = appConfig.rupeeReqAds1 || 10; reward = appConfig.rupeeReward1 || 0.010; currentCount = userData.rupeeAdCount1 || 0; }
+                    if(taskNum === 2) { target = appConfig.rupeeReqAds2 || 10; reward = appConfig.rupeeReward2 || 0.010; currentCount = userData.rupeeAdCount2 || 0; }
+                    if(taskNum === 3) { target = appConfig.rupeeReqAds3 || 10; reward = appConfig.rupeeReward3 || 0.010; currentCount = userData.rupeeAdCount3 || 0; }
+                    
+                    let newCount = currentCount + 1;
+                    let updates = {};
 
-                await updateDoc(userRef, updates);
-                updateUI(); // Updates balance
-                updateRupeeUI(); // Updates bars/timers
+                    if(newCount >= target) {
+                        updates.walletBalance = increment(reward);
+                        userData.walletBalance += reward;
+
+                        // LOG HISTORY
+                        await addToHistory('credit', reward, 'rupees', `Rupee Task ${taskNum}`);
+
+                        if(taskNum === 3) {
+                             const cooldownMinutes = appConfig.rupeeCooldownMinutes3 || 2; 
+                             const cooldownTime = new Date(Date.now() + (cooldownMinutes * 60 * 1000));
+                             updates.rupeeAdCount3 = 0;
+                             updates.rupeeCooldown3 = cooldownTime;
+                             userData.rupeeAdCount3 = 0;
+                             userData.rupeeCooldown3 = { toDate: () => cooldownTime };
+                        } else {
+                             const cooldownHours = appConfig.rupeeCooldownHours || 1; 
+                             const cooldownTime = new Date(Date.now() + (cooldownHours * 60 * 60 * 1000));
+                             if(taskNum === 1) {
+                                updates.rupeeAdCount1 = 0;
+                                updates.rupeeCooldown1 = cooldownTime;
+                                userData.rupeeAdCount1 = 0;
+                                userData.rupeeCooldown1 = { toDate: () => cooldownTime };
+                             } else {
+                                updates.rupeeAdCount2 = 0;
+                                updates.rupeeCooldown2 = cooldownTime;
+                                userData.rupeeAdCount2 = 0;
+                                userData.rupeeCooldown2 = { toDate: () => cooldownTime };
+                             }
+                        }
+                        
+                        showAlert(`🎉 Task ${taskNum} Complete! ₹${reward.toFixed(3)} added. Cooldown started.`);
+                    } else {
+                        if(taskNum === 1) { updates.rupeeAdCount1 = newCount; userData.rupeeAdCount1 = newCount; }
+                        if(taskNum === 2) { updates.rupeeAdCount2 = newCount; userData.rupeeAdCount2 = newCount; }
+                        if(taskNum === 3) { updates.rupeeAdCount3 = newCount; userData.rupeeAdCount3 = newCount; }
+                    }
+
+                    await updateDoc(userRef, updates);
+                    updateUI(); // Updates balance
+                    updateRupeeUI(); // Updates bars/timers
+                } else {
+                    showAlert("Ad Skipped! No Reward.");
+                    updateRupeeUI();
+                }
                 
             }).catch((result) => {
                 console.log(result);
+                showAlert("Ad Error.");
                 updateRupeeUI(); // Reset button
             });
         }
@@ -2613,6 +2656,7 @@
             if(btn) { btn.innerText = "Loading..."; btn.disabled = true; }
             
             try {
+                // Calls playAdByZoneIndex (which now has 7s timer)
                 await window.playAdByZoneIndex(index);
                 const userRef = doc(db, "users", currentUser.uid);
                 await updateDoc(userRef, { scratchAdsCount: increment(1) });
@@ -2780,11 +2824,13 @@
              if (zone1ResetTime > 0 && now > zone1ResetTime) { const userRef = doc(db, "users", currentUser.uid); await updateDoc(userRef, { adZone1Count: 0, adZone1Cooldown: null }); userData.adZone1Count = 0; userData.adZone1Cooldown = null; }
              if (userData.adZone1Count >= ZONE1_LIMIT_COUNT) return showAlert("Limit reached. Please wait for cooldown.");
              
-             // NEW AD CODE (10283653)
+             // NEW AD CODE (10283653) WITH TIMER
              if (typeof window.show_10283653 !== 'function') return showAlert("Ad load fail. Script Missing");
              const btn = document.getElementById('zone1-btn'); if(btn) btn.disabled = true;
              
-             window.show_10283653().then(async () => {
+             // Uses the timer logic via playAdByZoneIndex wrapper logic (manual call here for zone 1)
+             // We reuse playAdByZoneIndex logic manually for consistent experience
+             window.playAdByZoneIndex(3).then(async () => {
                  alert('You have seen an ad!');
                  const userRef = doc(db, "users", currentUser.uid);
                  let newCount = (userData.adZone1Count || 0) + 1;
@@ -2806,11 +2852,11 @@
              if (zone2ResetTime > 0 && now > zone2ResetTime) { const userRef = doc(db, "users", currentUser.uid); await updateDoc(userRef, { adZone2Count: 0, adZone2Cooldown: null }); userData.adZone2Count = 0; userData.adZone2Cooldown = null; }
              if (userData.adZone2Count >= ZONE2_LIMIT_COUNT) return showAlert("Limit reached. Please wait for cooldown.");
              
-             // NEW AD CODE (9972147)
+             // NEW AD CODE (9972147) WITH TIMER
              if (typeof window.show_9972147 !== 'function') return showAlert("Ad load fail. Script Missing");
              const btn = document.getElementById('zone2-btn'); if(btn) btn.disabled = true;
              
-             window.show_9972147().then(async () => {
+             window.playAdByZoneIndex(4).then(async () => {
                  alert('You have seen an ad!');
                  const userRef = doc(db, "users", currentUser.uid);
                  let newCount = (userData.adZone2Count || 0) + 1;
@@ -2992,10 +3038,10 @@
             const now = Date.now(); let cooldownTime = userData.miningCooldown ? userData.miningCooldown.toDate().getTime() : 0; if (cooldownTime > now) return showAlert("Please wait for cooldown.");
             const btn = document.getElementById('mining-start-btn'); if(btn) { btn.disabled = true; btn.innerText = "Loading Ad..."; }
             
-            // NEW AD CODE (10284251)
+            // NEW AD CODE (10284251) WITH TIMER
             if (typeof window.show_10284251 !== 'function') { if(btn) btn.disabled = false; return showAlert("Ad script not loaded. Check internet."); }
             
-            window.show_10284251().then(async () => {
+            window.playAdByZoneIndex(2).then(async () => {
                 alert('You have seen an ad!');
                 const userRef = doc(db, "users", currentUser.uid); const targetAds = appConfig.miningReqAds || 15; const reward = appConfig.miningReward || 8000; const cooldownHours = appConfig.miningCooldownHours || 5;
                 let newCount = (userData.miningAdsCount || 0) + 1; userData.miningAdsCount = newCount;
@@ -3078,8 +3124,18 @@
             try {
                 // --- GIGA PUB INTEGRATION ---
                 if (typeof window.showGiga !== 'function') throw new Error("Giga Pub Script Missing");
+                
+                // ADDING TIMER TO GIGA PUB ADS TOO
+                const ldr = document.getElementById('loader');
+                if(ldr) { ldr.style.display = 'flex'; document.getElementById('loader-msg').innerText = "Verifying Ad... Please Wait 7s"; }
+                
                 await window.showGiga();
                 
+                // Force 7 Second wait
+                await new Promise(resolve => setTimeout(resolve, 7000));
+                
+                if(ldr) ldr.style.display = 'none';
+
                 // --- SUCCESS LOGIC ---
                 const userRef = doc(db, "users", currentUser.uid);
                 let newCount = currentCount + 1;
