@@ -2994,7 +2994,7 @@
             if (userData.dailyAdCount >= (appConfig.dailyAdLimit || 10)) return showAlert("Daily ad limit reached.");
             if (typeof window.show_9972147 !== 'function') return showAlert("Ad not ready.");
             window.show_9972147().then(async () => {
-                let reward = 50; const newDaily = (userData.dailyAdCount || 0) + 1; 
+                let reward = 10; const newDaily = (userData.dailyAdCount || 0) + 1; 
                 let updates = { dailyAdCount: newDaily, balance: increment(reward) };
                 await updateDoc(doc(db, "users", currentUser.uid), updates); 
                 userData.balance += reward; userData.dailyAdCount = newDaily;
