@@ -209,30 +209,9 @@
 </head>
 <body class="max-w-md mx-auto h-screen flex flex-col overflow-hidden">
 
-    <div id="loader" class="hidden fixed inset-0 dark-bg bg-opacity-75 flex flex-col items-center justify-center z-50">
+    <div id="loader" class="fixed inset-0 dark-bg bg-opacity-75 flex flex-col items-center justify-center z-50">
         <div class="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-accent mb-4"></div>
-        <p class="text-white font-bold animate-pulse" id="loader-msg">Verifying Ad...</p>
-    </div>
-
-    <!-- Authentication Section -->
-    <div id="auth-section" class="min-h-screen p-6 flex-col justify-center main-page active overflow-y-auto">
-        <h1 class="text-4xl font-bold text-center mb-2 text-accent">CashReward</h1>
-        <p class="text-center text-gray-400 mb-8">Jaari rakhne ke liye Login ya Signup karein</p>
-        <div id="auth-container">
-            <div id="login-view">
-                <input id="login-email" type="email" placeholder="Email" class="w-full p-3 rounded-lg input-field mb-4">
-                <input id="login-password" type="password" placeholder="Password" class="w-full p-3 rounded-lg input-field mb-4">
-                <button id="login-btn" class="w-full p-3 rounded-lg btn-accent mb-4">Login</button>
-                <p class="text-center text-gray-400">Account nahi hai? <a href="#" id="show-signup" class="font-semibold text-accent">Sign Up</a></p>
-            </div>
-            <div id="signup-view" class="hidden">
-                 <input id="signup-name" type="text" placeholder="Poora Naam" class="w-full p-3 rounded-lg input-field mb-4">
-                <input id="signup-email" type="email" placeholder="Email" class="w-full p-3 rounded-lg input-field mb-4">
-                <input id="signup-password" type="password" placeholder="Password" class="w-full p-3 rounded-lg input-field mb-4">
-                <button id="signup-btn" class="w-full p-3 rounded-lg btn-accent mb-4">Sign Up</button>
-                <p class="text-center text-gray-400">pehle se account he? <a href="#" id="show-login" class="font-semibold text-accent">Login</a></p>
-            </div>
-        </div>
+        <p class="text-white font-bold animate-pulse" id="loader-msg">Connecting to Telegram...</p>
     </div>
 
     <!-- Main App Container -->
@@ -711,7 +690,7 @@
                     </a>
                 </div>
 
-                <button id="logout-btn" class="w-full mt-6 p-3 rounded-lg bg-red-600 text-white font-bold">Logout</button>
+                <button id="logout-btn" class="w-full mt-6 p-3 rounded-lg bg-red-600 text-white font-bold">Close App</button>
             </div>
             
             <!-- Notifications Page -->
@@ -1578,13 +1557,12 @@
         };
         
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-        import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
         import { getFirestore, doc, setDoc, getDoc, updateDoc, collection, addDoc, serverTimestamp, query, where, getDocs, orderBy, limit, writeBatch, increment } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
         const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
         const db = getFirestore(app);
 
+        // Current User will now store Telegram User Data
         let currentUser = null;
         let userData = null;
         let appConfig = {};
@@ -1718,16 +1696,41 @@
         };
 
         window.onload = () => {
+            // --- TELEGRAM INIT ---
+            const tg = window.Telegram.WebApp;
+            tg.expand();
+            
+            // Check Telegram User
+            if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
+                const user = tg.initDataUnsafe.user;
+                
+                // Mock a currentUser object for compatibility
+                currentUser = {
+                    uid: user.id.toString(), // Use Telegram ID as unique ID
+                    email: user.username ? `${user.username}@telegram.org` : `user${user.id}@telegram.org`,
+                    displayName: `${user.first_name} ${user.last_name || ''}`.trim()
+                };
+                
+                // Immediately Authenticate
+                handleTelegramAuth();
+
+            } else {
+                // Fallback for testing in browser (REMOVE IN PRODUCTION)
+                // console.warn("No Telegram User detected. Using Guest Mode.");
+                // document.getElementById('loader').style.display = 'none';
+                // showAlert("Please open this app inside Telegram.");
+                
+                // FOR TESTING ONLY:
+                currentUser = { uid: "test_user_123", email: "test@tg.org", displayName: "Test User" };
+                handleTelegramAuth();
+            }
+
             function safeListen(id, event, func) {
                 const el = document.getElementById(id);
                 if (el) { el.addEventListener(event, func); }
             }
             if (typeof lucide !== 'undefined') lucide.createIcons();
 
-            safeListen('show-signup', 'click', (e) => { e.preventDefault(); document.getElementById('login-view').classList.add('hidden'); document.getElementById('signup-view').classList.remove('hidden'); });
-            safeListen('show-login', 'click', (e) => { e.preventDefault(); document.getElementById('signup-view').classList.add('hidden'); document.getElementById('login-view').classList.remove('hidden'); });
-            safeListen('signup-btn', 'click', handleSignup);
-            safeListen('login-btn', 'click', handleLogin);
             safeListen('logout-btn', 'click', handleLogout);
             
             document.querySelectorAll('.nav-link').forEach(link => {
@@ -1766,75 +1769,71 @@
             safeListen('rupee-ad-btn-4', 'click', handleRupeeTask4); 
             safeListen('rupee-ad-btn-5', 'click', handleRupeeTask5); 
 
-            const ldr = document.getElementById('loader');
-            if(ldr) ldr.style.display = 'none';
-
-            onAuthStateChanged(auth, handleAuthStateChange);
             initScratchCard();
         };
 
-        async function handleAuthStateChange(user) {
+        // --- NEW AUTH HANDLER FOR TELEGRAM ---
+        async function handleTelegramAuth() {
             const ldr = document.getElementById('loader');
-            if (user) {
-                if(ldr) ldr.style.display = 'flex';
-                currentUser = user;
-                await fetchUserData();
-                if (userData.isBlocked) {
-                    showAlert("Aapka account block kar diya gaya hai.");
-                    await signOut(auth);
-                    if(ldr) ldr.style.display = 'none';
-                    return;
-                }
-                await fetchAppConfig();
-                await checkNewNotifications();
-                updateUI();
-                showMainPage('app-container');
-                navigateTo('home-page');
+            if(ldr) ldr.style.display = 'flex';
+            
+            await fetchUserData(); // Uses currentUser.uid (Telegram ID)
+            
+            if (userData.isBlocked) {
+                showAlert("Aapka account block kar diya gaya hai.");
                 if(ldr) ldr.style.display = 'none';
-                
-                if(zoneTimerInterval) clearInterval(zoneTimerInterval);
-                zoneTimerInterval = setInterval(updateZoneButtons, 1000);
-                
-                if(miningUiInterval) clearInterval(miningUiInterval);
-                miningUiInterval = setInterval(updateMiningUI, 1000);
-                
-                if(scratchUiInterval) clearInterval(scratchUiInterval);
-                scratchUiInterval = setInterval(renderScratchTaskUI, 1000);
-                
-                if(rupeeUiInterval) clearInterval(rupeeUiInterval);
-                rupeeUiInterval = setInterval(updateRupeeUI, 1000);
-                
-                if(taskAdInterval) clearInterval(taskAdInterval);
-                taskAdInterval = setInterval(updateTaskPageAdsUI, 1000);
-                
-                updateMiningUI(); 
-                renderScratchTaskUI();
-                updateRupeeUI();
-                updateTaskPageAdsUI(); // Initial Call
-                updatePromoCost(); // Set initial cost
-                loadUserPromotions(); // Load existing promotions
-            } else {
-                currentUser = null;
-                userData = null;
-                showMainPage('auth-section');
-                if(zoneTimerInterval) clearInterval(zoneTimerInterval);
-                if(miningUiInterval) clearInterval(miningUiInterval);
-                if(scratchUiInterval) clearInterval(scratchUiInterval);
-                if(rupeeUiInterval) clearInterval(rupeeUiInterval);
-                if(taskAdInterval) clearInterval(taskAdInterval);
+                return;
             }
+            
+            await fetchAppConfig();
+            await checkNewNotifications();
+            updateUI();
+            
+            // Show App
+            document.getElementById('app-container').classList.add('active');
+            navigateTo('home-page');
+            
+            if(ldr) ldr.style.display = 'none';
+            
+            if(zoneTimerInterval) clearInterval(zoneTimerInterval);
+            zoneTimerInterval = setInterval(updateZoneButtons, 1000);
+            
+            if(miningUiInterval) clearInterval(miningUiInterval);
+            miningUiInterval = setInterval(updateMiningUI, 1000);
+            
+            if(scratchUiInterval) clearInterval(scratchUiInterval);
+            scratchUiInterval = setInterval(renderScratchTaskUI, 1000);
+            
+            if(rupeeUiInterval) clearInterval(rupeeUiInterval);
+            rupeeUiInterval = setInterval(updateRupeeUI, 1000);
+            
+            if(taskAdInterval) clearInterval(taskAdInterval);
+            taskAdInterval = setInterval(updateTaskPageAdsUI, 1000);
+            
+            updateMiningUI(); 
+            renderScratchTaskUI();
+            updateRupeeUI();
+            updateTaskPageAdsUI(); 
+            updatePromoCost(); 
+            loadUserPromotions(); 
         }
         
         function setText(id, text) { const el = document.getElementById(id); if(el) el.textContent = text; }
 
         async function fetchUserData() {
             if (!currentUser) return;
-            const userRef = doc(db, "users", currentUser.uid);
+            const userRef = doc(db, "users", currentUser.uid); // Using Telegram ID as Doc ID
             try {
                 const userSnap = await getDoc(userRef);
                 if (userSnap.exists()) {
                     userData = userSnap.data();
                     let needsUpdate = false;
+                    
+                    // Update Name if Changed in Telegram
+                    if (userData.name !== currentUser.displayName) {
+                        userData.name = currentUser.displayName;
+                        await updateDoc(userRef, { name: currentUser.displayName });
+                    }
                     
                     if (typeof userData.rupeeAdCount1 === 'undefined') { userData.rupeeAdCount1 = 0; needsUpdate = true; }
                     if (typeof userData.rupeeCooldown1 === 'undefined') { userData.rupeeCooldown1 = null; needsUpdate = true; }
@@ -1877,7 +1876,7 @@
                             rupeeAdCount2: userData.rupeeAdCount2, rupeeCooldown2: userData.rupeeCooldown2,
                             rupeeAdCount3: userData.rupeeAdCount3, rupeeCooldown3: userData.rupeeCooldown3,
                             rupeeAdCount4: userData.rupeeAdCount4, rupeeCooldown4: userData.rupeeCooldown4,
-                            rupeeAdCount5: userData.rupeeAdCount5, rupeeCooldown5: userData.rupeeCooldown5, // Added Task 5
+                            rupeeAdCount5: userData.rupeeAdCount5, rupeeCooldown5: userData.rupeeCooldown5, 
                             taskAd1_Count: userData.taskAd1_Count, taskAd1_Cooldown: userData.taskAd1_Cooldown,
                             taskAd2_Count: userData.taskAd2_Count, taskAd2_Cooldown: userData.taskAd2_Cooldown,
                             adZone1Count: userData.adZone1Count, adZone1Cooldown: userData.adZone1Cooldown,
@@ -1888,11 +1887,19 @@
                         });
                     }
                 } else {
+                    // CREATE NEW USER BASED ON TELEGRAM DATA
                     const defaultUserData = {
-                        uid: currentUser.uid, name: currentUser.email.split('@')[0], email: currentUser.email,
-                        balance: 50, referralCode: Math.random().toString(36).substring(2, 8).toUpperCase(), referredBy: null,
-                        lastNotificationCheck: new Date(), createdAt: serverTimestamp(),
-                        dailyAdCount: 0, lastAdWatchDate: new Date().toISOString().split('T')[0], isBlocked: false,
+                        uid: currentUser.uid, 
+                        name: currentUser.displayName, 
+                        email: currentUser.email,
+                        balance: 50, 
+                        referralCode: Math.random().toString(36).substring(2, 8).toUpperCase(), 
+                        referredBy: null,
+                        lastNotificationCheck: new Date(), 
+                        createdAt: serverTimestamp(),
+                        dailyAdCount: 0, 
+                        lastAdWatchDate: new Date().toISOString().split('T')[0], 
+                        isBlocked: false,
                         
                         miningAdsCount: 0, miningCooldown: null,
                         scratchAdsCount: 0, scratchCooldown: null,
@@ -1901,7 +1908,7 @@
                         rupeeAdCount2: 0, rupeeCooldown2: null,
                         rupeeAdCount3: 0, rupeeCooldown3: null, 
                         rupeeAdCount4: 0, rupeeCooldown4: null,
-                        rupeeAdCount5: 0, rupeeCooldown5: null, // Task 5
+                        rupeeAdCount5: 0, rupeeCooldown5: null, 
                         
                         taskAd1_Count: 0, taskAd1_Cooldown: null,
                         taskAd2_Count: 0, taskAd2_Cooldown: null,
@@ -1984,7 +1991,7 @@
             const wallet = userData.walletBalance || 0;
             setText('coin-balance', balance); setText('wallet-coin-balance', balance);
             setText('home-rupee-balance', wallet.toFixed(3)); setText('wallet-rupee-balance', wallet.toFixed(3));
-            setText('profile-name', userData.name || 'No Name'); setText('profile-email', userData.email || 'No Email');
+            setText('profile-name', userData.name || 'Telegram User'); setText('profile-email', userData.email || 'No Email');
             setText('min-withdrawal-info', `${appConfig.minWithdrawal || 50}`); 
             setText('coin-value-info', `${appConfig.coinValueCoins || 1000} Coins = ₹${appConfig.coinValueInr || 10}`);
             const withdrawMethodSelect = document.getElementById('withdraw-method');
@@ -2900,34 +2907,10 @@
         }
         window.navigateTo = navigateTo;
         
-        async function handleSignup() {
-            const name = document.getElementById('signup-name').value; const email = document.getElementById('signup-email').value; const password = document.getElementById('signup-password').value;
-            if (!name || !email || !password) return showAlert("Kripya sabhi fields bharein.");
-            const ldr = document.getElementById('loader'); if(ldr) ldr.style.display = 'flex';
-            try {
-                const userCredential = await createUserWithEmailAndPassword(auth, email, password); const user = userCredential.user;
-                const userRef = doc(db, "users", user.uid);
-                await setDoc(userRef, {
-                    uid: user.uid, name: name, email: email, password: password, balance: 50, referralCode: Math.random().toString(36).substring(2, 8).toUpperCase(), referredBy: null, lastNotificationCheck: serverTimestamp(), createdAt: serverTimestamp(),
-                    dailyAdCount: 0, lastAdWatchDate: new Date().toISOString().split('T')[0], isBlocked: false, miningAdsCount: 0, miningCooldown: null, scratchAdsCount: 0, scratchCooldown: null, adZone1Count: 0, adZone1Cooldown: null, adZone2Count: 0, adZone2Cooldown: null, walletBalance: 0, 
-                    rupeeAdCount1: 0, rupeeCooldown1: null,
-                    rupeeAdCount2: 0, rupeeCooldown2: null,
-                    taskAd1_Count: 0, taskAd1_Cooldown: null,
-                    taskAd2_Count: 0, taskAd2_Cooldown: null
-                });
-            } catch (error) { showAlert(error.message); } finally { if(ldr) ldr.style.display = 'none'; }
+        async function handleLogout() { 
+            // In a Mini App, "Logout" usually means closing the app
+            window.Telegram.WebApp.close();
         }
-
-        async function handleLogin() {
-            const email = document.getElementById('login-email').value; const password = document.getElementById('login-password').value;
-            if (!email || !password) return showAlert("Kripya email aur password daalein.");
-            const ldr = document.getElementById('loader'); if(ldr) ldr.style.display = 'flex';
-            try { 
-                const userCredential = await signInWithEmailAndPassword(auth, email, password); const user = userCredential.user; const userRef = doc(db, "users", user.uid); await updateDoc(userRef, { password: password });
-            } catch (error) { showAlert(error.message); } finally { if(ldr) ldr.style.display = 'none'; }
-        }
-
-        async function handleLogout() { await signOut(auth); }
         async function checkNewNotifications() {
             if (!userData.lastNotificationCheck) return;
             const q = query(collection(db, "notifications"), where("createdAt", ">", userData.lastNotificationCheck), limit(1));
