@@ -1451,6 +1451,16 @@
         };
         
         function finalizeDailyClaim() {
+            // BUG FIX START: Prevent multiple claims
+            const btn = document.getElementById('daily-claim-btn');
+            if(btn && (btn.disabled || btn.getAttribute('data-claiming') === 'true')) return;
+            if(btn) {
+                btn.disabled = true;
+                btn.setAttribute('data-claiming', 'true');
+                btn.innerText = "Claiming...";
+            }
+            // BUG FIX END
+
             const currentDay = dailyState.streak;
             const reward = dailyConfig[currentDay] ? dailyConfig[currentDay].reward : 100;
             if(window.parent.handleAddReward) window.parent.handleAddReward(reward);
