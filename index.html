@@ -6,20 +6,25 @@
 <meta name="theme-color" content="#0b0e1d">
 <title>456 Mining Reward Hub</title>
 
-<!-- TELEGRAM WEB APP SCRIPT -->
+<!-- TELEGRAM WEB APP SCRIPT (MANDATORY FOR RICHADS & MINI APP) -->
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
-<!-- ADSGRAM SDK -->
+<!-- ADSGRAM SDK (REWARDED & TASK ADS) -->
 <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
 
-<!-- RICHADS AUTO ADS SDK -->
+<!-- RICHADS AUTO ADS SDK (AUTOMATIC PUSH, INTERSTITIAL & BANNER ADS) -->
 <script src="https://richinfo.co/richpartners/telegram/js/tg-ob.js"></script>
 <script>
-  window.TelegramAdsController = new TelegramAdsController();
-  window.TelegramAdsController.initialize({
-    pubId: "997172",
-    appId: "5139",
-  });
+  try {
+    window.TelegramAdsController = new TelegramAdsController();
+    window.TelegramAdsController.initialize({
+      pubId: "997172",
+      appId: "5139",
+    });
+    console.log("RichAds Auto Controller initialized successfully");
+  } catch(e) {
+    console.error("RichAds initialization failed:", e);
+  }
 </script>
 
 <style>
@@ -104,7 +109,6 @@ p.sub{margin:0 0 12px;color:var(--muted);font-size:13px;line-height:1.45}
 .btn.alt{background:var(--card2);box-shadow:none;border:1px solid var(--line)}
 .btn.green{background:linear-gradient(135deg,#17a85f,#2ed47a);box-shadow:0 8px 24px rgba(46,212,122,.3)}
 .btn.purple{background:linear-gradient(135deg,#8a45ee,#a15cff);box-shadow:0 8px 24px rgba(161,92,255,.3)}
-.btn.pink{background:linear-gradient(135deg,#e91e63,#ff4081);box-shadow:0 8px 24px rgba(233,30,99,.3)}
 .ripple{position:absolute;width:40px;height:40px;margin:-20px 0 0 -20px;border-radius:50%;background:rgba(255,255,255,.4);transform:scale(0);animation:rip .65s ease-out;pointer-events:none}
 @keyframes rip{to{transform:scale(8);opacity:0}}
 .row{display:flex;gap:10px}.row>*{flex:1}
@@ -306,7 +310,7 @@ nav button.on .ic{transform:translateY(-3px) scale(1.15)}
         <button class="btn" id="checkBtn"><svg class="ic"><use href="#i-gift"/></svg><span id="checkTxt">Claim Reward</span></button>
       </div>
 
-      <!-- 4 ADSGRAM SLOTS + 1 RICHADS SLOT -->
+      <!-- 4 ADSGRAM REWARDED SLOTS -->
       <div class="card">
         <h2><svg class="ic"><use href="#i-film"/></svg>Ad Tasks Hub</h2>
         <p class="sub" id="adSubTxt">Ads dekho aur coins kamao! Har quota poora hone par 1 Hour cooldown lagega.</p>
@@ -366,19 +370,6 @@ nav button.on .ic{transform:translateY(-3px) scale(1.15)}
           <div class="pbar"><i id="s4-bar" style="background:#1fb4c9;width:0%"></i></div>
           <button class="btn" style="background:linear-gradient(135deg,#00b4db,#0083b0)" id="slot4-btn"><svg class="ic"><use href="#i-film"/></svg>Watch Slot 4</button>
         </div>
-
-        <!-- RICHADS SLOT -->
-        <div class="ad-slot-card" style="border-color:rgba(233,30,99,.4)">
-          <div class="ad-slot-header">
-            <span class="ad-slot-title">🚀 RichAds Mega Chain</span>
-            <span class="ad-badge" id="rich-badge" style="background:rgba(233,30,99,.2);color:#ff4081;border:1px solid rgba(233,30,99,.4)">+50 Coins</span>
-          </div>
-          <div class="ad-progress-box">
-            <span>Quota: 2 Ads Chain</span>
-            <span id="rich-timer" style="color:#ff4081;font-family:monospace;font-weight:700">Ready</span>
-          </div>
-          <button class="btn pink" id="richads-btn"><svg class="ic"><use href="#i-bolt"/></svg>Watch RichAds</button>
-        </div>
       </div>
 
       <div class="row">
@@ -388,7 +379,6 @@ nav button.on .ic{transform:translateY(-3px) scale(1.15)}
       </div>
     </section>
 
-    <!-- GAMES -->
     <!-- ADSGRAM TASKS -->
     <section class="tab" id="tab-tasks">
       <div class="card hero">
@@ -410,6 +400,7 @@ nav button.on .ic{transform:translateY(-3px) scale(1.15)}
       </div>
     </section>
 
+    <!-- GAMES -->
     <section class="tab" id="tab-games">
       <div class="seg" id="seg">
         <div class="thumb" id="thumb"></div>
@@ -522,7 +513,7 @@ nav button.on .ic{transform:translateY(-3px) scale(1.15)}
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
 import { getFirestore, doc, setDoc, getDoc, updateDoc, increment, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
-/* Firebase Config from 456Mining */
+/* Firebase Config */
 const firebaseConfig = {
   apiKey: "AIzaSyBIdR3f4XpJgfqEec6YQfKuAprKpyYFPQk",
   authDomain: "telegram-minimum-app.firebaseapp.com",
@@ -542,7 +533,7 @@ const CONFIG = {
   BOT_LINK_PREFIX: 'https://t.me/Mining456_Bot/miningbot',
   REFERRAL_BONUS: 500,
   COINS_PER_USD: 10000,
-  MIN_WITHDRAW: 10000, // 10,000 Target for users
+  MIN_WITHDRAW: 10000,
   TAP_ENERGY_MAX: 100,
   SPIN_PER_DAY: 3,
   DAILY: [100, 150, 200, 250, 300, 400, 600],
@@ -585,7 +576,6 @@ let S = {
   slot2_count: 0, slot2_cd: 0,
   slot3_count: 0, slot3_cd: 0,
   slot4_count: 0, slot4_cd: 0,
-  rich_cd: 0,
   gameScore: 0,
   gameProgress: 0
 };
@@ -597,9 +587,6 @@ let energy = CONFIG.TAP_ENERGY_MAX;
 
 const saveLocal = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e){} };
 
-/* ========================================================
-   7000 COINS DIFFICULTY ENGINE (Takes >10 days for last 3000)
-   ======================================================== */
 function isNerfed() {
   return S.bal >= 7000;
 }
@@ -607,10 +594,9 @@ function isNerfed() {
 function getRewardParams() {
   if (isNerfed()) {
     return {
-      interstitial: 3,  // Down from 50
-      rewarded: 5,      // Down from 70
-      richads: 5,       // Down from 50
-      scoreRateCoins: 0.5, // 0.5 coins per 1,000 score
+      interstitial: 3,
+      rewarded: 5,
+      scoreRateCoins: 0.5,
       dailyMultiplier: 0.05,
       spinPrizes: [1, 2, 3, 1, 5, 2]
     };
@@ -618,8 +604,7 @@ function getRewardParams() {
   return {
     interstitial: 50,
     rewarded: 70,
-    richads: 50,
-    scoreRateCoins: 10,  // 10 coins per 1,000 score
+    scoreRateCoins: 10,
     dailyMultiplier: 1.0,
     spinPrizes: [10, 20, 50, 5, 100, 30]
   };
@@ -643,7 +628,6 @@ async function syncFromFirebase() {
       S.slot3_cd = data.slot3_cd ?? S.slot3_cd;
       S.slot4_count = data.slot4_count ?? S.slot4_count;
       S.slot4_cd = data.slot4_cd ?? S.slot4_cd;
-      S.rich_cd = data.rich_cd ?? S.rich_cd;
       S.gameScore = data.gameScore ?? S.gameScore;
       S.gameProgress = data.gameProgress ?? S.gameProgress;
     } else {
@@ -657,7 +641,6 @@ async function syncFromFirebase() {
         slot2_count: 0, slot2_cd: 0,
         slot3_count: 0, slot3_cd: 0,
         slot4_count: 0, slot4_cd: 0,
-        rich_cd: 0,
         gameScore: 0,
         gameProgress: 0,
         createdAt: serverTimestamp()
@@ -783,19 +766,16 @@ function render(animate){
   const p = getRewardParams();
   const nerfed = isNerfed();
 
-  // Show/Hide nerf banner
   if (nerfed) {
     $('nerfBanner').classList.add('active');
   } else {
     $('nerfBanner').classList.remove('active');
   }
 
-  // Update dynamic badges
   $('s1-badge').textContent = `+${p.interstitial} Coins / Ad`;
   $('s2-badge').textContent = `+${p.interstitial} Coins / Ad`;
   $('s3-badge').textContent = `+${p.rewarded} Coins / Ad`;
   $('s4-badge').textContent = `+${p.rewarded} Coins / Ad`;
-  $('rich-badge').textContent = `+${p.richads} Coins`;
   $('gameRewardRule').textContent = `⭐ Har 1,000 Score = ${p.scoreRateCoins} Coins ${nerfed ? '(Elite Mode)' : ''}`;
 
   const usd = (S.bal / CONFIG.COINS_PER_USD).toFixed(2);
@@ -811,7 +791,6 @@ function render(animate){
   $('enTxt').textContent = Math.floor(energy);
   $('enBar').style.width = (energy / CONFIG.TAP_ENERGY_MAX * 100) + '%';
   
-  // Game displays
   $('gameScoreDisplay').textContent = fmt(S.gameScore);
   $('scoreProgress').style.width = ((S.gameProgress % 1000) / 1000 * 100) + '%';
   $('scoreNextPts').textContent = fmt(1000 - (S.gameProgress % 1000));
@@ -910,16 +889,6 @@ function updateAdSlotsUI() {
     s4Btn.disabled = false; s4Btn.innerHTML = `${ico('film')} Watch Ad (${S.slot4_count}/2)`;
     s4Timer.textContent = "Ready";
   }
-
-  // RichAds
-  const richBtn = $('richads-btn'), richTimer = $('rich-timer');
-  if (S.rich_cd > now) {
-    richBtn.disabled = true; richBtn.innerHTML = `${ico('shield')} Cooldown Active`;
-    richTimer.textContent = formatCooldown(S.rich_cd - now);
-  } else {
-    richBtn.disabled = false; richBtn.innerHTML = `${ico('bolt')} Watch RichAds Chain`;
-    richTimer.textContent = "Ready";
-  }
 }
 setInterval(updateAdSlotsUI, 1000);
 
@@ -934,7 +903,7 @@ function showAdsgramAd(blockId) {
   });
 }
 
-/* Slot 1: int-18902 (3 Ads, 1hr CD) */
+/* Slot 1: int-18902 */
 $('slot1-btn').onclick = async () => {
   const now = Date.now();
   if (S.slot1_cd > now) return toast("Slot 1 Cooldown!");
@@ -965,7 +934,7 @@ $('slot1-btn').onclick = async () => {
   }
 };
 
-/* Slot 2: int-18930 (4 Ads, 1hr CD) */
+/* Slot 2: int-18930 */
 $('slot2-btn').onclick = async () => {
   const now = Date.now();
   if (S.slot2_cd > now) return toast("Slot 2 Cooldown!");
@@ -996,7 +965,7 @@ $('slot2-btn').onclick = async () => {
   }
 };
 
-/* Slot 3: 18957 (3 Ads, 1hr CD - Rewarded) */
+/* Slot 3: 18957 (Rewarded) */
 $('slot3-btn').onclick = async () => {
   const now = Date.now();
   if (S.slot3_cd > now) return toast("Slot 3 Cooldown!");
@@ -1027,7 +996,7 @@ $('slot3-btn').onclick = async () => {
   }
 };
 
-/* Slot 4: 19068 (2 Ads, 1hr CD - Rewarded) */
+/* Slot 4: 19068 (Rewarded) */
 $('slot4-btn').onclick = async () => {
   const now = Date.now();
   if (S.slot4_cd > now) return toast("Slot 4 Cooldown!");
@@ -1058,36 +1027,6 @@ $('slot4-btn').onclick = async () => {
   }
 };
 
-/* RichAds Slot */
-$('richads-btn').onclick = async () => {
-  const now = Date.now();
-  if (S.rich_cd > now) return toast("RichAds Cooldown Active!");
-  const p = getRewardParams();
-  const btn = $('richads-btn');
-  btn.disabled = true; btn.textContent = "Loading RichAds (1/2)...";
-
-  try {
-    if (!window.TelegramAdsController) throw new Error("RichAds script missing");
-    await window.TelegramAdsController.show();
-    btn.textContent = "Loading RichAds (2/2)...";
-    await new Promise(r => setTimeout(r, 1500));
-    await window.TelegramAdsController.show();
-
-    S.ads += 2; S.rich_cd = now + ONE_HOUR;
-    addCoins(p.richads, 'RichAds Bonus', 'bolt');
-    flyCoins(btn, 10);
-    saveLocal();
-
-    const userRef = doc(db, "users", uid);
-    await updateDoc(userRef, { rich_cd: S.rich_cd, totalAds: increment(2) });
-    modal({ icon: 'bolt', title: 'RichAds Complete!', amount: p.richads, sub: 'RichAds complete ho gayi! 1 Hour cooldown active.' });
-  } catch(e) {
-    toast("RichAds load nahi hui.");
-  } finally {
-    updateAdSlotsUI();
-  }
-};
-
 /* ========================================================
    MINING SCORE GAME (1000 SCORE = COINS)
    ======================================================== */
@@ -1106,11 +1045,10 @@ coinBtn.addEventListener('pointerdown', e => {
   const mult = Math.min(3, 1 + Math.floor(combo / 20));
   
   energy -= 1;
-  const pts = 25 * mult; // Points per tap
+  const pts = 25 * mult;
   S.gameScore += pts;
   S.gameProgress += pts;
 
-  // Check 1000 Score Milestone
   if (S.gameProgress >= 1000) {
     const p = getRewardParams();
     const batches = Math.floor(S.gameProgress / 1000);
@@ -1178,7 +1116,7 @@ $('spinBtn').onclick = () => {
 };
 
 /* ========================================================
-   INVITE BOT LINK (t.me/Mining456_Bot/miningbot)
+   INVITE BOT LINK
    ======================================================== */
 const officialRefLink = `${CONFIG.BOT_LINK_PREFIX}?startapp=ref_${uid}`;
 $('refLink').textContent = officialRefLink;
@@ -1215,7 +1153,7 @@ $('checkBtn').onclick = () => {
 const tabs = ['home','tasks','games','invite','wallet'];
 document.querySelectorAll('nav button').forEach(b => b.onclick = () => go(b.dataset.t));
 
-/* AdsGram Task rewards: credit coins only after the SDK emits its documented reward event. */
+/* AdsGram Task rewards */
 (function setupAdsgramTask(){
   const taskEl = document.querySelector('adsgram-task[data-block-id="task-53625"]');
   const statusEl = $('adsgramTaskStatus');
