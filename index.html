@@ -201,11 +201,19 @@ input:focus{border-color:var(--accent);box-shadow:0 0 0 4px rgba(108,123,255,.18
 /* nav */
 nav{position:fixed;bottom:0;left:0;right:0;z-index:5;display:flex;justify-content:center;padding:0 12px calc(10px + env(safe-area-inset-bottom))}
 nav .in{position:relative;max-width:496px;width:100%;display:flex;background:rgba(20,25,50,.85);backdrop-filter:blur(18px);border:1px solid var(--line);border-radius:22px;padding:6px;box-shadow:0 12px 40px rgba(0,0,0,.4)}
-nav .ind{position:absolute;top:6px;bottom:6px;left:6px;width:calc((100% - 12px)/4);border-radius:16px;background:linear-gradient(135deg,rgba(108,123,255,.35),rgba(161,92,255,.35));transition:transform .45s cubic-bezier(.3,1.25,.4,1)}
+nav .ind{position:absolute;top:6px;bottom:6px;left:6px;width:calc((100% - 12px)/5);border-radius:16px;background:linear-gradient(135deg,rgba(108,123,255,.35),rgba(161,92,255,.35));transition:transform .45s cubic-bezier(.3,1.25,.4,1)}
 nav button{position:relative;flex:1;background:none;border:0;color:var(--muted);padding:9px 0 8px;font-size:11px;font-weight:700;display:flex;flex-direction:column;align-items:center;gap:3px;transition:color .3s}
 nav button .ic{transition:transform .4s cubic-bezier(.3,1.5,.4,1)}
 nav button.on{color:#fff}
 nav button.on .ic{transform:translateY(-3px) scale(1.15)}
+
+/* AdsGram Task page */
+.adsgram-task-card{margin:0 0 14px;padding:16px;border:1px solid rgba(108,123,255,.35);border-radius:20px;background:linear-gradient(145deg,rgba(29,35,71,.92),rgba(12,17,35,.96));box-shadow:0 12px 30px rgba(0,0,0,.25)}
+.adsgram-task-card h2{display:flex;align-items:center;gap:9px;margin:0 0 8px;font-size:17px}
+.adsgram-task-card .sub{margin:0 0 14px}
+#adsgramTaskMount{min-height:58px;width:100%;display:flex;justify-content:center;align-items:center;overflow:visible;touch-action:pan-y}
+#adsgramTaskMount adsgram-task{display:block;width:100%;--adsgram-task-font-size:14px;--adsgram-task-icon-size:40px;--adsgram-task-button-width:76px;--adsgram-task-icon-border-radius:12px}
+#adsgramTaskStatus{font-size:12px;color:var(--muted);text-align:center;min-height:17px;margin-top:10px;line-height:1.4}
 
 /* modal & toast */
 #modal{position:fixed;inset:0;z-index:60;display:grid;place-items:center;padding:24px;background:rgba(5,7,18,.7);backdrop-filter:blur(8px);opacity:0;visibility:hidden;transition:opacity .3s,visibility .3s}
@@ -381,6 +389,27 @@ nav button.on .ic{transform:translateY(-3px) scale(1.15)}
     </section>
 
     <!-- GAMES -->
+    <!-- ADSGRAM TASKS -->
+    <section class="tab" id="tab-tasks">
+      <div class="card hero">
+        <small>Complete tasks and earn coins</small>
+        <h2 style="justify-content:center;margin-top:8px"><svg class="ic"><use href="#i-gift"/></svg> Tasks Rewards</h2>
+        <p class="sub" style="text-align:center;margin:8px 0 0">AdsGram task complete karne par random coin reward milega.</p>
+      </div>
+      <div class="adsgram-task-card">
+        <h2><svg class="ic"><use href="#i-film"/></svg> AdsGram Sponsored Task</h2>
+        <p class="sub">Go button dabao, task complete karo aur reward claim hone par coins milenge.</p>
+        <div id="adsgramTaskMount">
+          <adsgram-task data-block-id="task-53625" data-debug="false" data-debug-console="false" class="task"></adsgram-task>
+        </div>
+        <div id="adsgramTaskStatus" aria-live="polite">AdsGram task load ho raha hai…</div>
+      </div>
+      <div class="card">
+        <h2><svg class="ic"><use href="#i-shield"/></svg> Reward Rules</h2>
+        <p class="sub" style="margin-bottom:0">Har successful task completion par 30, 60, 70, 90 ya 100 coins mein se koi ek random reward milega. Sirf AdsGram ke completion event par reward diya jayega.</p>
+      </div>
+    </section>
+
     <section class="tab" id="tab-games">
       <div class="seg" id="seg">
         <div class="thumb" id="thumb"></div>
@@ -478,6 +507,7 @@ nav button.on .ic{transform:translateY(-3px) scale(1.15)}
   <nav><div class="in">
     <div class="ind" id="ind"></div>
     <button class="on" data-t="home"><svg class="ic"><use href="#i-home"/></svg>Home</button>
+    <button data-t="tasks"><svg class="ic"><use href="#i-gift"/></svg>Tasks</button>
     <button data-t="games"><svg class="ic"><use href="#i-game"/></svg>Games</button>
     <button data-t="invite"><svg class="ic"><use href="#i-users"/></svg>Invite</button>
     <button data-t="wallet"><svg class="ic"><use href="#i-wallet"/></svg>Wallet</button>
@@ -1182,8 +1212,35 @@ $('checkBtn').onclick = () => {
 };
 
 /* ============ Navigation ============ */
-const tabs = ['home','games','invite','wallet'];
+const tabs = ['home','tasks','games','invite','wallet'];
 document.querySelectorAll('nav button').forEach(b => b.onclick = () => go(b.dataset.t));
+
+/* AdsGram Task rewards: credit coins only after the SDK emits its documented reward event. */
+(function setupAdsgramTask(){
+  const taskEl = document.querySelector('adsgram-task[data-block-id="task-53625"]');
+  const statusEl = $('adsgramTaskStatus');
+  if (!taskEl) return;
+  const taskRewards = [30, 60, 70, 90, 100];
+  taskEl.addEventListener('reward', () => {
+    const reward = taskRewards[Math.floor(Math.random() * taskRewards.length)];
+    addCoins(reward, 'AdsGram Task Reward', 'gift');
+    if (statusEl) statusEl.textContent = `Task complete! +${reward} coins added to your balance.`;
+    flyCoins(taskEl, 8);
+    notifyH('success');
+    modal({ icon:'gift', title:'Task Completed!', amount:reward, sub:'AdsGram task reward aapke balance mein add ho gaya.' });
+  });
+  taskEl.addEventListener('onError', event => {
+    console.warn('AdsGram task error:', event && event.detail ? event.detail : event);
+    if (statusEl) statusEl.textContent = 'AdsGram task load nahi hua. Thodi der baad try karo.';
+  });
+  taskEl.addEventListener('onBannerNotFound', () => {
+    if (statusEl) statusEl.textContent = 'Abhi koi task available nahi hai.';
+  });
+  taskEl.addEventListener('onTooLongSession', () => {
+    if (statusEl) statusEl.textContent = 'Task session expire ho gaya. App reload karke try karo.';
+  });
+})();
+
 function go(name){
   const i = tabs.indexOf(name);
   document.querySelectorAll('nav button').forEach(x => x.classList.toggle('on', x.dataset.t === name));
