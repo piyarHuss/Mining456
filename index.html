@@ -6,26 +6,29 @@
 <meta name="theme-color" content="#0b0e1d">
 <title>456 Mining Reward Hub</title>
 
-<!-- TELEGRAM WEB APP SCRIPT (MANDATORY FOR RICHADS & MINI APP) -->
+<!-- ===== 1. TELEGRAM WEB APP SDK ===== -->
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
-<!-- ADSGRAM SDK (REWARDED & TASK ADS) -->
-<script src="https://sad.adsgram.ai/js/sad.min.js"></script>
-
-<!-- RICHADS AUTO ADS SDK (AUTOMATIC PUSH, INTERSTITIAL & BANNER ADS) -->
+<!-- ===== 2. RICHADS (RICHPARTNERS) AUTO ADS SDK ===== -->
 <script src="https://richinfo.co/richpartners/telegram/js/tg-ob.js"></script>
 <script>
-  try {
-    window.TelegramAdsController = new TelegramAdsController();
-    window.TelegramAdsController.initialize({
-      pubId: "997172",
-      appId: "5139",
-    });
-    console.log("RichAds Auto Controller initialized successfully");
-  } catch(e) {
-    console.error("RichAds initialization failed:", e);
-  }
+  // Automatic Ads Initialization (Banner, Interstitial Video & Push-style Ads)
+  window.addEventListener('DOMContentLoaded', () => {
+    if (typeof TelegramAdsController !== 'undefined') {
+      window.TelegramAdsController = new TelegramAdsController();
+      window.TelegramAdsController.initialize({
+        pubId: "997172",
+        appId: "5469",
+      });
+      console.log("RichAds Service Started Successfully");
+    } else {
+      console.log("RichAds SDK not loaded yet");
+    }
+  });
 </script>
+
+<!-- ===== 3. ADSGRAM SDK (REWARDED & TASK ADS) ===== -->
+<script src="https://sad.adsgram.ai/js/sad.min.js"></script>
 
 <style>
 :root{
